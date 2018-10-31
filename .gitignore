@@ -1,0 +1,7 @@
+.vs/*
+*/bin/*
+*/obj/*
+*/logs/*
+*/Properties/*
+*/*.csproj.user
+*/Streaming.Api/logs/*

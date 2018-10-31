@@ -1,0 +1,6 @@
+{
+  "Hosting": {
+    "HttpPort": "54321",
+    "Environment": "Development"
+  }
+}
