@@ -8,6 +8,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.DependencyInjection;
 using Streaming.Api.Middlewares;
 using Streaming.Api.Monitor;
@@ -21,6 +22,11 @@ namespace Streaming.Api
             services.AddScoped<ICustomLogger, CustomLogger>();
             services.AddAutoMapper();
             services.AddMvc();
+            services.Configure<FormOptions>(x =>
+            {
+                x.ValueLengthLimit = int.MaxValue;
+                x.MultipartBodyLengthLimit = int.MaxValue;
+            });
 
             var builder = new ContainerBuilder();
             builder.Populate(services);

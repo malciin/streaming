@@ -11,7 +11,7 @@ namespace Streaming.Application.Commands
         protected override void Load(ContainerBuilder builder)
         {
             base.Load(builder);
-            builder.RegisterAssemblyTypes()
+            builder.RegisterAssemblyTypes(ThisAssembly)
                 .Where(x => x.IsAssignableTo<ICommandHandler>())
                 .AsImplementedInterfaces();
 

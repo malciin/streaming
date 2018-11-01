@@ -5,3 +5,5 @@
 */Properties/*
 */*.csproj.user
 */Streaming.Api/logs/*
+*/Streaming.Api/processed/*
+*/Streaming.Api/processings/*

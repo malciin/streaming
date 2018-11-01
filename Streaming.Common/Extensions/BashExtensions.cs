@@ -1,14 +1,16 @@
-﻿using System.Diagnostics;
+﻿using Streaming.Common.Helpers;
+using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace Streaming.Common.Extensions
 {
     public static class BashExtensions
     {
-        public static string ExecuteBash(this string Command)
+        private static Process StartCommandProcess(string command)
         {
             ProcessStartInfo psi = new ProcessStartInfo();
             psi.FileName = "bash";
-            psi.Arguments = $"-c \"{Command}\"";
+            psi.Arguments = $"-c \"{command}\"";
             psi.UseShellExecute = false;
             psi.RedirectStandardOutput = true;
             psi.RedirectStandardError = true;
@@ -18,8 +20,13 @@ namespace Streaming.Common.Extensions
                 StartInfo = psi
             };
 
-
             proc.Start();
+            return proc;
+        }
+
+        public static string ExecuteBash(this string Command)
+        {
+            var proc = StartCommandProcess(Command);
 
             string error = proc.StandardError.ReadToEnd();
 
@@ -27,10 +34,22 @@ namespace Streaming.Common.Extensions
                 return "error: " + error;
 
             string output = proc.StandardOutput.ReadToEnd();
-
             proc.WaitForExit();
+            return output;
+        }
 
-            return output.Replace("\n", "").Replace("\r", "");
+        public static async Task<string> ExecuteBashAsync(this string Command)
+        {
+            var proc = StartCommandProcess(Command);
+
+            string error = await proc.StandardError.ReadToEndAsync();
+
+            if (!string.IsNullOrEmpty(error))
+                return "error: " + error;
+
+            string output = await proc.StandardOutput.ReadToEndAsync();
+            proc.WaitForExit();
+            return output;
         }
     }
 }

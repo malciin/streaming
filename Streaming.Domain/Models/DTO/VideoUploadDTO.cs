@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Microsoft.AspNetCore.Http;
 
 namespace Streaming.Domain.Models.DTO
 {
@@ -9,7 +7,6 @@ namespace Streaming.Domain.Models.DTO
         public string Title { get; set; }
         public string Description { get; set; }
 
-        public string FileName { get; set; }
-        public byte[] FileBytes { get; set; }
+        public IFormFile File { get; set; }
     }
 }

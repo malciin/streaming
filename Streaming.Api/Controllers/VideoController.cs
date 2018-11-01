@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Streaming.Domain.Models.DTO;
 using Streaming.Domain.Services;
 
 namespace Streaming.Api.Controllers
@@ -15,6 +16,14 @@ namespace Streaming.Api.Controllers
         public VideoController(IVideoService videoService)
         {
             this.videoService = videoService;
+        }
+
+        [DisableRequestSizeLimit]
+        [HttpPost]
+        public async Task<IActionResult> UploadVideo([FromForm] VideoUploadDTO Video)
+        {
+            await videoService.AddAsync(Video);
+            return Ok();
         }
 
         [HttpGet("Get")]

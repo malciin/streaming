@@ -31,6 +31,7 @@ namespace Streaming.Api
                 .ConfigureAppConfiguration(config =>
                 {
                     config.AddJsonFile("Configuration.json", optional: false, reloadOnChange: false);
+                    
                 })
                 .UseStartup<Startup>();
     }

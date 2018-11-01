@@ -10,6 +10,10 @@ namespace Streaming.Domain.Services
     {
         Task<IEnumerable<VideoBasicMetadataDTO>> GetRangeAsync(int Offset, int HowMuch);
         Task<bool> AddAsync(VideoUploadDTO VideoUploadDTO);
+
+        Task<bool> UpdateVideoMetadata(VideoBasicMetadataDTO Video);
+        Task<bool> UpdateBaseVideo(Guid VideoId, string Manifest);
+
         Task<string> GetVideoManifestAsync(Guid VideoId);
         Task<byte[]> GetVideoPartAsync(Guid VideoId, int Part);
     }

@@ -15,7 +15,8 @@ namespace Streaming.Application.Mappings
                 .ForMember(x => x.CreatedDate, opt => opt.MapFrom(o => DateTime.Now))
                 .ForMember(x => x.Description, opt => opt.MapFrom(o => o.Description))
                 .ForMember(x => x.Title, opt => opt.MapFrom(o => o.Title))
-                .ForMember(x => x.VideoOriginalName, opt => opt.MapFrom(o => o.FileName));
+                .ForMember(x => x.VideoId, opt => opt.MapFrom(o => Guid.NewGuid()))
+                .ForMember(x => x.VideoOriginalName, opt => opt.MapFrom(o => o.File.FileName));
         }
     }
 }
