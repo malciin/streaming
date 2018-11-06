@@ -9,7 +9,7 @@ namespace Streaming.Common.Extensions
         private static Process StartCommandProcess(string command)
         {
             ProcessStartInfo psi = new ProcessStartInfo();
-            psi.FileName = "bash";
+            psi.FileName = PlatformHelper.CommandlineToolname;
             psi.Arguments = $"-c \"{command}\"";
             psi.UseShellExecute = false;
             psi.RedirectStandardOutput = true;

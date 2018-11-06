@@ -1,9 +1,9 @@
-.vs/*
-*/bin/*
-*/obj/*
-*/logs/*
+.vs/**
+*/bin/**
+*/obj/**
+*/logs/**
 */Properties/*
 */*.csproj.user
-*/Streaming.Api/logs/*
-*/Streaming.Api/processed/*
-*/Streaming.Api/processings/*
+Streaming.Api/logs/*
+Streaming.Api/processed/*
+Streaming.Api/processing/*

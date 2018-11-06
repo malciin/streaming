@@ -2,5 +2,9 @@
   "Hosting": {
     "HttpPort": "54321",
     "Environment": "Development"
+  },
+  "Directories": {
+    "VideoToProcessDirectory": "processing",
+    "ProcessedVideoDirectory": "processed"
   }
 }
