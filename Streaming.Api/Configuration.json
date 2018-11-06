@@ -1,7 +1,8 @@
 {
   "Hosting": {
     "HttpPort": "54321",
-    "Environment": "Development"
+    "Environment": "Development",
+    "SecretServerKey": "Type your supersecretkeyhere"
   },
   "Directories": {
     "VideoToProcessDirectory": "processing",

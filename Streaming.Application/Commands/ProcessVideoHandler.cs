@@ -13,9 +13,9 @@ namespace Streaming.Application.Commands
     public class ProcessVideoHandler : ICommandHandler<ProcessVideo>
     {
         private readonly IVideoService videoService;
-        private readonly IDirectoriesConfig directoriesConfig;
+        private readonly IDirectoriesConfiguration directoriesConfig;
 
-        public ProcessVideoHandler(IVideoService videoService, IDirectoriesConfig directoriesConfig)
+        public ProcessVideoHandler(IVideoService videoService, IDirectoriesConfiguration directoriesConfig)
         {
             this.videoService = videoService;
             this.directoriesConfig = directoriesConfig;

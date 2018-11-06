@@ -5,12 +5,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Streaming.Api
+namespace Streaming.Api.Configurations
 {
-    public class Configuration : IDirectoriesConfig
+    public class DirectoriesConfiguration : IDirectoriesConfiguration
     {
 
-        public Configuration(IConfigurationRoot Configuration)
+        public DirectoriesConfiguration(IConfigurationRoot Configuration)
         {
             ProcessingDirectory = Configuration["Directories:VideoToProcessDirectory"];
             ProcessedDirectory = Configuration["Directories:ProcessedVideoDirectory"];

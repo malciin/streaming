@@ -18,9 +18,9 @@ namespace Streaming.Application.Services
         private readonly IMongoDatabase mongoClient;
         private readonly ICommandBus commandBus;
         private readonly IMapper mapper;
-        private readonly IDirectoriesConfig directoriesConfig;
+        private readonly IDirectoriesConfiguration directoriesConfig;
 
-        public VideoService(IDirectoriesConfig directoriesConfig, ICommandBus commandBus, IMongoDatabase mongoClient, IMapper mapper)
+        public VideoService(IDirectoriesConfiguration directoriesConfig, ICommandBus commandBus, IMongoDatabase mongoClient, IMapper mapper)
         {
             this.mongoClient = mongoClient;
             this.commandBus = commandBus;

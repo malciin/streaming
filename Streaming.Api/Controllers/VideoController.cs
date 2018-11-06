@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Streaming.Domain.Models.DTO;
@@ -31,6 +32,13 @@ namespace Streaming.Api.Controllers
         {
             var movieBytes = await videoService.GetVideoPartAsync(Id, Part);
             return File(movieBytes, "video/MP2T");
+        }
+
+        [HttpGet("Manifest")]
+        public async Task<IActionResult> GetManifest(Guid Id)
+        {
+            var manifestStr = await videoService.GetVideoManifestAsync(Id);
+            return File(Encoding.UTF8.GetBytes(manifestStr), "application/x-mpegURL", $"{Id}.m3u8");
         }
     }
 }

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Streaming.Application.Configuration
 {
-    public interface IDirectoriesConfig
+    public interface IDirectoriesConfiguration
     {
         string ProcessingDirectory { get; }
         string ProcessedDirectory { get; }

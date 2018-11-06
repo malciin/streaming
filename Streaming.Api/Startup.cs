@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Streaming.Api.Configurations;
 using Streaming.Api.Middlewares;
 using Streaming.Api.Monitor;
 using Streaming.Application.Configuration;
@@ -22,7 +23,8 @@ namespace Streaming.Api
         
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
-            services.AddSingleton<IDirectoriesConfig, Configuration>(x => new Configuration((IConfigurationRoot)x.GetRequiredService<IConfiguration>()));
+            services.AddSingleton<IDirectoriesConfiguration, DirectoriesConfiguration>(x => new DirectoriesConfiguration((IConfigurationRoot)x.GetRequiredService<IConfiguration>()));
+            services.AddSingleton<IKeysConfiguration, KeysConfiguration>(x => new KeysConfiguration((IConfigurationRoot)x.GetRequiredService<IConfiguration>()));
             services.AddScoped<ICustomLogger, CustomLogger>();
             services.AddAutoMapper();
             services.AddMvc();
@@ -36,7 +38,6 @@ namespace Streaming.Api
             builder.Populate(services);
 
             builder.RegisterModule<Application.Commands._CommandModule>();
-            builder.RegisterModule<Application.Persistence.MongoModule>();
             builder.RegisterModule<Application.Services._ServicesModule>();
 
             return new AutofacServiceProvider(builder.Build());
