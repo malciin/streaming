@@ -1,0 +1,24 @@
+.videoUploadForm {
+    width: 1024px;
+    margin: auto;
+}
+
+.videoUploadForm label {
+    color: white;
+    display: block;
+}
+
+.videoUploadForm label input[type="text"] {
+    display: block;
+    background-color: rgba(0,0,0,0);
+    color: white;
+    border: solid 2px hsl(214, 100%, 58%);
+    border-radius: 10px;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px;
+}
+
+.videoUploadForm label input[type="file"] {
+    color: white;
+}
