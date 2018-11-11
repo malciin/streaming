@@ -9,11 +9,18 @@ def pushSshDirectoryToRemote(connectionData, directoryFrom, directoryTo)
 }
 
 node('host') {
-    stage('Build') 
+    stage('Build-backend') 
     {
         sh "cd Streaming.Api"
         sh "dotnet restore"
         sh "dotnet publish --configuration Release --output ../Build"
+    }
+
+    stage('Build-frontend')
+    {
+        sh "cd Streaming.Frontend"
+        sh "npm i"
+        sh "npm run build"
     }
 
     stage('Deploy')
@@ -21,14 +28,14 @@ node('host') {
         def uploadServerDirectory = "/home/marcin/streaminDemo"
 
         def connectionData = [
-            serverIp: "142.93.173.48",
+            serverIp: "${env.SERVER_IP}",
             serverLogin: null,
             serverPassword: null
         ]
-        def serverIp = "142.93.173.48"
-        def screenName = 'streamingDemo'
+
+        def screenName = "${env.SCREEN_NAME}"
         def currentDirectory = pwd()
-        withCredentials([usernamePassword(credentialsId: 'digitalOcean_ubuntu18', usernameVariable: 'USERNAME', passwordVariable: 'SERVER_PASSWORD')])
+        withCredentials([usernamePassword(credentialsId: "${CREDENTIALS_ID}", usernameVariable: 'USERNAME', passwordVariable: 'SERVER_PASSWORD')])
         {
             connectionData.serverLogin         = env.USERNAME
             connectionData.serverPassword      = env.SERVER_PASSWORD
