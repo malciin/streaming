@@ -15,14 +15,14 @@ namespace Streaming.Application.Services
 {
     public class VideoService : IVideoService
     {
-        private readonly IMongoDatabase mongoClient;
+        private readonly IMongoDatabase mongoDatabase;
         private readonly ICommandBus commandBus;
         private readonly IMapper mapper;
         private readonly IDirectoriesConfiguration directoriesConfig;
 
-        public VideoService(IDirectoriesConfiguration directoriesConfig, ICommandBus commandBus, IMongoDatabase mongoClient, IMapper mapper)
+        public VideoService(IDirectoriesConfiguration directoriesConfig, ICommandBus commandBus, IMongoDatabase mongoDatabase, IMapper mapper)
         {
-            this.mongoClient = mongoClient;
+            this.mongoDatabase = mongoDatabase;
             this.commandBus = commandBus;
             this.mapper = mapper;
             this.directoriesConfig = directoriesConfig;
@@ -64,6 +64,20 @@ namespace Streaming.Application.Services
         public Task<bool> UpdateBaseVideo(Guid VideoId, string Manifest)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<bool> UpdateVideoAfterProcessed(VideoProcessedDataDTO VideoProcessedData)
+        {
+            var searchFilter = Builders<Video>.Filter.Eq(x => x.VideoId, VideoProcessedData.VideoId);
+            var updateDefinition = Builders<Video>.Update
+                .Set(x => x.FinishedProcessingDate, VideoProcessedData.FinishedProcessingDate)
+                .Set(x => x.VideoSegmentsZip, VideoProcessedData.VideoSegmentsZip)
+                .Set(x => x.ProcessingInfo, VideoProcessedData.ProcessingInfo)
+                .Set(x => x.VideoManifestHLS, VideoProcessedData.VideoManifestHLS)
+                .Set(x => x.Length, VideoProcessedData.Length);
+
+            var result = await mongoDatabase.GetCollection<Video>(typeof(Video).Name).UpdateOneAsync(searchFilter, updateDefinition);
+            return result.ModifiedCount == 1;
         }
 
         public Task<bool> UpdateVideoMetadata(VideoBasicMetadataDTO Video)
