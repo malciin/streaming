@@ -15,18 +15,14 @@ node('host') {
 
     stage('Build-backend') 
     {
-        sh "cd Streaming.Api"
-        sh "dotnet restore"
-        sh "dotnet publish --configuration Release --output ../Build"
-        sh "cd .."
+        sh "cd Streaming.Api && dotnet restore"
+        sh "cd Streaming.Api && dotnet publish --configuration Release --output ../Build"
     }
 
     stage('Build-frontend')
     {
-        sh "cd Streaming.Frontend"
-        sh "npm i"
-        sh "npm run build"
-        sh "cd .."
+        sh "cd Streaming.Frontend && npm i"
+        sh "cd Streaming.Frontend && npm run build"
     }
 
     stage('Deploy')
@@ -57,7 +53,7 @@ node('host') {
         runSshCommand(connectionData, "rm -rf ${uploadBackendServerDirectory}")
         runSshCommand(connectionData, "rm -rf ${uploadFrontendDirectory}")
 
-        pushSshDirectoryToRemote(connectionData, "${currentDirectory}/build", "${uploadBackendServerDirectory}")
+        pushSshDirectoryToRemote(connectionData, "${currentDirectory}/Build", "${uploadBackendServerDirectory}")
         pushSshDirectoryToRemote(connectionData, "${currentDirectory}/Streaming.Frontend/build", "${uploadFrontendDirectory}")
         runSshCommand(connectionData, "screen -dmSL ${screenName} dotnet ${uploadBackendServerDirectory}/jenkinsHello.dll")
     }
