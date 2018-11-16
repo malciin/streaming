@@ -9,6 +9,10 @@ def pushSshDirectoryToRemote(connectionData, directoryFrom, directoryTo)
 }
 
 node('host') {
+    stage('Checkout SCM') {
+        checkout scm
+    }
+
     stage('Build-backend') 
     {
         sh "cd Streaming.Api"
