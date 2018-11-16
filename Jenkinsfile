@@ -14,6 +14,7 @@ node('host') {
         sh "cd Streaming.Api"
         sh "dotnet restore"
         sh "dotnet publish --configuration Release --output ../Build"
+        sh "cd .."
     }
 
     stage('Build-frontend')
@@ -21,11 +22,13 @@ node('host') {
         sh "cd Streaming.Frontend"
         sh "npm i"
         sh "npm run build"
+        sh "cd .."
     }
 
     stage('Deploy')
     {
-        def uploadServerDirectory = "/home/marcin/streaminDemo"
+        def uploadBackendServerDirectory = "/home/marcin/streaming.api"
+		def uploadFrontendDirectory = "/var/www/streaming"
 
         def connectionData = [
             serverIp: "${env.SERVER_IP}",
@@ -47,8 +50,11 @@ node('host') {
         catch (Exception e) {
             echo 'Error when removing the screen. Propably screen is not created, trying to preceed...'
         }
-        runSshCommand(connectionData, "rm -rf ${uploadServerDirectory}")
-        pushSshDirectoryToRemote(connectionData, "${currentDirectory}/build", "${uploadServerDirectory}")
-        runSshCommand(connectionData, "screen -dmSL ${screenName} dotnet ${uploadServerDirectory}/jenkinsHello.dll")
+        runSshCommand(connectionData, "rm -rf ${uploadBackendServerDirectory}")
+        runSshCommand(connectionData, "rm -rf ${uploadFrontendDirectory}")
+
+        pushSshDirectoryToRemote(connectionData, "${currentDirectory}/build", "${uploadBackendServerDirectory}")
+        pushSshDirectoryToRemote(connectionData, "${currentDirectory}/Streaming.Frontend/build", "${uploadFrontendDirectory}")
+        runSshCommand(connectionData, "screen -dmSL ${screenName} dotnet ${uploadBackendServerDirectory}/jenkinsHello.dll")
     }
 }
