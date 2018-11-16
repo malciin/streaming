@@ -10,6 +10,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="Configuration.json" CopyToOutputDirectory="Always" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="4.3.0" />
     <PackageReference Include="AutoMapper" Version="7.0.1" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="5.0.1" />
