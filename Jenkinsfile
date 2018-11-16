@@ -29,6 +29,7 @@ node('host') {
     {
         def uploadBackendServerDirectory = "/home/marcin/streaming.backend"
 		def uploadFrontendDirectory = "/home/marcin/streaming.frontend"
+        def backendExecutableName = "Streaming.Api.dll"
 
         def connectionData = [
             serverIp: "${env.SERVER_IP}",
@@ -55,6 +56,6 @@ node('host') {
 
         pushSshDirectoryToRemote(connectionData, "${currentDirectory}/Build", "${uploadBackendServerDirectory}")
         pushSshDirectoryToRemote(connectionData, "${currentDirectory}/Streaming.Frontend/build", "${uploadFrontendDirectory}")
-        runSshCommand(connectionData, "screen -dmSL ${screenName} dotnet ${uploadBackendServerDirectory}/jenkinsHello.dll")
+        runSshCommand(connectionData, "screen -dmSL ${screenName} dotnet ${uploadBackendServerDirectory}/${backendExecutableName}")
     }
 }
