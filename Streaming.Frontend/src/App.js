@@ -1,18 +1,16 @@
-import React, { Component } from 'react';
-import { BrowserRouter as Router, Route, Link, BrowserRouter } from "react-router-dom";
 import '../node_modules/bootstrap/dist/css/bootstrap.css'
-import Navbar from './Components/Navbar/Navbar'
-import Homepage from './Components/Homepage/Homepage'
-import VideoUploadForm from './Components/Forms/VideoUploadForm/VideoUploadForm';
+import React, { Component } from 'react';
+import { BrowserRouter as Router, Route } from "react-router-dom";
+import IndexPage from './pages/indexPage/indexPage';
+import UploadVideoPage from './pages/uploadVideoPage/uploadVideoPage';
 
 class App extends Component {
   render() {
     return (
       <Router>
         <div className="app">
-          <Navbar />
-          <Route exact path="/" component={Homepage} />
-          <Route exact path="/Upload" component={VideoUploadForm} />
+          <Route exact path="/" component={IndexPage} />
+          <Route exact path="/Upload" component={UploadVideoPage} />
         </div>
       </Router>
     );
