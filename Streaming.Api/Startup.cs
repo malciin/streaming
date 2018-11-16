@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using AutoMapper;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -27,7 +29,10 @@ namespace Streaming.Api
             services.AddSingleton<IKeysConfiguration, KeysConfiguration>(x => new KeysConfiguration((IConfigurationRoot)x.GetRequiredService<IConfiguration>()));
             services.AddScoped<ICustomLogger, CustomLogger>();
             services.AddAutoMapper();
-            services.AddMvc();
+            services.AddMvc().AddFluentValidation(x =>
+            {
+                x.RegisterValidatorsFromAssemblyContaining<Application.Validators.VideoUploadValidator>();
+            });
             services.Configure<FormOptions>(x =>
             {
                 x.ValueLengthLimit = int.MaxValue;
