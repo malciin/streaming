@@ -27,8 +27,8 @@ node('host') {
 
     stage('Deploy')
     {
-        def uploadBackendServerDirectory = "/home/marcin/streaming.api"
-		def uploadFrontendDirectory = "/var/www/streaming"
+        def uploadBackendServerDirectory = "/home/marcin/streaming.backend"
+		def uploadFrontendDirectory = "/home/marcin/streaming.frontend"
 
         def connectionData = [
             serverIp: "${env.SERVER_IP}",
@@ -38,7 +38,7 @@ node('host') {
 
         def screenName = "${env.SCREEN_NAME}"
         def currentDirectory = pwd()
-        withCredentials([usernamePassword(credentialsId: "${CREDENTIALS_ID}", usernameVariable: 'USERNAME', passwordVariable: 'SERVER_PASSWORD')])
+        withCredentials([usernamePassword(credentialsId: "${env.CREDENTIALS_ID}", usernameVariable: 'USERNAME', passwordVariable: 'SERVER_PASSWORD')])
         {
             connectionData.serverLogin         = env.USERNAME
             connectionData.serverPassword      = env.SERVER_PASSWORD
