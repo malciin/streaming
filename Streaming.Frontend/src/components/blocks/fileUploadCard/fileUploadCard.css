@@ -1,0 +1,25 @@
+.icon {
+    font-size: 25px;
+    padding: 10px;
+    border-radius: 100px;
+}
+
+.card-content {
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.icon-clickable:hover {
+    cursor: pointer;
+}
+
+.flex-box {
+    display: flex;
+}
+
+.upload-card {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 5px;
+}

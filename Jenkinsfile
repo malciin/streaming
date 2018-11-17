@@ -9,6 +9,10 @@ def pushSshDirectoryToRemote(connectionData, directoryFrom, directoryTo)
 }
 
 node('host') {
+    def uploadBackendServerDirectory = "/home/marcin/streaming.backend"
+    def uploadFrontendDirectory = "/home/marcin/streaming.frontend"
+    def backendExecutableName = "Streaming.Api.dll"
+
     stage('Checkout SCM') {
         checkout scm
     }
@@ -27,10 +31,6 @@ node('host') {
 
     stage('Deploy')
     {
-        def uploadBackendServerDirectory = "/home/marcin/streaming.backend"
-		def uploadFrontendDirectory = "/home/marcin/streaming.frontend"
-        def backendExecutableName = "Streaming.Api.dll"
-
         def connectionData = [
             serverIp: "${env.SERVER_IP}",
             serverLogin: null,

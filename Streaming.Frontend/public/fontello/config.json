@@ -11,6 +11,18 @@
       "css": "upload-cloud",
       "code": 59392,
       "src": "entypo"
+    },
+    {
+      "uid": "09b251f36844ae25d58767d85d21bf88",
+      "css": "video-alt",
+      "code": 59393,
+      "src": "elusive"
+    },
+    {
+      "uid": "2626e3a1bbcd90e45849af3b58a1d594",
+      "css": "trash",
+      "code": 59394,
+      "src": "entypo"
     }
   ]
 }
