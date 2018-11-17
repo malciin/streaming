@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import { BrowserRouter as Router, Route } from "react-router-dom";
 import IndexPage from './pages/indexPage/indexPage';
 import UploadVideoPage from './pages/uploadVideoPage/uploadVideoPage';
+import './App.scss'
 
 class App extends Component {
   render() {

@@ -1,5 +1,5 @@
 import React from 'react';
-import Dropzone from 'react-dropzone';
+import DropzoneFileField from '../dropzoneFileField/dropzoneFileField';
 import FileUploadCard from '../fileUploadCard/fileUploadCard';
 
 export default class Mp4Upload extends React.Component {
@@ -24,13 +24,27 @@ export default class Mp4Upload extends React.Component {
         this.setState({
             video: files[0]
         }, function () {
-            this.props.videoUploaded(this.state.video);
+            this.props.onChange({
+                target: {
+                    value: this.state.video,
+                    name: this.props.name
+                }
+            });
         });
+
+        
     }
 
     removeFile() {
         this.setState({
             video: null
+        });
+
+        this.props.onChange({
+            target: {
+                value: null,
+                name: this.props.name
+            }
         });
     }
     
@@ -41,15 +55,7 @@ export default class Mp4Upload extends React.Component {
             child = <FileUploadCard file={this.state.video} deleteFile={this.removeFile}/>;
         }
         else {
-            child = 
-            <Dropzone onDrop={this.addFile} onFileDialogCancel={this.removeFile} className="dropzone" accept="video/mp4">
-                <div className="dropzone-description">
-                    <div>
-                        <p><i className="upload-icon icon-upload-cloud"></i></p>
-                        <p>Upload file .mp4</p>
-                    </div>
-                </div>
-            </Dropzone>;
+            child = <DropzoneFileField addFile={this.addFile} removeFile={this.removeFile} className="dropzone" />;
         }
         return (
             <div className="mp4Upload">

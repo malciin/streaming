@@ -1,0 +1,11 @@
+$background-color: #1d1d1d;
+$text-color: #ffffff;
+$accent-color: #3700B3;
+
+.text-primary-color {
+    color: $text-color;
+}
+
+.text-secondary-color {
+    color: darken($text-color, 25%);
+}

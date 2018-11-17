@@ -1,0 +1,20 @@
+@import '../../../shared/global.scss';
+
+.form-group {
+    label {
+        color: darken($text-color, 25%);
+    }
+    .form-control {
+        color: $text-color;
+        background-color: darken($background-color, 5%);
+        outline: 0 none;
+        border-color: darken($background-color, 5%);
+        &:focus {
+            background-color: lighten($background-color, 10%);
+            border-color: $accent-color;
+            box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px $accent-color;
+            outline: 0 none;
+        }
+    }
+    
+}
