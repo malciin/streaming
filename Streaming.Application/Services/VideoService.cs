@@ -4,11 +4,12 @@ using Streaming.Application.Commands;
 using Streaming.Application.Configuration;
 using Streaming.Domain.Command;
 using Streaming.Domain.Models.Core;
-using Streaming.Domain.Models.DTO;
+using Streaming.Domain.Models.DTO.Video;
 using Streaming.Domain.Services;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Streaming.Application.Services
@@ -16,6 +17,8 @@ namespace Streaming.Application.Services
     public class VideoService : IVideoService
     {
         private readonly IMongoDatabase mongoDatabase;
+        private readonly IMongoCollection<Video> videoCollection;
+
         private readonly ICommandBus commandBus;
         private readonly IMapper mapper;
         private readonly IDirectoriesConfiguration directoriesConfig;
@@ -23,6 +26,7 @@ namespace Streaming.Application.Services
         public VideoService(IDirectoriesConfiguration directoriesConfig, ICommandBus commandBus, IMongoDatabase mongoDatabase, IMapper mapper)
         {
             this.mongoDatabase = mongoDatabase;
+            videoCollection = mongoDatabase.GetCollection<Video>("Videos");
             this.commandBus = commandBus;
             this.mapper = mapper;
             this.directoriesConfig = directoriesConfig;
@@ -32,11 +36,14 @@ namespace Streaming.Application.Services
         {
             var video = mapper.Map<Video>(videoUploadDTO);
 
+            // Move below to ProcessVideo command
             Directory.CreateDirectory(directoriesConfig.ProcessingDirectory);
             using (var file = new FileStream($"{directoriesConfig.ProcessingDirectory}/{video.VideoId}", FileMode.CreateNew, FileAccess.Write))
             {
                 await videoUploadDTO.File.CopyToAsync(file);
             }
+
+            await videoCollection.InsertOneAsync(video);
 
             commandBus.Send(new ProcessVideo
             {
@@ -46,14 +53,27 @@ namespace Streaming.Application.Services
             return false;
         }
 
-        public Task<IEnumerable<VideoBasicMetadataDTO>> GetRangeAsync(int Offset, int HowMuch)
+        public async Task<VideoBasicMetadataDTO> GetAsync(Guid VideoId)
         {
-            throw new NotImplementedException();
+            var searchFilter = Builders<Video>.Filter.Eq(x => x.VideoId, VideoId);
+            return await videoCollection
+                .Find<Video>(searchFilter)
+                .Project(x => mapper.Map<VideoBasicMetadataDTO>(x))
+                .FirstOrDefaultAsync();
         }
 
-        public Task<string> GetVideoManifestAsync(Guid VideoId)
+        public async Task<IEnumerable<VideoBasicMetadataDTO>> GetAsync(VideoSearchDTO Search)
         {
-            throw new NotImplementedException();
+            var results = await videoCollection.Find(_ => true).Skip(Search.Offset).Limit(Search.HowMuch).ToListAsync();
+            return results.Select(x => mapper.Map<VideoBasicMetadataDTO>(x));
+        }
+
+        public async Task<string> GetVideoManifestAsync(Guid VideoId)
+        {
+            var searchFilter = Builders<Video>.Filter.Eq(x => x.VideoId, VideoId);
+            return await videoCollection
+                .Find<Video>(searchFilter)
+                .Project(x => x.VideoManifestHLS).FirstOrDefaultAsync();
         }
 
         public Task<byte[]> GetVideoPartAsync(Guid VideoId, int Part)
@@ -61,12 +81,7 @@ namespace Streaming.Application.Services
             throw new NotImplementedException();
         }
 
-        public Task<bool> UpdateBaseVideo(Guid VideoId, string Manifest)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task<bool> UpdateVideoAfterProcessed(VideoProcessedDataDTO VideoProcessedData)
+        public async Task<bool> UpdateVideoAfterProcessingAsync(VideoProcessedDataDTO VideoProcessedData)
         {
             var searchFilter = Builders<Video>.Filter.Eq(x => x.VideoId, VideoProcessedData.VideoId);
             var updateDefinition = Builders<Video>.Update
@@ -76,13 +91,8 @@ namespace Streaming.Application.Services
                 .Set(x => x.VideoManifestHLS, VideoProcessedData.VideoManifestHLS)
                 .Set(x => x.Length, VideoProcessedData.Length);
 
-            var result = await mongoDatabase.GetCollection<Video>(typeof(Video).Name).UpdateOneAsync(searchFilter, updateDefinition);
+            var result = await videoCollection.UpdateOneAsync(searchFilter, updateDefinition);
             return result.ModifiedCount == 1;
-        }
-
-        public Task<bool> UpdateVideoMetadata(VideoBasicMetadataDTO Video)
-        {
-            throw new NotImplementedException();
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Streaming.Domain.Models.DTO;
 using FluentValidation;
 using System.Threading.Tasks;
+using Streaming.Domain.Models.DTO.Video;
 
 namespace Streaming.Application.Validators
 {

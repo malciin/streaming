@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Streaming.Domain.Models.DTO
+namespace Streaming.Domain.Models.DTO.Video
 {
     public class VideoProcessedDataDTO
     {

@@ -1,4 +1,5 @@
 ﻿using Streaming.Domain.Models.DTO;
+using Streaming.Domain.Models.DTO.Video;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -8,12 +9,11 @@ namespace Streaming.Domain.Services
 {
     public interface IVideoService
     {
-        Task<IEnumerable<VideoBasicMetadataDTO>> GetRangeAsync(int Offset, int HowMuch);
+        Task<VideoBasicMetadataDTO> GetAsync(Guid VideoId);
+        Task<IEnumerable<VideoBasicMetadataDTO>> GetAsync(VideoSearchDTO Search);
         Task<bool> AddAsync(VideoUploadDTO VideoUploadDTO);
 
-        Task<bool> UpdateVideoAfterProcessed(VideoProcessedDataDTO VideoProcessedData);
-        Task<bool> UpdateVideoMetadata(VideoBasicMetadataDTO Video);
-        Task<bool> UpdateBaseVideo(Guid VideoId, string Manifest);
+        Task<bool> UpdateVideoAfterProcessingAsync(VideoProcessedDataDTO VideoProcessedData);
 
         Task<string> GetVideoManifestAsync(Guid VideoId);
         Task<byte[]> GetVideoPartAsync(Guid VideoId, int Part);

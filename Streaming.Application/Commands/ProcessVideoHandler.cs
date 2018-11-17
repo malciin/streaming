@@ -1,13 +1,11 @@
 ﻿using Streaming.Application.Configuration;
 using Streaming.Common.Extensions;
 using Streaming.Domain.Command;
-using Streaming.Domain.Models.DTO;
+using Streaming.Domain.Models.DTO.Video;
 using Streaming.Domain.Services;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Streaming.Application.Commands
@@ -61,7 +59,7 @@ namespace Streaming.Application.Commands
             }
 
             videoProcessedData.FinishedProcessingDate = DateTime.Now;
-            await videoService.UpdateVideoAfterProcessed(videoProcessedData);
+            await videoService.UpdateVideoAfterProcessingAsync(videoProcessedData);
             
             $"rm {Command.RawVideoLocalPath}".ExecuteBash();
         }

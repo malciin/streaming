@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Streaming.Domain.Models.DTO;
+using Streaming.Domain.Models.DTO.Video;
 using Streaming.Domain.Services;
 
 namespace Streaming.Api.Controllers
@@ -27,15 +28,21 @@ namespace Streaming.Api.Controllers
             return Ok();
         }
 
+        [HttpGet]
+        public IEnumerable<VideoBasicMetadataDTO> GetVideo(VideoSearchDTO Search)
+        {
+            throw new NotImplementedException();
+        }
+
         [HttpGet("Get")]
-        public async Task<IActionResult> Get(Guid Id, int Part)
+        public async Task<IActionResult> GetVideoPart(Guid Id, int Part)
         {
             var movieBytes = await videoService.GetVideoPartAsync(Id, Part);
             return File(movieBytes, "video/MP2T");
         }
 
         [HttpGet("Manifest")]
-        public async Task<IActionResult> GetManifest(Guid Id)
+        public async Task<IActionResult> GetVideoManifest(Guid Id)
         {
             var manifestStr = await videoService.GetVideoManifestAsync(Id);
             return File(Encoding.UTF8.GetBytes(manifestStr), "application/x-mpegURL", $"{Id}.m3u8");
