@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Streaming.Domain.Models.Core;
 using Streaming.Domain.Models.DTO;
+using Streaming.Domain.Models.DTO.Video;
 using System;
 using System.Collections.Generic;
 using System.Text;

@@ -40,6 +40,8 @@ namespace Streaming.Api
             });
 
             var builder = new ContainerBuilder();
+            Application.Mappings.MongoDbMappings.Map();
+
             builder.Populate(services);
 
             builder.RegisterModule<Application.Commands._CommandModule>();

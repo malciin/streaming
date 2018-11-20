@@ -36,19 +36,12 @@ namespace Streaming.Application.Services
         {
             var video = mapper.Map<Video>(videoUploadDTO);
 
-            // Move below to ProcessVideo command
-            Directory.CreateDirectory(directoriesConfig.ProcessingDirectory);
-            using (var file = new FileStream($"{directoriesConfig.ProcessingDirectory}/{video.VideoId}", FileMode.CreateNew, FileAccess.Write))
-            {
-                await videoUploadDTO.File.CopyToAsync(file);
-            }
-
             await videoCollection.InsertOneAsync(video);
 
             commandBus.Send(new ProcessVideo
             {
-                RawVideoLocalPath = $"{directoriesConfig.ProcessingDirectory}/{video.VideoId}",
-                VideoId = video.VideoId
+                VideoId = video.VideoId,
+                Video = videoUploadDTO.File
             });
             return false;
         }
@@ -71,6 +64,9 @@ namespace Streaming.Application.Services
         public async Task<string> GetVideoManifestAsync(Guid VideoId)
         {
             var searchFilter = Builders<Video>.Filter.Eq(x => x.VideoId, VideoId);
+
+            var results = videoCollection.Find<Video>(searchFilter).ToList();
+            var all = videoCollection.Find<Video>(_ => true).ToList();
             return await videoCollection
                 .Find<Video>(searchFilter)
                 .Project(x => x.VideoManifestHLS).FirstOrDefaultAsync();

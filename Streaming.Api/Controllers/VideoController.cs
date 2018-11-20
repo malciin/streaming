@@ -41,10 +41,12 @@ namespace Streaming.Api.Controllers
             return File(movieBytes, "video/MP2T");
         }
 
-        [HttpGet("Manifest")]
+        [HttpGet("Manifest/{Id}")]
         public async Task<IActionResult> GetVideoManifest(Guid Id)
         {
+            var url = Url.Action("GetVideoPart");
             var manifestStr = await videoService.GetVideoManifestAsync(Id);
+            manifestStr = manifestStr.Replace("[ENDPOINT]", url).Replace("[ID]", Id.ToString());
             return File(Encoding.UTF8.GetBytes(manifestStr), "application/x-mpegURL", $"{Id}.m3u8");
         }
     }
