@@ -16,15 +16,18 @@ class UploadVideoForm extends React.Component {
         }
 
         this.handleInputChange = this.handleInputChange.bind(this);
-        this.videoUploaded = this.videoUploaded.bind(this);
+        this.uploadVideo = this.uploadVideo.bind(this);
     }
 
-    videoUploaded(file) {
-        this.setState({
-            video: file
-        }, function () {
-            console.log(this.state.video)
-        });
+    uploadVideo(event) {
+        console.log("Test");
+        var formData = new FormData();
+        formData.append("Title", this.state.videoTitle);
+        formData.append("Description", this.state.videoDescription);
+        formData.append("File", this.state.video);
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", this.props.apiDefinition.post);
+        xhr.send(formData);
     }
 
     handleInputChange(event) {
@@ -35,8 +38,6 @@ class UploadVideoForm extends React.Component {
         this.setState({
           [name]: value
         });
-
-        
     }
     
     render() {
@@ -46,7 +47,7 @@ class UploadVideoForm extends React.Component {
                 <TextField onChange={this.handleInputChange} label="Please enter a video title" name="videoTitle" />
                 <TextField onChange={this.handleInputChange} label="Please enter a video description" name="videoDescription"/>
                 <Mp4Upload onChange={this.handleInputChange} name="video" />
-                { this.state.video && <ButtonField style={{marginTop: '5px'}} btnType="btn-primary" label="Upload" center /> }
+                { this.state.video && <ButtonField style={{marginTop: '5px'}} onClick={this.uploadVideo} btnType="btn-primary" label="Upload" center /> }
             </div>
         );
     }
