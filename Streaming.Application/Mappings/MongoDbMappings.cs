@@ -14,6 +14,7 @@ namespace Streaming.Application.Mappings
             {
                 cm.AutoMap();
                 cm.MapIdMember(x => x.VideoId);
+                cm.SetIgnoreExtraElements(true);
             });
         }
     }

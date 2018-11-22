@@ -12,11 +12,12 @@
 
   <ItemGroup>
     <PackageReference Include="Autofac" Version="4.8.1" />
-    <PackageReference Include="AutoMapper" Version="7.0.1" />
+    <PackageReference Include="AutoMapper" Version="8.0.0" />
     <PackageReference Include="FluentValidation" Version="8.0.100" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="2.1.1" />
-    <PackageReference Include="MongoDB.Driver" Version="2.7.0" />
-    <PackageReference Include="MongoDB.Driver.Core" Version="2.7.0" />
+    <PackageReference Include="MongoDB.Driver" Version="2.7.2" />
+    <PackageReference Include="MongoDB.Driver.Core" Version="2.7.2" />
+    <PackageReference Include="MongoDB.Driver.GridFS" Version="2.7.2" />
   </ItemGroup>
 
   <ItemGroup>

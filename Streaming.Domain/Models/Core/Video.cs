@@ -12,8 +12,7 @@ namespace Streaming.Domain.Models.Core
         public DateTime CreatedDate { get; set; }
         public DateTime FinishedProcessingDate { get; set; }
         public string Description { get; set; }
-
-        public byte[] VideoSegmentsZip { get; set; }
+        
         public byte[] VideoThumbnail { get; set; }
 
         public string VideoOriginalName { get; set; }

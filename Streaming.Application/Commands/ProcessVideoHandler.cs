@@ -5,6 +5,7 @@ using Streaming.Domain.Models.DTO.Video;
 using Streaming.Domain.Services;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -20,6 +21,7 @@ namespace Streaming.Application.Commands
 
         private DirectoryInfo processingDirectory;
         private DirectoryInfo processedDirectory;
+        private TimeSpan VideoLength;
 
         public ProcessVideoHandler(IVideoService videoService, IDirectoriesConfiguration directoriesConfig)
         {
@@ -29,43 +31,53 @@ namespace Streaming.Application.Commands
 
         void SetupProcessingEnvironment(ProcessVideo command)
         {
-            processingDirectory = Directory.CreateDirectory($"{directoriesConfig.ProcessingDirectory}/");
-            processedDirectory = Directory.CreateDirectory($"{directoriesConfig.ProcessedDirectory}/{command.VideoId}/");
+            processingDirectory = Directory.CreateDirectory(String.Format($"{directoriesConfig.ProcessingDirectory}{{0}}", Path.DirectorySeparatorChar));
+            processedDirectory = Directory.CreateDirectory(String.Format($"{directoriesConfig.ProcessedDirectory}{{0}}{command.VideoId}{{0}}", Path.DirectorySeparatorChar));
+        }
+
+        async Task<string> GetVideoLengthStringAsync(string videoPath)
+        {
+            var getLengthStringCommand = $"ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 [FILEPATH]";
+            return (await getLengthStringCommand.Replace("[FILEPATH]", $"{videoPath}").ExecuteBashAsync())
+                    .Replace("\r\n", String.Empty).Replace("\n", String.Empty);
         }
 
         async Task FFmpegProcessVideoAsync(Guid videoId)
         {
-            var copyVideoCmd = $"ffmpeg -i {directoriesConfig.ProcessingDirectory}/{videoId}.mp4 -c copy {directoriesConfig.ProcessingDirectory}/{videoId}.ts";
+            var copyVideoCmd = $"ffmpeg -i {processingDirectory.FullName}{videoId}.mp4 -c copy {processingDirectory.FullName}{videoId}.ts";
+
             await copyVideoCmd.ExecuteBashAsync();
-            var splitVideoIntoPartsCmd = "ffmpeg -i " +
-                $"{directoriesConfig.ProcessingDirectory}/{videoId}.ts " +
+
+            var length = await GetVideoLengthStringAsync($"{processingDirectory.FullName}{videoId}.ts");
+            VideoLength = TimeSpan.FromSeconds(double.Parse(length));
+
+            var splitVideoIntoPartsCmd = String.Format("ffmpeg -i " +
+                $"{processingDirectory.FullName}{videoId}.ts " +
                 "-c copy -map 0 -segment_time 5 -f segment " +
-                $"{directoriesConfig.ProcessedDirectory}/{videoId}/%03d.ts";
+                $"{processedDirectory.FullName}{{0}}%03d.ts", Path.DirectorySeparatorChar);
 
             await splitVideoIntoPartsCmd.ExecuteBashAsync();
 
             foreach (var command in new string[] {
-                $"rm {directoriesConfig.ProcessingDirectory}/{videoId}.mp4",
-                $"rm {directoriesConfig.ProcessingDirectory}/{videoId}.ts",
+                $"rm {processingDirectory.FullName}{videoId}.mp4",
+                $"rm {processingDirectory.FullName}{videoId}.ts",
             })
                 await command.ExecuteBashAsync();
         }
 
         async Task<string> CreateGenericManifest()
         {
-            var getLengthStringCommand = $"ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 [FILEPATH]";
             var stringBuilder = new StringBuilder();
             stringBuilder.AppendLine("#EXTM3U");
             stringBuilder.AppendLine("#EXT-X-VERSION:3");
             stringBuilder.AppendLine("#EXT-X-TARGETDURATION:5");
             stringBuilder.AppendLine("#EXT-X-MEDIA-SEQUENCE:0");
             int part = 0;
-            foreach(var file in processedDirectory.GetFiles().Where(x => x.Extension != "zip"))
+            foreach(var file in processedDirectory.GetFiles())
             {
-                var length = (await getLengthStringCommand.Replace("[FILEPATH]", $"{file.FullName}").ExecuteBashAsync())
-                    .Replace("\r\n", String.Empty).Replace("\n", String.Empty);
+                var length = await GetVideoLengthStringAsync(file.FullName);
                 stringBuilder.AppendLine($"#EXTINF:{length}");
-                stringBuilder.AppendLine($"[ENDPOINT]?Id=[ID]&Part={part++}");
+                stringBuilder.AppendLine($"[ENDPOINT]/[ID]/{part++}");
             }
             stringBuilder.AppendLine("#EXT-X-ENDLIST");
             return stringBuilder.ToString();
@@ -73,37 +85,37 @@ namespace Streaming.Application.Commands
 
         public async Task Handle(ProcessVideo Command)
         {
+            var timer = Stopwatch.StartNew();
+
             SetupProcessingEnvironment(Command);
-            using (var file = new FileStream($"{directoriesConfig.ProcessingDirectory}/{Command.VideoId}.mp4", FileMode.CreateNew, FileAccess.Write))
+            using (var file = new FileStream($"{processingDirectory.FullName}{Command.VideoId}.mp4", FileMode.CreateNew, FileAccess.Write))
             {
                 Command.Video.CopyTo(file);
             }
 
             await FFmpegProcessVideoAsync(Command.VideoId);
 
-            using (var str = new MemoryStream())
+            var fileZipped = new MemoryStream();
+            using (var zipArchive = new ZipArchive(fileZipped, ZipArchiveMode.Create, true))
             {
-                using (var zipArchive = new ZipArchive(str, ZipArchiveMode.Create, true))
+                foreach (var file in processedDirectory.GetFiles())
                 {
-                    foreach (var file in processedDirectory.GetFiles())
-                    {
-                        zipArchive.CreateEntryFromFile($"{directoriesConfig.ProcessedDirectory}/{ Command.VideoId}/{file.Name}", file.Name);
-                    }
-                }
-                str.Position = 0;
-                using (var file = new FileStream($"{directoriesConfig.ProcessedDirectory}/{Command.VideoId}.zip", FileMode.OpenOrCreate, FileAccess.Write))
-                {
-                    await str.CopyToAsync(file);
+                    zipArchive.CreateEntryFromFile(String.Format($"{processedDirectory.FullName}{{0}}{file.Name}", Path.DirectorySeparatorChar), file.Name);
                 }
             }
+            fileZipped.Position = 0;
 
             var manifest = await CreateGenericManifest();
 
+            timer.Stop();
             await videoService.UpdateVideoAfterProcessingAsync(new VideoProcessedDataDTO
             {
                 VideoId = Command.VideoId,
                 FinishedProcessingDate = DateTime.Now,
-                VideoManifestHLS = manifest
+                VideoManifestHLS = manifest,
+                Length = VideoLength,
+                ProcessingInfo = $"Sucessfully processed after {timer.Elapsed.TotalMilliseconds}ms",
+                VideoSegmentsZip = fileZipped.ToArray()
             });
         }
     }

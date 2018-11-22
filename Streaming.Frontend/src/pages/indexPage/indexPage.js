@@ -1,6 +1,8 @@
 import React from 'react';
 import './indexPage.css'
 import Navbar from '../../components/navbar/navbar';
+import VideoPlayer from '../../components/blocks/videoPlayer/videoPlayer';
+import { Config } from '../../shared/config';
 
 class IndexPage extends React.Component{
     render() {
@@ -22,6 +24,8 @@ class IndexPage extends React.Component{
                     <p>
                         Morbi nec urna nibh. Sed gravida nisl ligula, id gravida magna imperdiet eget. Quisque erat sem, faucibus ac porttitor vitae, placerat ac ipsum. Curabitur sit amet justo urna. Sed et tempus elit. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Quisque scelerisque sagittis enim vitae laoreet. Proin finibus malesuada dolor, eget tincidunt ante auctor in. Aenean at rhoncus lorem. Ut ac ornare nisi. 
                     </p>
+
+                    <VideoPlayer videoId="ceaea1ed-519b-414b-9e0d-79678ca2adcd" manifestEndpoint={`${Config.apiPath}/Video/Manifest`} />
                 </div>
             </div>
         );

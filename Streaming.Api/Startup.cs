@@ -25,6 +25,13 @@ namespace Streaming.Api
         
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAll", x =>
+                {
+                    x.AllowAnyOrigin().AllowAnyMethod();
+                });
+            });
             services.AddSingleton<IDirectoriesConfiguration, DirectoriesConfiguration>(x => new DirectoriesConfiguration((IConfigurationRoot)x.GetRequiredService<IConfiguration>()));
             services.AddSingleton<IKeysConfiguration, KeysConfiguration>(x => new KeysConfiguration((IConfigurationRoot)x.GetRequiredService<IConfiguration>()));
             services.AddScoped<ICustomLogger, CustomLogger>();
@@ -57,6 +64,7 @@ namespace Streaming.Api
                 app.UseMiddleware<ExceptionHandlingMiddleware>();
             }
 
+            app.UseCors("AllowAll");
             app.UseMvc();
         }
     }

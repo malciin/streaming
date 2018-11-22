@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Streaming.Common.Helpers;
 using Streaming.Domain.Models.DTO;
 using Streaming.Domain.Models.DTO.Video;
 using Streaming.Domain.Services;
@@ -28,25 +29,25 @@ namespace Streaming.Api.Controllers
             return Ok();
         }
 
-        [HttpGet]
-        public IEnumerable<VideoBasicMetadataDTO> GetVideo(VideoSearchDTO Search)
+        [HttpPost("Search")]
+        public async Task<IEnumerable<VideoBasicMetadataDTO>> Search(VideoSearchDTO Search)
         {
-            throw new NotImplementedException();
+            return await videoService.GetAsync(Search);
         }
 
-        [HttpGet("Get")]
+        [HttpGet("{Id}/{Part}")]
         public async Task<IActionResult> GetVideoPart(Guid Id, int Part)
         {
             var movieBytes = await videoService.GetVideoPartAsync(Id, Part);
-            return File(movieBytes, "video/MP2T");
+            return File(movieBytes, "video/MP2T", $"{Part}.ts");
         }
 
         [HttpGet("Manifest/{Id}")]
         public async Task<IActionResult> GetVideoManifest(Guid Id)
         {
-            var url = Url.Action("GetVideoPart");
+            var getVideoPartEndpoint = UrlHelper.GetHostUrl(HttpContext) + "/Video";
             var manifestStr = await videoService.GetVideoManifestAsync(Id);
-            manifestStr = manifestStr.Replace("[ENDPOINT]", url).Replace("[ID]", Id.ToString());
+            manifestStr = manifestStr.Replace("[ENDPOINT]", getVideoPartEndpoint).Replace("[ID]", Id.ToString());
             return File(Encoding.UTF8.GetBytes(manifestStr), "application/x-mpegURL", $"{Id}.m3u8");
         }
     }
