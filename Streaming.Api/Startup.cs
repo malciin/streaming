@@ -29,7 +29,7 @@ namespace Streaming.Api
             {
                 options.AddPolicy("AllowAll", x =>
                 {
-                    x.AllowAnyOrigin().AllowAnyMethod();
+                    x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
                 });
             });
             services.AddSingleton<IDirectoriesConfiguration, DirectoriesConfiguration>(x => new DirectoriesConfiguration((IConfigurationRoot)x.GetRequiredService<IConfiguration>()));

@@ -7,7 +7,7 @@ class Navbar extends React.Component {
         return (
             <nav className="navbar navbar-expand-lg navbar-light bg-light">
                 <div className="navbar-brand" href="#">
-                    <img src="pageLogo.png" alt="logo" />  
+                    <img src= {"pageLogo.png"} alt="logo" />  
                 </div>
                 <div className="navbar">
                     <ul className="navbar-nav">
