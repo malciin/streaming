@@ -1,3 +1,31 @@
-#video {
-    width: 720px;
+#video-wrapper {
+    position: relative;
+    #video {
+        width: 100%;
+    }
+
+    .video-control {
+        display: block;
+        width: 100%;
+        color: white;
+        position: absolute;
+        bottom: 0;
+        background-color: rgba(0, 0,0,0.8);
+        .play {
+            cursor: pointer;
+        }
+
+        -webkit-transition: 0.5s;
+        -moz-transition: 0.5s;
+        -o-transition: 0.5s;
+        transition: 0.5s;
+        opacity: 0;
+        visibility: hidden;
+    }
+
+    .video-control.showed-controls {
+        visibility: visible;
+        opacity: 1;
+    }
 }
+
