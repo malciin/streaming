@@ -6,6 +6,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="processed\**" />
+    <Content Remove="processed\**" />
+    <EmbeddedResource Remove="processed\**" />
+    <None Remove="processed\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="wwwroot\" />
   </ItemGroup>
 

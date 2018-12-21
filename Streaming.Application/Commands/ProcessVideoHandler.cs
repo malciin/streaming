@@ -1,4 +1,4 @@
-﻿using Streaming.Application.Configuration;
+﻿using Streaming.Application.Settings;
 using Streaming.Common.Extensions;
 using Streaming.Domain.Command;
 using Streaming.Domain.Models.DTO.Video;
@@ -17,13 +17,13 @@ namespace Streaming.Application.Commands
     public class ProcessVideoHandler : ICommandHandler<ProcessVideo>
     {
         private readonly IVideoService videoService;
-        private readonly IDirectoriesConfiguration directoriesConfig;
+        private readonly IDirectoriesSettings directoriesConfig;
 
         private DirectoryInfo processingDirectory;
         private DirectoryInfo processedDirectory;
         private TimeSpan VideoLength;
 
-        public ProcessVideoHandler(IVideoService videoService, IDirectoriesConfiguration directoriesConfig)
+        public ProcessVideoHandler(IVideoService videoService, IDirectoriesSettings directoriesConfig)
         {
             this.videoService = videoService;
             this.directoriesConfig = directoriesConfig;
@@ -95,28 +95,30 @@ namespace Streaming.Application.Commands
 
             await FFmpegProcessVideoAsync(Command.VideoId);
 
-            var fileZipped = new MemoryStream();
-            using (var zipArchive = new ZipArchive(fileZipped, ZipArchiveMode.Create, true))
+            using (var memoryStream = new MemoryStream())
             {
-                foreach (var file in processedDirectory.GetFiles())
+                using (var zipArchive = new ZipArchive(memoryStream, ZipArchiveMode.Create, true))
                 {
-                    zipArchive.CreateEntryFromFile(String.Format($"{processedDirectory.FullName}{{0}}{file.Name}", Path.DirectorySeparatorChar), file.Name);
+                    foreach (var file in processedDirectory.GetFiles())
+                    {
+                        zipArchive.CreateEntryFromFile(String.Format($"{processedDirectory.FullName}{{0}}{file.Name}", Path.DirectorySeparatorChar), file.Name);
+                    }
                 }
+                memoryStream.Position = 0;
+
+                var manifest = await CreateGenericManifest();
+
+                timer.Stop();
+                await videoService.UpdateVideoAfterProcessingAsync(new VideoProcessedDataDTO
+                {
+                    VideoId = Command.VideoId,
+                    FinishedProcessingDate = DateTime.Now,
+                    VideoManifestHLS = manifest,
+                    Length = VideoLength,
+                    ProcessingInfo = $"Sucessfully processed after {timer.Elapsed.TotalMilliseconds}ms",
+                    VideoSegmentsZip = memoryStream.ToArray()
+                });
             }
-            fileZipped.Position = 0;
-
-            var manifest = await CreateGenericManifest();
-
-            timer.Stop();
-            await videoService.UpdateVideoAfterProcessingAsync(new VideoProcessedDataDTO
-            {
-                VideoId = Command.VideoId,
-                FinishedProcessingDate = DateTime.Now,
-                VideoManifestHLS = manifest,
-                Length = VideoLength,
-                ProcessingInfo = $"Sucessfully processed after {timer.Elapsed.TotalMilliseconds}ms",
-                VideoSegmentsZip = fileZipped.ToArray()
-            });
         }
     }
 }

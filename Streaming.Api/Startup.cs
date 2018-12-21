@@ -16,7 +16,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Streaming.Api.Configurations;
 using Streaming.Api.Middlewares;
 using Streaming.Api.Monitor;
-using Streaming.Application.Configuration;
+using Streaming.Application.Settings;
 
 namespace Streaming.Api
 {
@@ -32,8 +32,8 @@ namespace Streaming.Api
                     x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
                 });
             });
-            services.AddSingleton<IDirectoriesConfiguration, DirectoriesConfiguration>(x => new DirectoriesConfiguration((IConfigurationRoot)x.GetRequiredService<IConfiguration>()));
-            services.AddSingleton<IKeysConfiguration, KeysConfiguration>(x => new KeysConfiguration((IConfigurationRoot)x.GetRequiredService<IConfiguration>()));
+            services.AddSingleton<IDirectoriesSettings, DirectoriesSettings>(x => new DirectoriesSettings((IConfigurationRoot)x.GetRequiredService<IConfiguration>()));
+            services.AddSingleton<IKeysSettings, KeysSettings>(x => new KeysSettings((IConfigurationRoot)x.GetRequiredService<IConfiguration>()));
             services.AddScoped<ICustomLogger, CustomLogger>();
             services.AddAutoMapper();
             services.AddMvc().AddFluentValidation(x =>

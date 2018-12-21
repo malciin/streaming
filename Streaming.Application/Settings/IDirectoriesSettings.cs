@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Streaming.Application.Configuration
+namespace Streaming.Application.Settings
 {
-    public interface IDirectoriesConfiguration
+    public interface IDirectoriesSettings
     {
         string ProcessingDirectory { get; }
         string ProcessedDirectory { get; }

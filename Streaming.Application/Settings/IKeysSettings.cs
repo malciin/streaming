@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Streaming.Application.Configuration
+namespace Streaming.Application.Settings
 {
-    public interface IKeysConfiguration
+    public interface IKeysSettings
     {
         string SecretServerKey { get; }
     }

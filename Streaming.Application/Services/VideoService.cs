@@ -2,7 +2,7 @@
 using MongoDB.Driver;
 using MongoDB.Driver.GridFS;
 using Streaming.Application.Commands;
-using Streaming.Application.Configuration;
+using Streaming.Application.Settings;
 using Streaming.Domain.Command;
 using Streaming.Domain.Models.Core;
 using Streaming.Domain.Models.DTO.Video;
@@ -23,9 +23,9 @@ namespace Streaming.Application.Services
 
         private readonly ICommandBus commandBus;
         private readonly IMapper mapper;
-        private readonly IDirectoriesConfiguration directoriesConfig;
+        private readonly IDirectoriesSettings directoriesConfig;
 
-        public VideoService(IDirectoriesConfiguration directoriesConfig, ICommandBus commandBus, IMongoDatabase mongoDatabase, IMapper mapper, IGridFSBucket bucket)
+        public VideoService(IDirectoriesSettings directoriesConfig, ICommandBus commandBus, IMongoDatabase mongoDatabase, IMapper mapper, IGridFSBucket bucket)
         {
             this.mongoDatabase = mongoDatabase;
             videoCollection = mongoDatabase.GetCollection<Video>("Videos");
@@ -41,7 +41,7 @@ namespace Streaming.Application.Services
 
             await videoCollection.InsertOneAsync(video);
 
-            commandBus.Send(new ProcessVideo
+            _ = commandBus.SendAsync(new ProcessVideo
             {
                 VideoId = video.VideoId,
                 Video = videoUploadDTO.File
@@ -79,6 +79,11 @@ namespace Streaming.Application.Services
         {
             var result = Part.ToString();
             return new string('0', 3 - result.Length) + result + ".ts";
+        }
+
+        public async Task DownloadVideoAsync(Guid VideoId)
+        {
+            throw new NotImplementedException();
         }
 
         public async Task<byte[]> GetVideoPartAsync(Guid VideoId, int Part)

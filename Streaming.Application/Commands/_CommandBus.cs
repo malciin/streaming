@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Streaming.Application.Commands
 {
@@ -14,10 +15,10 @@ namespace Streaming.Application.Commands
             this.commandHandlersMapping = commandHandlersMapping;
         }
 
-        public void Send<TCommand>(TCommand command) where TCommand : ICommand
+        public async Task SendAsync<TCommand>(TCommand command) where TCommand : ICommand
         {
             var handler = (ICommandHandler<TCommand>) commandHandlersMapping(typeof(TCommand));
-            handler.Handle(command);
+            await handler.Handle(command);
         }
     }
 }
