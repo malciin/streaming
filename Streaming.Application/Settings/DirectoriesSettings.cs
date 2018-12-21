@@ -1,11 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
-using Streaming.Application.Settings;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace Streaming.Api.Configurations
+namespace Streaming.Application.Settings
 {
     public class DirectoriesSettings : IDirectoriesSettings
     {

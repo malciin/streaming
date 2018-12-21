@@ -1,22 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using AutoMapper;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Streaming.Api.Configurations;
 using Streaming.Api.Middlewares;
 using Streaming.Api.Monitor;
-using Streaming.Application.Settings;
 
 namespace Streaming.Api
 {
@@ -32,8 +24,7 @@ namespace Streaming.Api
                     x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
                 });
             });
-            services.AddSingleton<IDirectoriesSettings, DirectoriesSettings>(x => new DirectoriesSettings((IConfigurationRoot)x.GetRequiredService<IConfiguration>()));
-            services.AddSingleton<IKeysSettings, KeysSettings>(x => new KeysSettings((IConfigurationRoot)x.GetRequiredService<IConfiguration>()));
+
             services.AddScoped<ICustomLogger, CustomLogger>();
             services.AddAutoMapper();
             services.AddMvc().AddFluentValidation(x =>
@@ -51,8 +42,9 @@ namespace Streaming.Api
 
             builder.Populate(services);
 
-            builder.RegisterModule<Application.Commands._CommandModule>();
-            builder.RegisterModule<Application.Services._ServicesModule>();
+            builder.RegisterModule<Application.Modules.CommandModule>();
+            builder.RegisterModule<Application.Modules.ServicesModule>();
+            builder.RegisterModule<Application.Modules.SettingsModule>();
 
             return new AutofacServiceProvider(builder.Build());
         }

@@ -1,10 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
-using Streaming.Domain.Command;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Streaming.Application.Commands
+namespace Streaming.Application.Command.Commands.Video
 {
     public class ProcessVideo : ICommand
     {

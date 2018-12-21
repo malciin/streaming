@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Streaming.Api.Configurations
+namespace Streaming.Application.Settings
 {
     public partial class KeysSettings
     {

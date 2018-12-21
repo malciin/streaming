@@ -1,25 +1,25 @@
 ﻿using MongoDB.Driver.GridFS;
+using Streaming.Application.Command.Commands.Video;
 using Streaming.Application.Settings;
-using Streaming.Domain.Command;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Streaming.Application.Commands
+namespace Streaming.Application.Command.Handlers.Video
 {
-    public class DownloadVideoHandler : ICommandHandler<DownloadVideo>
+    public class DownloadVideo : ICommandHandler<Commands.Video.DownloadVideo>
     {
         private readonly IDirectoriesSettings directoriesConfig;
         private readonly IGridFSBucket bucket;
 
-        public DownloadVideoHandler(IDirectoriesSettings directoriesConfig, IGridFSBucket bucket)
+        public DownloadVideo(IDirectoriesSettings directoriesConfig, IGridFSBucket bucket)
         {
             this.bucket = bucket;
             this.directoriesConfig = directoriesConfig;
         }
 
-        public Task Handle(DownloadVideo Command)
+        public Task HandleAsync(Commands.Video.DownloadVideo Command)
         {
             throw new NotImplementedException();
         }

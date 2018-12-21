@@ -1,12 +1,11 @@
 ﻿using AutoMapper;
 using MongoDB.Driver;
 using MongoDB.Driver.GridFS;
-using Streaming.Application.Commands;
+using Streaming.Application.Command;
+using Streaming.Application.Command.Commands.Video;
 using Streaming.Application.Settings;
-using Streaming.Domain.Command;
 using Streaming.Domain.Models.Core;
 using Streaming.Domain.Models.DTO.Video;
-using Streaming.Domain.Services;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -41,7 +40,7 @@ namespace Streaming.Application.Services
 
             await videoCollection.InsertOneAsync(video);
 
-            _ = commandBus.SendAsync(new ProcessVideo
+            _ = commandBus.HandleAsync(new ProcessVideo
             {
                 VideoId = video.VideoId,
                 Video = videoUploadDTO.File

@@ -1,6 +1,6 @@
-﻿using Streaming.Application.Settings;
+﻿using Streaming.Application.Command.Commands.Video;
+using Streaming.Application.Settings;
 using Streaming.Common.Extensions;
-using Streaming.Domain.Command;
 using Streaming.Domain.Models.DTO.Video;
 using Streaming.Domain.Services;
 using System;
@@ -12,9 +12,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Streaming.Application.Commands
+namespace Streaming.Application.Command.Handlers.Video
 {
-    public class ProcessVideoHandler : ICommandHandler<ProcessVideo>
+    public class ProcessVideo : ICommandHandler<Commands.Video.ProcessVideo>
     {
         private readonly IVideoService videoService;
         private readonly IDirectoriesSettings directoriesConfig;
@@ -23,13 +23,13 @@ namespace Streaming.Application.Commands
         private DirectoryInfo processedDirectory;
         private TimeSpan VideoLength;
 
-        public ProcessVideoHandler(IVideoService videoService, IDirectoriesSettings directoriesConfig)
+        public ProcessVideo(IVideoService videoService, IDirectoriesSettings directoriesConfig)
         {
             this.videoService = videoService;
             this.directoriesConfig = directoriesConfig;
         }
 
-        void SetupProcessingEnvironment(ProcessVideo command)
+        void SetupProcessingEnvironment(Commands.Video.ProcessVideo command)
         {
             processingDirectory = Directory.CreateDirectory(String.Format($"{directoriesConfig.ProcessingDirectory}{{0}}", Path.DirectorySeparatorChar));
             processedDirectory = Directory.CreateDirectory(String.Format($"{directoriesConfig.ProcessedDirectory}{{0}}{command.VideoId}{{0}}", Path.DirectorySeparatorChar));
@@ -83,7 +83,7 @@ namespace Streaming.Application.Commands
             return stringBuilder.ToString();
         }
 
-        public async Task Handle(ProcessVideo Command)
+        public async Task HandleAsync(Commands.Video.ProcessVideo Command)
         {
             var timer = Stopwatch.StartNew();
 

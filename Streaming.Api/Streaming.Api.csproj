@@ -6,9 +6,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="logs\**" />
     <Compile Remove="processed\**" />
+    <Content Remove="logs\**" />
     <Content Remove="processed\**" />
+    <EmbeddedResource Remove="logs\**" />
     <EmbeddedResource Remove="processed\**" />
+    <None Remove="logs\**" />
     <None Remove="processed\**" />
   </ItemGroup>
 

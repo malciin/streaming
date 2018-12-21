@@ -1,38 +1,37 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Streaming.Application.Command;
+using Streaming.Application.Command.Commands.Video;
+using Streaming.Application.Query;
 using Streaming.Common.Helpers;
-using Streaming.Domain.Models.DTO;
 using Streaming.Domain.Models.DTO.Video;
-using Streaming.Domain.Services;
 
 namespace Streaming.Api.Controllers
 {
-    [Route("/Video"), ApiController]
-    public class VideoController : ControllerBase
+    [Route("/Video")]
+    public class VideoController : _ApiControllerBase
     {
-        private IVideoService videoService;
-
-        public VideoController(IVideoService videoService)
+        private readonly IVideoQueries queries;
+        private VideoController(ICommandBus commandBus, IVideoQueries queries) : base(commandBus)
         {
-            this.videoService = videoService;
+            this.queries = queries;
         }
 
         [DisableRequestSizeLimit]
         [HttpPost]
-        public async Task<IActionResult> UploadVideo([FromForm] VideoUploadDTO Video)
+        public async Task<IActionResult> UploadVideo(UploadVideo UploadVideo)
         {
-            await videoService.AddAsync(Video);
+            await CommandBus.HandleAsync(UploadVideo);
             return Ok();
         }
 
         [HttpGet("{Id}")]
         public async Task<VideoBasicMetadataDTO> GetById(Guid id)
         {
-            return await videoService.GetAsync(id);
+            return await queries.GetBasicVideoMetadataAsync(id);
         }
 
         [HttpPost("Search")]
