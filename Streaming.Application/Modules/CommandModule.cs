@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Text;
 using Autofac;
 using Streaming.Application.Command;
+using Streaming.Application.Command.Bus;
 
 namespace Streaming.Application.Modules
 {
@@ -17,6 +18,10 @@ namespace Streaming.Application.Modules
             builder.RegisterType<CommandDispatcher>()
                    .As<ICommandDispatcher>()
                    .InstancePerLifetimeScope();
+
+			builder.RegisterType<CommandBus>()
+				   .As<ICommandBus>()
+				   .SingleInstance();
 
             builder.RegisterAssemblyTypes(currentAssembly)
                    .AsClosedTypesOf(typeof(ICommandHandler<>))
