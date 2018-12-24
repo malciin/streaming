@@ -1,8 +1,8 @@
-﻿using Streaming.Application.Command.Commands.Video;
+﻿using MongoDB.Driver;
+using MongoDB.Driver.GridFS;
+using Streaming.Application.Command.Commands.Video;
 using Streaming.Application.Settings;
 using Streaming.Common.Extensions;
-using Streaming.Domain.Models.DTO.Video;
-using Streaming.Domain.Services;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -16,17 +16,21 @@ namespace Streaming.Application.Command.Handlers.Video
 {
     public class ProcessVideo : ICommandHandler<Commands.Video.ProcessVideo>
     {
-        private readonly IVideoService videoService;
-        private readonly IDirectoriesSettings directoriesConfig;
+		private readonly IGridFSBucket bucket;
+		private readonly IMongoCollection<Domain.Models.Core.Video> videoCollection;
+		private readonly IDirectoriesSettings directoriesConfig;
 
         private DirectoryInfo processingDirectory;
         private DirectoryInfo processedDirectory;
         private TimeSpan VideoLength;
 
-        public ProcessVideo(IVideoService videoService, IDirectoriesSettings directoriesConfig)
+        public ProcessVideo(IDirectoriesSettings directoriesConfig,
+			IMongoCollection<Domain.Models.Core.Video> videoCollection,
+			IGridFSBucket bucket)
         {
-            this.videoService = videoService;
             this.directoriesConfig = directoriesConfig;
+			this.bucket = bucket;
+			this.videoCollection = videoCollection;
         }
 
         void SetupProcessingEnvironment(Commands.Video.ProcessVideo command)
@@ -42,9 +46,9 @@ namespace Streaming.Application.Command.Handlers.Video
                     .Replace("\r\n", String.Empty).Replace("\n", String.Empty);
         }
 
-        async Task FFmpegProcessVideoAsync(Guid videoId)
+        async Task ffmpegProcessVideoAsync(Guid videoId, string videoPath)
         {
-            var copyVideoCmd = $"ffmpeg -i {processingDirectory.FullName}{videoId}.mp4 -c copy {processingDirectory.FullName}{videoId}.ts";
+            var copyVideoCmd = $"ffmpeg -i {videoPath} -c copy {processingDirectory.FullName}{videoId}.ts";
 
             await copyVideoCmd.ExecuteBashAsync();
 
@@ -88,12 +92,8 @@ namespace Streaming.Application.Command.Handlers.Video
             var timer = Stopwatch.StartNew();
 
             SetupProcessingEnvironment(Command);
-            using (var file = new FileStream($"{processingDirectory.FullName}{Command.VideoId}.mp4", FileMode.CreateNew, FileAccess.Write))
-            {
-                Command.Video.CopyTo(file);
-            }
 
-            await FFmpegProcessVideoAsync(Command.VideoId);
+            await ffmpegProcessVideoAsync(Command.VideoId, Command.VideoPath);
 
             using (var memoryStream = new MemoryStream())
             {
@@ -109,15 +109,18 @@ namespace Streaming.Application.Command.Handlers.Video
                 var manifest = await CreateGenericManifest();
 
                 timer.Stop();
-                await videoService.UpdateVideoAfterProcessingAsync(new VideoProcessedDataDTO
-                {
-                    VideoId = Command.VideoId,
-                    FinishedProcessingDate = DateTime.Now,
-                    VideoManifestHLS = manifest,
-                    Length = VideoLength,
-                    ProcessingInfo = $"Sucessfully processed after {timer.Elapsed.TotalMilliseconds}ms",
-                    VideoSegmentsZip = memoryStream.ToArray()
-                });
+				
+				var searchFilter = Builders<Domain.Models.Core.Video>.Filter.Eq(x => x.VideoId, Command.VideoId);
+
+				await bucket.UploadFromStreamAsync(Command.VideoId.ToString(), memoryStream);
+
+				var updateDefinition = Builders<Domain.Models.Core.Video>.Update
+					.Set(x => x.FinishedProcessingDate, DateTime.UtcNow)
+					.Set(x => x.ProcessingInfo, $"Sucessfully processed after {timer.Elapsed.TotalMilliseconds}ms")
+					.Set(x => x.VideoManifestHLS, manifest)
+					.Set(x => x.Length, VideoLength);
+
+				await videoCollection.UpdateOneAsync(searchFilter, updateDefinition);
             }
         }
     }

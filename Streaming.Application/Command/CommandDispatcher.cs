@@ -3,10 +3,10 @@ using System.Threading.Tasks;
 
 namespace Streaming.Application.Command
 {
-    public class CommandBus : ICommandBus
+    public class CommandDispatcher : ICommandDispatcher
     {
         private readonly IComponentContext componentContext;
-        public CommandBus(IComponentContext componentContext)
+        public CommandDispatcher(IComponentContext componentContext)
         {
             this.componentContext = componentContext;
         }

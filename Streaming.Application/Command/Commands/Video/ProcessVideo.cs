@@ -8,6 +8,6 @@ namespace Streaming.Application.Command.Commands.Video
     public class ProcessVideo : ICommand
     {
         public Guid VideoId { get; set; }
-        public IFormFile Video { get; set; }
+        public string VideoPath { get; set; }
     }
 }

@@ -5,9 +5,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Streaming.Application.Command;
 using Streaming.Application.Command.Commands.Video;
+using Streaming.Application.DTO.Video;
 using Streaming.Application.Query;
-using Streaming.Common.Helpers;
-using Streaming.Domain.Models.DTO.Video;
 
 namespace Streaming.Api.Controllers
 {
@@ -15,7 +14,7 @@ namespace Streaming.Api.Controllers
     public class VideoController : _ApiControllerBase
     {
         private readonly IVideoQueries queries;
-        private VideoController(ICommandBus commandBus, IVideoQueries queries) : base(commandBus)
+        private VideoController(ICommandDispatcher commandBus, IVideoQueries queries) : base(commandBus)
         {
             this.queries = queries;
         }
@@ -24,7 +23,7 @@ namespace Streaming.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> UploadVideo(UploadVideo UploadVideo)
         {
-            await CommandBus.HandleAsync(UploadVideo);
+            await CommandDispatcher.HandleAsync(UploadVideo);
             return Ok();
         }
 
@@ -37,23 +36,21 @@ namespace Streaming.Api.Controllers
         [HttpPost("Search")]
         public async Task<IEnumerable<VideoBasicMetadataDTO>> Search(VideoSearchDTO Search)
         {
-            return await videoService.GetAsync(Search);
+			return await queries.SearchAsync(Search);
         }
 
         [HttpGet("{Id}/{Part}")]
         public async Task<IActionResult> GetVideoPart(Guid Id, int Part)
         {
-            var movieBytes = await videoService.GetVideoPartAsync(Id, Part);
-            return File(movieBytes, "video/MP2T", $"{Part}.ts");
+			var movieStream = await queries.GetVideoPartAsync(Id, Part);
+            return File(movieStream, "video/MP2T", $"{Part}.ts");
         }
 
         [HttpGet("Manifest/{Id}")]
         public async Task<IActionResult> GetVideoManifest(Guid Id)
         {
-            var getVideoPartEndpoint = UrlHelper.GetHostUrl(HttpContext) + "/Video";
-            var manifestStr = await videoService.GetVideoManifestAsync(Id);
-            manifestStr = manifestStr.Replace("[ENDPOINT]", getVideoPartEndpoint).Replace("[ID]", Id.ToString());
-            return File(Encoding.UTF8.GetBytes(manifestStr), "application/x-mpegURL", $"{Id}.m3u8");
-        }
+			var manifest = await queries.GetVideoManifestAsync(Id);
+			return File(Encoding.UTF8.GetBytes(manifest), "application/x-mpegURL", $"{Id}.m3u8");
+		}
     }
 }

@@ -9,12 +9,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Streaming.Application", "St
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Streaming.Api", "Streaming.Api\Streaming.Api.csproj", "{87F01BF3-B657-4ECC-A8B8-2027F6A58C66}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Streaming.Common", "Streaming.Common\Streaming.Common.csproj", "{C06CFB26-78F5-4119-9903-E583E08D529D}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B7187E23-F84D-4139-A4ED-B298F5EE0542}"
 	ProjectSection(SolutionItems) = preProject
 		Jenkinsfile = Jenkinsfile
 	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Streaming.Common", "Streaming.Common\Streaming.Common.csproj", "{2FC85B0A-0752-4B0D-833F-59662036382E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -34,10 +34,10 @@ Global
 		{87F01BF3-B657-4ECC-A8B8-2027F6A58C66}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{87F01BF3-B657-4ECC-A8B8-2027F6A58C66}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{87F01BF3-B657-4ECC-A8B8-2027F6A58C66}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C06CFB26-78F5-4119-9903-E583E08D529D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C06CFB26-78F5-4119-9903-E583E08D529D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C06CFB26-78F5-4119-9903-E583E08D529D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C06CFB26-78F5-4119-9903-E583E08D529D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2FC85B0A-0752-4B0D-833F-59662036382E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2FC85B0A-0752-4B0D-833F-59662036382E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2FC85B0A-0752-4B0D-833F-59662036382E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2FC85B0A-0752-4B0D-833F-59662036382E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

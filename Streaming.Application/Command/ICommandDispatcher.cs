@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Streaming.Application.Command
 {
-    public interface ICommandBus
+    public interface ICommandDispatcher
     {
         Task HandleAsync<T>(T command) where T : ICommand;
     }

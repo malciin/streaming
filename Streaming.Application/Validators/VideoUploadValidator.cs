@@ -1,11 +1,10 @@
-﻿using Streaming.Domain.Models.DTO;
-using FluentValidation;
+﻿using FluentValidation;
+using Streaming.Application.Command.Commands.Video;
 using System.Threading.Tasks;
-using Streaming.Domain.Models.DTO.Video;
 
 namespace Streaming.Application.Validators
 {
-    public class VideoUploadValidator : AbstractValidator<VideoUploadDTO>
+    public class VideoUploadValidator : AbstractValidator<UploadVideo>
     {
         public VideoUploadValidator()
         {

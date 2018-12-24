@@ -5,10 +5,10 @@ namespace Streaming.Api.Controllers
 {
     public class _ApiControllerBase : ControllerBase
     {
-        protected readonly ICommandBus CommandBus;
-        protected _ApiControllerBase (ICommandBus CommandBus)
+        protected readonly ICommandDispatcher CommandDispatcher;
+        protected _ApiControllerBase (ICommandDispatcher CommandDispatcher)
         {
-            this.CommandBus = CommandBus;
+            this.CommandDispatcher = CommandDispatcher;
         }
     }
 }

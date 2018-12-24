@@ -14,8 +14,8 @@ namespace Streaming.Application.Modules
             base.Load(builder);
             var currentAssembly = typeof(CommandModule).GetTypeInfo().Assembly;
 
-            builder.RegisterType<CommandBus>()
-                   .As<ICommandBus>()
+            builder.RegisterType<CommandDispatcher>()
+                   .As<ICommandDispatcher>()
                    .InstancePerLifetimeScope();
 
             builder.RegisterAssemblyTypes(currentAssembly)
