@@ -1,14 +1,10 @@
 ﻿using MongoDB.Driver;
-using MongoDB.Driver.GridFS;
-using Streaming.Application.Command.Commands.Video;
+using Streaming.Application.Repository;
 using Streaming.Application.Settings;
 using Streaming.Common.Extensions;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.IO.Compression;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -16,8 +12,8 @@ namespace Streaming.Application.Command.Handlers.Video
 {
     public class ProcessVideo : ICommandHandler<Commands.Video.ProcessVideo>
     {
-		private readonly IGridFSBucket bucket;
 		private readonly IMongoCollection<Domain.Models.Core.Video> videoCollection;
+		private readonly IVideoBlobRepository videoBlobRepo;
 		private readonly IDirectoriesSettings directoriesConfig;
 
         private DirectoryInfo processingDirectory;
@@ -26,11 +22,11 @@ namespace Streaming.Application.Command.Handlers.Video
 
         public ProcessVideo(IDirectoriesSettings directoriesConfig,
 			IMongoCollection<Domain.Models.Core.Video> videoCollection,
-			IGridFSBucket bucket)
+			IVideoBlobRepository videoBlobRepo)
         {
             this.directoriesConfig = directoriesConfig;
-			this.bucket = bucket;
 			this.videoCollection = videoCollection;
+			this.videoBlobRepo = videoBlobRepo;
         }
 
         void SetupProcessingEnvironment(Commands.Video.ProcessVideo command)
@@ -94,34 +90,28 @@ namespace Streaming.Application.Command.Handlers.Video
             SetupProcessingEnvironment(Command);
 
             await ffmpegProcessVideoAsync(Command.VideoId, Command.VideoPath);
+			var manifest = await CreateGenericManifest();
 
-            using (var memoryStream = new MemoryStream())
-            {
-                using (var zipArchive = new ZipArchive(memoryStream, ZipArchiveMode.Create, true))
-                {
-                    foreach (var file in processedDirectory.GetFiles())
-                    {
-                        zipArchive.CreateEntryFromFile(String.Format($"{processedDirectory.FullName}{{0}}{file.Name}", Path.DirectorySeparatorChar), file.Name);
-                    }
-                }
-                memoryStream.Position = 0;
+			int partNum = 1;
+			foreach (var file in processedDirectory.GetFiles())
+			{
+				using (var fileStream = file.OpenRead())
+				{
+					await videoBlobRepo.UploadAsync(Command.VideoId, partNum++, fileStream);
+				}
+			}
 
-                var manifest = await CreateGenericManifest();
-
-                timer.Stop();
+			timer.Stop();
 				
-				var searchFilter = Builders<Domain.Models.Core.Video>.Filter.Eq(x => x.VideoId, Command.VideoId);
+			var searchFilter = Builders<Domain.Models.Core.Video>.Filter.Eq(x => x.VideoId, Command.VideoId);
 
-				await bucket.UploadFromStreamAsync(Command.VideoId.ToString(), memoryStream);
+			var updateDefinition = Builders<Domain.Models.Core.Video>.Update
+				.Set(x => x.FinishedProcessingDate, DateTime.UtcNow)
+				.Set(x => x.ProcessingInfo, $"Sucessfully processed after {timer.Elapsed.TotalMilliseconds}ms")
+				.Set(x => x.VideoManifestHLS, manifest)
+				.Set(x => x.Length, VideoLength);
 
-				var updateDefinition = Builders<Domain.Models.Core.Video>.Update
-					.Set(x => x.FinishedProcessingDate, DateTime.UtcNow)
-					.Set(x => x.ProcessingInfo, $"Sucessfully processed after {timer.Elapsed.TotalMilliseconds}ms")
-					.Set(x => x.VideoManifestHLS, manifest)
-					.Set(x => x.Length, VideoLength);
-
-				await videoCollection.UpdateOneAsync(searchFilter, updateDefinition);
-            }
+			await videoCollection.UpdateOneAsync(searchFilter, updateDefinition);
         }
     }
 }

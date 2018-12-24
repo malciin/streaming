@@ -8,6 +8,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using MongoDB.Driver;
 using Streaming.Application.DTO.Video;
+using Streaming.Application.Repository;
 using Streaming.Application.Settings;
 using Streaming.Common.Helpers;
 using Streaming.Domain.Models.Core;
@@ -20,16 +21,19 @@ namespace Streaming.Application.Query
         private readonly IMongoCollection<Video> collection;
 		private readonly IHttpContextAccessor httpContextAccessor;
 		private readonly IDirectoriesSettings directorySettings;
+		private readonly IVideoBlobRepository videoBlobRepo;
 
         public VideoQueries(IMapper mapper, 
 			IMongoCollection<Video> collection,
 			IHttpContextAccessor httpContextAccessor, 
-			IDirectoriesSettings directorySettings)
+			IDirectoriesSettings directorySettings,
+			IVideoBlobRepository videoBlobRepo)
         {
             this.mapper = mapper;
             this.collection = collection;
 			this.httpContextAccessor = httpContextAccessor;
 			this.directorySettings = directorySettings;
+			this.videoBlobRepo = videoBlobRepo;
         }
 
         public async Task<VideoBasicMetadataDTO> GetBasicVideoMetadataAsync(Guid VideoId)
@@ -64,11 +68,9 @@ namespace Streaming.Application.Query
 			return new string('0', 3 - result.Length) + result + ".ts";
 		}
 
-		public async ValueTask<Stream> GetVideoPartAsync(Guid VideoId, int Part)
+		public async Task<Stream> GetVideoPartAsync(Guid VideoId, int Part)
 		{
-			var directory = new DirectoryInfo(String.Format($"{directorySettings.ProcessedDirectory}{{0}}{VideoId}{{0}}", Path.DirectorySeparatorChar));
-			var file = directory.GetFiles().Where(x => x.Name == GetFileNameByPart(Part)).First();
-			return file.OpenRead();
+			return await videoBlobRepo.GetVideoAsync(VideoId, Part);
 		}
 
 		public async Task<IEnumerable<VideoBasicMetadataDTO>> SearchAsync(VideoSearchDTO Search)

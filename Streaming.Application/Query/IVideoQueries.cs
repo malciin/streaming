@@ -11,6 +11,6 @@ namespace Streaming.Application.Query
         Task<VideoBasicMetadataDTO> GetBasicVideoMetadataAsync(Guid VideoId);
 		Task<IEnumerable<VideoBasicMetadataDTO>> SearchAsync(VideoSearchDTO Search);
 		Task<string> GetVideoManifestAsync(Guid VideoId);
-		ValueTask<Stream> GetVideoPartAsync(Guid VideoId, int Part);
+		Task<Stream> GetVideoPartAsync(Guid VideoId, int Part);
 	}
 }
