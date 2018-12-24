@@ -42,8 +42,10 @@ namespace Streaming.Api.Controllers
         [HttpGet("{Id}/{Part}")]
         public async Task<IActionResult> GetVideoPart(Guid Id, int Part)
         {
-			var movieStream = await queries.GetVideoPartAsync(Id, Part);
-            return File(movieStream, "video/MP2T", $"{Part}.ts");
+			using (var movieStream = await queries.GetVideoPartAsync(Id, Part))
+			{
+				return File(movieStream, "video/MP2T", $"{Part}.ts");
+			}
         }
 
         [HttpGet("Manifest/{Id}")]
