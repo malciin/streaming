@@ -7,4 +7,4 @@
 Streaming.Api/logs/*
 Streaming.Api/processed/*
 Streaming.Api/processing/*
-/Streaming.Api/Configurations/KeysConfiguration.Secret.cs
+Streaming.Application/Settings/KeysSettings.Secret.cs
