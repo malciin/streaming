@@ -1,4 +1,5 @@
 ﻿using Autofac;
+using Streaming.Application.Command.Commands.Video;
 using System;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
@@ -9,7 +10,7 @@ namespace Streaming.Application.Command.Bus
     class CommandBus : ICommandBus
 	{
 		private readonly ILifetimeScope lifetimeScope;
-		private ConcurrentQueue<ICommand> queue = new ConcurrentQueue<ICommand>();
+		private ConcurrentQueue<dynamic> queue = new ConcurrentQueue<dynamic>();
 
         private Task worker;
         private object lockObj = new object();
@@ -30,7 +31,7 @@ namespace Streaming.Application.Command.Bus
 		{
 			while(!queue.IsEmpty)
 			{
-				ICommand command;
+				dynamic command;
 				queue.TryDequeue(out command);
 				using (var scope = lifetimeScope.BeginLifetimeScope())
 				{

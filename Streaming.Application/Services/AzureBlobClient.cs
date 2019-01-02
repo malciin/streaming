@@ -33,14 +33,16 @@ namespace Streaming.Application.Services
 		public async Task<Stream> GetFileAsync(string ContainerName, string FileName)
 		{
 			var client = new HttpClient();
-			var response = await client.SendAsync(createBlobRequest($"{defaultEndpointsProtocol}://{accountName}.blob.{endpointSuffix}/{ContainerName}/{FileName}", HttpMethod.Get));
+            var request = createBlobRequest($"{defaultEndpointsProtocol}://{accountName}.blob.{endpointSuffix}/{ContainerName}/{FileName}", HttpMethod.Get);
+            var response = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
 			return await response.Content.ReadAsStreamAsync();
 		}
 
 		public async Task UploadFileAsync(string ContainerName, string FileName, Stream InputStream)
 		{
 			var client = new HttpClient();
-			var response = await client.SendAsync(createBlobRequest($"{defaultEndpointsProtocol}://{accountName}.blob.{endpointSuffix}/{ContainerName}/{FileName}", HttpMethod.Put, InputStream));
+            var request = createBlobRequest($"{defaultEndpointsProtocol}://{accountName}.blob.{endpointSuffix}/{ContainerName}/{FileName}", HttpMethod.Put, InputStream);
+            var response = await client.SendAsync(request);
 		}
 
 		#region AzureBlobHelpers

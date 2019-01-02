@@ -12,7 +12,7 @@ namespace Streaming.Application.Modules
 		{
 			base.Load(builder);
 
-			builder.RegisterType<VideoMongoDbBlobRepository>()
+			builder.RegisterType<VideoAzureBlobRepository>()
 				   .As<IVideoBlobRepository>()
 				   .InstancePerLifetimeScope();
 		}

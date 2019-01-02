@@ -5,6 +5,7 @@ using Streaming.Common.Extensions;
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -57,13 +58,6 @@ namespace Streaming.Application.Command.Handlers.Video
                 $"{processedDirectory.FullName}{{0}}%03d.ts", Path.DirectorySeparatorChar);
 
             await splitVideoIntoPartsCmd.ExecuteBashAsync();
-
-            var cleanCommands = new string[] {
-                $"rm {processingDirectory.FullName}{videoId}.mp4",
-                $"rm {processingDirectory.FullName}{videoId}.ts" };
-
-            foreach (var command in cleanCommands)
-                await command.ExecuteBashAsync();
         }
 
         async Task<string> CreateGenericManifest()
@@ -93,7 +87,7 @@ namespace Streaming.Application.Command.Handlers.Video
             await ffmpegProcessVideoAsync(Command.VideoId, Command.VideoPath);
 			var manifest = await CreateGenericManifest();
 
-            int partNum = 1;
+            int partNum = 0;
 			foreach (var file in processedDirectory.GetFiles())
 			{
 				using (var fileStream = file.OpenRead())
@@ -104,7 +98,15 @@ namespace Streaming.Application.Command.Handlers.Video
 
 			timer.Stop();
 
-			var searchFilter = Builders<Domain.Models.Core.Video>.Filter.Eq(x => x.VideoId, Command.VideoId);
+            var cleanCommands = new string[] {
+                $"rm {processingDirectory.FullName}{Command.VideoId}.mp4",
+                $"rm {processingDirectory.FullName}{Command.VideoId}.ts" }
+                .Concat(processedDirectory.GetFiles().Select(x => $"rm {x}"));
+
+            foreach (var command in cleanCommands)
+                await command.ExecuteBashAsync();
+
+            var searchFilter = Builders<Domain.Models.Core.Video>.Filter.Eq(x => x.VideoId, Command.VideoId);
 
             var updateDefinition = Builders<Domain.Models.Core.Video>.Update
 				.Set(x => x.FinishedProcessingDate, DateTime.UtcNow)

@@ -19,9 +19,12 @@ namespace Streaming.Application.Command.Handlers.Video
 		private readonly IDirectoriesSettings directoriesSettings;
 
 		public UploadVideo(IMongoCollection<Domain.Models.Core.Video> videoCollection,
-			IDirectoriesSettings directoriesSettings)
+			IDirectoriesSettings directoriesSettings,
+            ICommandBus commandBus)
 		{
 			this.videoCollection = videoCollection;
+            this.directoriesSettings = directoriesSettings;
+            this.commandBus = commandBus;
 		}
 
 		public async Task HandleAsync(Commands.Video.UploadVideo Command)
@@ -36,7 +39,7 @@ namespace Streaming.Application.Command.Handlers.Video
 
 			await videoCollection.InsertOneAsync(video);
 
-			var filePath = String.Format($"{directoriesSettings.ProcessingDirectory}{{0}}{Command.File.FileName}", Path.DirectorySeparatorChar);
+			var filePath = String.Format($"{directoriesSettings.ProcessingDirectory}{{0}}{video.VideoId}_{Command.File.FileName}", Path.DirectorySeparatorChar);
 
 			using (var fileStream = File.OpenWrite(filePath))
 			{
