@@ -14,7 +14,7 @@ namespace Streaming.Api.Controllers
     public class VideoController : _ApiControllerBase
     {
         private readonly IVideoQueries queries;
-        private VideoController(ICommandDispatcher commandBus, IVideoQueries queries) : base(commandBus)
+        public VideoController(ICommandDispatcher commandDispatcher, IVideoQueries queries) : base(commandDispatcher)
         {
             this.queries = queries;
         }

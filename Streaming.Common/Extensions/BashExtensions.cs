@@ -6,50 +6,37 @@ namespace Streaming.Common.Extensions
 {
     public static class BashExtensions
     {
-        private static Process StartCommandProcess(string command)
+        public static Process StartBashExecution(this string Command)
         {
             ProcessStartInfo psi = new ProcessStartInfo();
             psi.FileName = PlatformHelper.CommandlineToolname;
-            psi.Arguments = $"-c \"{command}\"";
+            psi.Arguments = $"-c \"{Command}\"";
             psi.UseShellExecute = false;
             psi.RedirectStandardOutput = true;
             psi.RedirectStandardError = true;
 
-            Process proc = new Process
+            Process process = new Process
             {
                 StartInfo = psi
             };
 
-            proc.Start();
-            return proc;
-        }
-
-        public static string ExecuteBash(this string Command)
-        {
-            var proc = StartCommandProcess(Command);
-
-            string error = proc.StandardError.ReadToEnd();
-
-            if (!string.IsNullOrEmpty(error))
-                return "error: " + error;
-
-            string output = proc.StandardOutput.ReadToEnd();
-            proc.WaitForExit();
-            return output;
+            process.Start();
+            return process;
         }
 
         public static async Task<string> ExecuteBashAsync(this string Command)
         {
-            var proc = StartCommandProcess(Command);
+            using (var process = Command.StartBashExecution())
+            {
+                string error = await process.StandardError.ReadToEndAsync();
 
-            string error = await proc.StandardError.ReadToEndAsync();
+                if (!string.IsNullOrEmpty(error))
+                    return "error: " + error;
 
-            if (!string.IsNullOrEmpty(error))
-                return "error: " + error;
-
-            string output = await proc.StandardOutput.ReadToEndAsync();
-            proc.WaitForExit();
-            return output;
+                string output = await process.StandardOutput.ReadToEndAsync();
+                process.WaitForExit();
+                return output;
+            }
         }
     }
 }

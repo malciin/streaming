@@ -1,19 +1,20 @@
 ﻿using Autofac;
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Streaming.Application.Command.Bus
 {
-	class CommandBus : ICommandBus
+
+    class CommandBus : ICommandBus
 	{
 		private readonly ILifetimeScope lifetimeScope;
 		private ConcurrentQueue<ICommand> queue = new ConcurrentQueue<ICommand>();
-		private object lockObj = new object();
+
+        private Task worker;
+        private object lockObj = new object();
 		private bool running = false;
+        
 
 		public CommandBus(ILifetimeScope lifetimeScope)
 		{
@@ -25,7 +26,7 @@ namespace Streaming.Application.Command.Bus
 			throw new NotImplementedException();
 		}
 
-		async Task Start()
+		async Task WorkerTask()
 		{
 			while(!queue.IsEmpty)
 			{
@@ -34,7 +35,7 @@ namespace Streaming.Application.Command.Bus
 				using (var scope = lifetimeScope.BeginLifetimeScope())
 				{
 					var dispatcher = scope.Resolve<ICommandDispatcher>();
-					await dispatcher.HandleAsync(command);
+                    await dispatcher.HandleAsync(command);
 				}
 			}
 			lock(lockObj)
@@ -51,7 +52,7 @@ namespace Streaming.Application.Command.Bus
 				if (!running)
 				{
 					running = true;
-					_ = Start();
+                    worker = WorkerTask();
 				}
 			}
 		}
