@@ -1,0 +1,7 @@
+.vs/*
+.git/*
+*/obj/*
+*/bin/*
+Streaming.Api/processed/*
+Streaming.Api/processing/*
+Streaming.Api/logs/*

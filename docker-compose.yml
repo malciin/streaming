@@ -1,0 +1,10 @@
+version: "3"
+services:
+  api:
+    container_name: streaming_api
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: streaming_api
+    ports:
+      - "54321:54321"
