@@ -2,11 +2,11 @@
 using Streaming.Application.Repository;
 using Streaming.Application.Settings;
 using Streaming.Common.Extensions;
+using Streaming.Domain.Models.Core;
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Streaming.Application.Command.Handlers.Video
@@ -60,22 +60,17 @@ namespace Streaming.Application.Command.Handlers.Video
             await splitVideoIntoPartsCmd.ExecuteBashAsync();
         }
 
-        async Task<string> CreateGenericManifest()
+        async Task<VideoManifest> CreateManifest(Guid VideoId)
         {
-            var stringBuilder = new StringBuilder();
-            stringBuilder.AppendLine("#EXTM3U");
-            stringBuilder.AppendLine("#EXT-X-VERSION:3");
-            stringBuilder.AppendLine("#EXT-X-TARGETDURATION:5");
-            stringBuilder.AppendLine("#EXT-X-MEDIA-SEQUENCE:0");
-            int part = 0;
+            var manifest = new VideoManifest();
+            manifest.SetHeaders(TargetDurationSeconds: 5);
+
             foreach(var file in processedDirectory.GetFiles())
             {
-                var length = await GetVideoLengthStringAsync(file.FullName);
-                stringBuilder.AppendLine($"#EXTINF:{length}");
-                stringBuilder.AppendLine($"[ENDPOINT]/[ID]/{part++}");
+                var length = double.Parse(await GetVideoLengthStringAsync(file.FullName));
+                manifest.AddPart(VideoId, length);
             }
-            stringBuilder.AppendLine("#EXT-X-ENDLIST");
-            return stringBuilder.ToString();
+            return manifest;
         }
 
         public async Task HandleAsync(Commands.Video.ProcessVideo Command)
@@ -85,7 +80,7 @@ namespace Streaming.Application.Command.Handlers.Video
             SetupProcessingEnvironment(Command);
 
             await ffmpegProcessVideoAsync(Command.VideoId, Command.VideoPath);
-			var manifest = await CreateGenericManifest();
+			var manifest = await CreateManifest(Command.VideoId);
 
             int partNum = 0;
 			foreach (var file in processedDirectory.GetFiles())
@@ -111,7 +106,7 @@ namespace Streaming.Application.Command.Handlers.Video
             var updateDefinition = Builders<Domain.Models.Core.Video>.Update
 				.Set(x => x.FinishedProcessingDate, DateTime.UtcNow)
 				.Set(x => x.ProcessingInfo, $"Sucessfully processed after {timer.Elapsed.TotalMilliseconds}ms")
-				.Set(x => x.VideoManifestHLS, manifest)
+				.Set(x => x.VideoManifestHLS, manifest.ToString())
 				.Set(x => x.Length, VideoLength);
 
 			await videoCollection.UpdateOneAsync(searchFilter, updateDefinition);
