@@ -8,3 +8,11 @@ services:
     image: streaming_api
     ports:
       - "54321:54321"
+  frontend:
+    container_name: streaming_frontend
+    build:
+      context: Streaming.Frontend/
+      dockerfile: Dockerfile
+    image: streaming_frontend
+    ports:
+      - "8080:3000"
