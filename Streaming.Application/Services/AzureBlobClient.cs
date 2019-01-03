@@ -31,7 +31,7 @@ namespace Streaming.Application.Services
                 Permissions = SharedAccessAccountPermissions.Read,
                 Services = SharedAccessAccountServices.Blob,
                 ResourceTypes = SharedAccessAccountResourceTypes.Object,
-                SharedAccessExpiryTime = DateTime.UtcNow.AddSeconds(10),
+                SharedAccessExpiryTime = DateTime.UtcNow.AddDays(1),
                 Protocols = SharedAccessProtocol.HttpsOnly
             };
 
@@ -47,7 +47,7 @@ namespace Streaming.Application.Services
 
 		public async Task UploadFileAsync(string ContainerName, string FileName, Stream InputStream)
 		{
-            var blob = await client.GetBlobReferenceFromServerAsync(new Uri($"{storageAccount.BlobEndpoint}{ContainerName}/{FileName}"));
+            var blob = client.GetContainerReference(ContainerName).GetBlockBlobReference(FileName);
             await blob.UploadFromStreamAsync(InputStream);
         }
 	}

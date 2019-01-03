@@ -10,6 +10,7 @@ using MongoDB.Driver;
 using Streaming.Application.DTO.Video;
 using Streaming.Application.Repository;
 using Streaming.Application.Settings;
+using Streaming.Application.Strategies;
 using Streaming.Common.Helpers;
 using Streaming.Domain.Models.Core;
 
@@ -19,19 +20,19 @@ namespace Streaming.Application.Query
     {
         private readonly IMapper mapper;
         private readonly IMongoCollection<Video> collection;
-		private readonly IHttpContextAccessor httpContextAccessor;
+		private readonly IManifestEndpointStrategy manifestEndpointStrategy;
 		private readonly IDirectoriesSettings directorySettings;
 		private readonly IVideoBlobRepository videoBlobRepo;
 
         public VideoQueries(IMapper mapper, 
 			IMongoCollection<Video> collection,
-			IHttpContextAccessor httpContextAccessor, 
+            IManifestEndpointStrategy manifestEndpointStrategy, 
 			IDirectoriesSettings directorySettings,
 			IVideoBlobRepository videoBlobRepo)
         {
             this.mapper = mapper;
             this.collection = collection;
-			this.httpContextAccessor = httpContextAccessor;
+			this.manifestEndpointStrategy = manifestEndpointStrategy;
 			this.directorySettings = directorySettings;
 			this.videoBlobRepo = videoBlobRepo;
         }
@@ -54,18 +55,7 @@ namespace Streaming.Application.Query
 				.Find<Video>(searchFilter)
 				.Project(x => x.VideoManifestHLS).FirstOrDefaultAsync();
 
-			var getVideoPartEndpoint = UrlHelper.GetHostUrl(httpContextAccessor.HttpContext) + "/Video";
-			var manifestStr = rawManifest
-				.Replace("[ENDPOINT]", getVideoPartEndpoint)
-				.Replace("[ID]", VideoId.ToString());
-
-			return manifestStr;
-		}
-
-		private string GetFileNameByPart(int Part)
-		{
-			var result = Part.ToString();
-			return new string('0', 3 - result.Length) + result + ".ts";
+			return manifestEndpointStrategy.SetEndpoints(VideoId, rawManifest);
 		}
 
 		public async Task<Stream> GetVideoPartAsync(Guid VideoId, int Part)

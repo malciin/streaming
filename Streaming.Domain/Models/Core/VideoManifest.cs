@@ -8,6 +8,8 @@ namespace Streaming.Domain.Models.Core
 {
     public class VideoManifest
     {
+        public static string EndpointPlaceholder => "[ENDPOINT]";
+
         private StringBuilder manifest;
         private int parts = 0;
         private bool headersSet;
@@ -38,7 +40,8 @@ namespace Streaming.Domain.Models.Core
         public VideoManifest AddPart(Guid Id, double PartLength)
         {
             manifest.AppendLine($"#EXTINF:{PartLength}");
-            manifest.AppendLine($"[ENDPOINT]/[ID]/{parts++}");
+            manifest.AppendLine(EndpointPlaceholder);
+            parts++;
             return this;
         }
 

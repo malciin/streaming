@@ -39,7 +39,8 @@ namespace Streaming.Application.Command.Handlers.Video
 
 			await videoCollection.InsertOneAsync(video);
 
-			var filePath = String.Format($"{directoriesSettings.ProcessingDirectory}{{0}}{video.VideoId}_{Command.File.FileName}", Path.DirectorySeparatorChar);
+            Directory.CreateDirectory($"{directoriesSettings.ProcessingDirectory}");
+            var filePath = String.Format($"{directoriesSettings.ProcessingDirectory}{{0}}{video.VideoId}_{Command.File.FileName}", Path.DirectorySeparatorChar);
 
 			using (var fileStream = File.OpenWrite(filePath))
 			{
