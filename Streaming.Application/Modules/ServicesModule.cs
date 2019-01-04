@@ -1,6 +1,7 @@
 ﻿using Autofac;
 using MongoDB.Driver;
 using MongoDB.Driver.GridFS;
+using Streaming.Application.Settings;
 using Streaming.Domain.Models.Core;
 
 namespace Streaming.Application.Modules
@@ -12,9 +13,11 @@ namespace Streaming.Application.Modules
             base.Load(builder);
 
 
-			builder.Register<IMongoDatabase>(context => new MongoClient("mongodb://localhost:27017")
-                   .GetDatabase("streaming"))
-                   .SingleInstance();
+			builder.Register<IMongoDatabase>(context => {
+                var connectionString = context.Resolve<IDatabaseSettings>().ConnectionString;
+                return new MongoClient(connectionString)
+                       .GetDatabase("streaming");
+            }).SingleInstance();
 
 			builder.Register(context =>
 			{

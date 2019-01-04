@@ -1,11 +1,13 @@
 {
   "Hosting": {
-    "HttpPort": "54321",
-    "Environment": "Development",
+    "HttpPort": "8086",
     "SecretServerKey": "Type your supersecretkeyhere"
   },
   "Directories": {
     "VideoToProcessDirectory": "processing",
     "ProcessedVideoDirectory": "processed"
+  },
+  "Database": {
+    "ConnectionString": "mongodb://localhost:27017"
   }
 }

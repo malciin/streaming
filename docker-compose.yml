@@ -7,7 +7,7 @@ services:
       dockerfile: Dockerfile
     image: streaming_api
     ports:
-      - "54321:54321"
+      - "8086:8086"
   frontend:
     container_name: streaming_frontend
     build:

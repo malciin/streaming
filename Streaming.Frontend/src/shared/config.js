@@ -1,3 +1,3 @@
 export const Config = {
-    "apiPath" : "http://localhost:54321"
+    "apiPath" : "http://localhost:8086"
 }

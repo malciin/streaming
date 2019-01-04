@@ -14,7 +14,7 @@ class IndexPage extends React.Component{
     }
     componentDidMount() {
 
-        fetch('http://localhost:54321/Video/Search', {
+        fetch(Config.apiPath + '/Video/Search', {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',

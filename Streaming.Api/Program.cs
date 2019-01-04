@@ -20,17 +20,16 @@ namespace Streaming.Api
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("Configuration.json", optional: false, reloadOnChange: false)
                 .Build();
-
             CreateWebHostBuilder(args).Build().Run();
         }
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
                 .UseUrls($"http://localhost:{configurationRoot["Hosting:HttpPort"]}")
-                .UseEnvironment(configurationRoot["Hosting:Environment"])
                 .ConfigureAppConfiguration(config =>
                 {
                     config.AddJsonFile("Configuration.json", optional: false, reloadOnChange: false);
+                    config.AddJsonFile($"Configuration.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}.json", optional: true, reloadOnChange: false);
                 })
                 .UseStartup<Startup>();
     }
