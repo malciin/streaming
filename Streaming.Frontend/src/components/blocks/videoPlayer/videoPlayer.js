@@ -1,82 +1,47 @@
 import React from 'react'
 import Hls from 'hls.js'
+import videojs from 'video.js'
 import './videoPlayer.scss'
 
 export default class VideoPlayer extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = {
-            manifestUrl: this.props.manifestUrl,
-            videoPlayed: false,
-            hover: false
-        }
-        this.stopStartVideo = this.stopStartVideo.bind(this);
-        this.handleMouseOver = this.handleMouseOver.bind(this);
-
-        this.video = React.createRef();
+        this.videoNode = React.createRef();
     }
 
     componentDidMount() {
-        var video = document.getElementById('video')
-        this.setState({
-            video: video
-        })
-        if(Hls.isSupported()) {
-            var hls = new Hls();
-            hls.loadSource(this.state.manifestUrl);
-            hls.attachMedia(video);
-            hls.on(Hls.Events.MANIFEST_PARSED,function() {
-                video.play();
+        var manifestUrl = this.props.manifestUrl;
+        console.log(manifestUrl);
+        this.player = videojs(this.videoNode.current,
+            {
+                sources: [{
+                  src: 'http://localhost:8086/Video/Manifest/0969e4f4-89e6-4e21-a7c3-4f67fefaa5f5',
+                  type: 'application/x-mpegURL'
+                }]
+            }, 
+            function onPlayerReady() {
+                var customSpinner = document.createElement('div');
+                customSpinner.className = 'vjs-custom-spinner';
+                customSpinner.innerHTML = '<div class="vjs-custom-spinner-bounce-1"></div><div class="vjs-custom-spinner-bounce-2"></div>'
+                document.getElementsByClassName('vjs-loading-spinner')[0].appendChild(customSpinner)
+                this.autoplay(true);
+                this.controls(true);
+                console.log(this.paused());
+                
             });
-            
-            this.setState({videoPlayed: true});
-        }
     }
 
-    handleMouseOver() {
-        console.log("Before: " + this.state.hover);
-        this.setState({
-            hover: !this.state.hover
-        });
-        
-    }
-
-    stopStartVideo(event)
-    {
-        console.log(this.video);
-        if (this.video.current.paused)
-        {
-            this.video.current.play();
-            this.setState({videoPlayed: true});
-        }
-        else
-        {
-            this.video.current.pause();
-            this.setState({videoPlayed: false});
-        }
+    componentWillUnmount() {
+        this.player.dispose();
     }
 
     render() {
-        let icon = "";
-        if (this.state.videoPlayed)
-        {
-            icon = "icon-pause-outline";
-        }
-        else
-        {
-            icon = "icon-play-outline";
-        }
-        return <div id="video-wrapper" className="row" onMouseEnter={this.handleMouseOver}
-        onMouseLeave={this.handleMouseOver}>
-            <video 
-                id="video"
-                onClick={this.stopStartVideo} 
-                ref={this.video}
-                ></video>
-            <div className={ `video-control${this.state.hover ? " showed-controls" : ""}`} >
-                <i className={ icon + " play"} onClick={this.stopStartVideo}></i>
-            </div>   
-        </div>
+        return (
+            <div>
+                <video className="video-js" ref={this.videoNode} controls>
+                </video>
+            </div>
+        )
     }
 }

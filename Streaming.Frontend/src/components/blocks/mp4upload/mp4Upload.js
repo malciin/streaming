@@ -31,8 +31,6 @@ export default class Mp4Upload extends React.Component {
                 }
             });
         });
-
-        
     }
 
     removeFile() {

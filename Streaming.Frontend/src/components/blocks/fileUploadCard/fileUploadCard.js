@@ -36,7 +36,7 @@ class FileUploadCard extends React.Component {
             <div className="upload-card flex-box text-primary-color">
                 
                 <div className="flex-box">
-                <div className="icon"><span className="icon-video-alt"></span></div>
+                <div className="icon"><span className="icon-video"></span></div>
                 <div className="card-content">
                     <div className="text-primary-color">{this.state.file.name}</div>
                     <div className="text-secondary-color">{this.printFriendlyBytes(this.state.file.size)}</div>
