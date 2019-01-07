@@ -16,7 +16,7 @@ export default class VideoPlayer extends React.Component {
         this.player = videojs(this.videoNode.current,
             {
                 sources: [{
-                  src: 'http://localhost:8086/Video/Manifest/0969e4f4-89e6-4e21-a7c3-4f67fefaa5f5',
+                  src: manifestUrl,
                   type: 'application/x-mpegURL'
                 }]
             }, 
