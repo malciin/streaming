@@ -49,7 +49,6 @@ namespace Streaming.Application.Query
 		{
 			var searchFilter = Builders<Video>.Filter.Eq(x => x.VideoId, VideoId);
 			var results = collection.Find<Video>(searchFilter).ToList();
-			var all = collection.Find<Video>(_ => true).ToList();
 
 			var rawManifest = await collection
 				.Find<Video>(searchFilter)

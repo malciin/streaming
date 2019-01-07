@@ -6,7 +6,7 @@
     display: flex;
     color: white;
     .thumbnail {
-        background-color: red;
+        background-color: #1f1f1f;
         color: white;
         text-decoration: none; /* no underline */
         height: 240px;
@@ -29,5 +29,6 @@
             font-size: 42px;
         }
     }
+    margin-bottom: 20px;
     
 }
