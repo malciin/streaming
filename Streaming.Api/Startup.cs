@@ -39,7 +39,7 @@ namespace Streaming.Api
 
             var builder = new ContainerBuilder();
 
-            Application.Mappings.MongoDbMappings.Map();
+            Application.MongoDb.Mappings.Map();
 
             builder.Populate(services);
 
@@ -47,7 +47,6 @@ namespace Streaming.Api
             builder.RegisterModule<Application.Modules.ServicesModule>();
             builder.RegisterModule<Application.Modules.SettingsModule>();
 			builder.RegisterModule<Application.Modules.QueryModule>();
-            builder.RegisterModule<Application.Modules.RepositoriesModule>();
             builder.RegisterModule<Application.Modules.StrategiesModule>();
 
             return new AutofacServiceProvider(builder.Build());

@@ -5,12 +5,12 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace Streaming.Application.Repository
+namespace Streaming.Application.Services
 {
-    public class VideoAzureBlobRepository : IVideoBlobRepository
+    public class VideoAzureBlobService : IVideoBlobService
 	{
 		private readonly AzureBlobClient blobClient;
-		public VideoAzureBlobRepository(IKeysSettings keysSettings)
+		public VideoAzureBlobService(IKeysSettings keysSettings)
 		{
 			blobClient = new AzureBlobClient(keysSettings.AzureBlobConnectionString);
 		}

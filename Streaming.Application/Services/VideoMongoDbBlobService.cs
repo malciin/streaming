@@ -5,13 +5,13 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Streaming.Application.Repository
+namespace Streaming.Application.Services
 {
-	public class VideoMongoDbBlobRepository : IVideoBlobRepository
+	public class VideoMongoDbBlobService : IVideoBlobService
 	{
 		IGridFSBucket gridBucket;
 
-		public VideoMongoDbBlobRepository(IGridFSBucket gridBucket)
+		public VideoMongoDbBlobService(IGridFSBucket gridBucket)
 		{
 			this.gridBucket = gridBucket;
 		}

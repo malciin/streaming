@@ -1,6 +1,7 @@
 ﻿using Autofac;
 using MongoDB.Driver;
 using MongoDB.Driver.GridFS;
+using Streaming.Application.Services;
 using Streaming.Application.Settings;
 using Streaming.Domain.Models.Core;
 
@@ -26,6 +27,10 @@ namespace Streaming.Application.Modules
 
             builder.Register<IGridFSBucket>(context => new GridFSBucket(context.Resolve<IMongoDatabase>()))
                    .SingleInstance();
+
+            builder.RegisterType<VideoAzureBlobService>()
+                   .As<IVideoBlobService>()
+                   .InstancePerLifetimeScope();
         }
     }
 }

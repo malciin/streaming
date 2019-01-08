@@ -2,9 +2,9 @@
 using System.IO;
 using System.Threading.Tasks;
 
-namespace Streaming.Application.Repository
+namespace Streaming.Application.Services
 {
-	public interface IVideoBlobRepository
+	public interface IVideoBlobService
 	{
         string GetVideoUrl(Guid VideoId, int PartNumber);
 		Task<Stream> GetVideoAsync(Guid VideoId, int PartNumber);

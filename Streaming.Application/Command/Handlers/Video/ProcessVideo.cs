@@ -1,5 +1,5 @@
 ﻿using MongoDB.Driver;
-using Streaming.Application.Repository;
+using Streaming.Application.Services;
 using Streaming.Application.Settings;
 using Streaming.Common.Extensions;
 using Streaming.Domain.Models.Core;
@@ -14,7 +14,7 @@ namespace Streaming.Application.Command.Handlers.Video
     public class ProcessVideo : ICommandHandler<Commands.Video.ProcessVideo>
     {
 		private readonly IMongoCollection<Domain.Models.Core.Video> videoCollection;
-		private readonly IVideoBlobRepository videoBlobRepo;
+		private readonly IVideoBlobService videoBlobService;
 		private readonly IDirectoriesSettings directoriesConfig;
 
         private DirectoryInfo processingDirectory;
@@ -23,11 +23,11 @@ namespace Streaming.Application.Command.Handlers.Video
 
         public ProcessVideo(IDirectoriesSettings directoriesConfig,
 			IMongoCollection<Domain.Models.Core.Video> videoCollection,
-			IVideoBlobRepository videoBlobRepo)
+			IVideoBlobService videoBlobService)
         {
             this.directoriesConfig = directoriesConfig;
 			this.videoCollection = videoCollection;
-			this.videoBlobRepo = videoBlobRepo;
+			this.videoBlobService = videoBlobService;
         }
 
         void SetupProcessingEnvironment(Commands.Video.ProcessVideo command)
@@ -87,7 +87,7 @@ namespace Streaming.Application.Command.Handlers.Video
 			{
 				using (var fileStream = file.OpenRead())
 				{
-					await videoBlobRepo.UploadAsync(Command.VideoId, partNum++, fileStream);
+					await videoBlobService.UploadAsync(Command.VideoId, partNum++, fileStream);
 				}
 			}
 

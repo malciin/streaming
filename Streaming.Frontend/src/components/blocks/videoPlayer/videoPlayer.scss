@@ -16,10 +16,38 @@ $slider-bg-color: lighten($accent-color, 33%);
         margin-top: -(1.5em / 2);   
     }
 
-    .vjs-control-bar, .vjs-big-play-button, .vjs-menu-button .vjs-menu-content {
+    .vjs-big-play-button, .vjs-menu-button .vjs-menu-content {
         background-color: rgba($accent-color, 0.7);
     }
+
+    .vjs-control-bar {
+        background-color: rgba($accent-color, 0.7);
+
+        .vjs-progress-holder{
+            height: 100%;
+            background-color: transparent;
+            
+            .vjs-load-progress, .vjs-load-progress div{
+                background-color: rgba(orange, 0.2);
+            }
+
+            .vjs-play-progress {
+                background-color: rgba(orange, 0.2);
+                &::before {
+                    content: "";
+                    width: 0px;
+                    height: 100%;
+                    background-color: $accent-color;
+                    display: block;
+                    top: 0;
+                    right: 0;
+                }
+            }
+        }
+    }
 }
+
+
 
 .vjs-loading-spinner {
     border: 0px;

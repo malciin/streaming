@@ -8,8 +8,8 @@ namespace Streaming.Application.Query
 {
     public interface IVideoQueries
     {
-        Task<VideoBasicMetadataDTO> GetBasicVideoMetadataAsync(Guid VideoId);
-		Task<IEnumerable<VideoBasicMetadataDTO>> SearchAsync(VideoSearchDTO Search);
+        Task<VideoMetadataDTO> GetBasicVideoMetadataAsync(Guid VideoId);
+		Task<IEnumerable<VideoMetadataDTO>> SearchAsync(VideoSearchDTO Search);
 		Task<string> GetVideoManifestAsync(Guid VideoId);
 		Task<Stream> GetVideoPartAsync(Guid VideoId, int Part);
 	}

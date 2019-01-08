@@ -1,12 +1,9 @@
 ﻿using MongoDB.Bson.Serialization;
 using Streaming.Domain.Models.Core;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace Streaming.Application.Mappings
+namespace Streaming.Application.MongoDb
 {
-    public static class MongoDbMappings
+    public static class Mappings
     {
         public static void Map()
         {

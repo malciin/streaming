@@ -28,13 +28,13 @@ namespace Streaming.Api.Controllers
         }
 
         [HttpGet("{Id}")]
-        public async Task<VideoBasicMetadataDTO> GetById(Guid id)
+        public async Task<VideoMetadataDTO> GetById(Guid id)
         {
             return await queries.GetBasicVideoMetadataAsync(id);
         }
 
         [HttpPost("Search")]
-        public async Task<IEnumerable<VideoBasicMetadataDTO>> Search(VideoSearchDTO Search)
+        public async Task<IEnumerable<VideoMetadataDTO>> Search(VideoSearchDTO Search)
         {
 			return await queries.SearchAsync(Search);
         }

@@ -27,8 +27,6 @@ export default class VideoPlayer extends React.Component {
                 document.getElementsByClassName('vjs-loading-spinner')[0].appendChild(customSpinner)
                 this.autoplay(true);
                 this.controls(true);
-                console.log(this.paused());
-                
             });
     }
 
