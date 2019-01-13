@@ -37,9 +37,9 @@ namespace Streaming.Domain.Models.Core
             return this;
         }
 
-        public VideoManifest AddPart(Guid Id, double PartLength)
+        public VideoManifest AddPart(Guid Id, TimeSpan PartLength)
         {
-            manifest.AppendLine($"#EXTINF:{PartLength}");
+            manifest.AppendLine($"#EXTINF:{PartLength.TotalSeconds}");
             manifest.AppendLine(EndpointPlaceholder);
             parts++;
             return this;

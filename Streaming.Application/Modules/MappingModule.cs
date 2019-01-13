@@ -9,7 +9,7 @@ namespace Streaming.Application.Modules
         protected override void Load(ContainerBuilder builder)
         {
             base.Load(builder);
-            var currentAssembly = typeof(IMappingService).GetTypeInfo().Assembly;
+            var currentAssembly = typeof(MappingModule).GetTypeInfo().Assembly;
 
             builder.RegisterAssemblyTypes(currentAssembly)
                    .AssignableTo<IMappingService>();

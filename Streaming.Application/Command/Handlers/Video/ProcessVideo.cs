@@ -4,9 +4,11 @@ using Streaming.Application.Settings;
 using Streaming.Common.Extensions;
 using Streaming.Domain.Models.Core;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Streaming.Application.Command.Handlers.Video
@@ -16,48 +18,27 @@ namespace Streaming.Application.Command.Handlers.Video
 		private readonly IMongoCollection<Domain.Models.Core.Video> videoCollection;
 		private readonly IVideoBlobService videoBlobService;
 		private readonly IDirectoriesSettings directoriesConfig;
+        private readonly IProcessVideoService processVideoService;
 
         private DirectoryInfo processingDirectory;
-        private DirectoryInfo processedDirectory;
-        private TimeSpan VideoLength;
+        IEnumerable<FileInfo> splittedFiles => processingDirectory
+            .GetFiles()
+            .Where(x => Regex.IsMatch(x.Name, @"\d+\.ts"));
 
         public ProcessVideo(IDirectoriesSettings directoriesConfig,
 			IMongoCollection<Domain.Models.Core.Video> videoCollection,
-			IVideoBlobService videoBlobService)
+			IVideoBlobService videoBlobService,
+            IProcessVideoService processVideoService)
         {
             this.directoriesConfig = directoriesConfig;
 			this.videoCollection = videoCollection;
 			this.videoBlobService = videoBlobService;
+            this.processVideoService = processVideoService;
         }
 
         void SetupProcessingEnvironment(Commands.Video.ProcessVideo command)
         {
             processingDirectory = Directory.CreateDirectory(String.Format($"{directoriesConfig.ProcessingDirectory}{{0}}", Path.DirectorySeparatorChar));
-            processedDirectory = Directory.CreateDirectory(String.Format($"{directoriesConfig.ProcessedDirectory}{{0}}{command.VideoId}{{0}}", Path.DirectorySeparatorChar));
-        }
-
-        async Task<string> GetVideoLengthStringAsync(string videoPath)
-        {
-            var getLengthStringCommand = $"ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 [FILEPATH]";
-            return (await getLengthStringCommand.Replace("[FILEPATH]", $"{videoPath}").ExecuteBashAsync())
-                    .Replace("\r\n", String.Empty).Replace("\n", String.Empty);
-        }
-
-        async Task ffmpegProcessVideoAsync(Guid videoId, string videoPath)
-        {
-            var copyVideoCmd = $"ffmpeg -i {videoPath} -c copy {processingDirectory.FullName}{videoId}.ts";
-
-            await copyVideoCmd.ExecuteBashAsync();
-
-            var length = await GetVideoLengthStringAsync($"{processingDirectory.FullName}{videoId}.ts");
-            VideoLength = TimeSpan.FromSeconds(double.Parse(length));
-
-            var splitVideoIntoPartsCmd = String.Format("ffmpeg -i " +
-                $"{processingDirectory.FullName}{videoId}.ts " +
-                "-c copy -map 0 -segment_time 5 -f segment " +
-                $"{processedDirectory.FullName}{{0}}%03d.ts", Path.DirectorySeparatorChar);
-
-            await splitVideoIntoPartsCmd.ExecuteBashAsync();
         }
 
         async Task<VideoManifest> CreateManifest(Guid VideoId)
@@ -65,9 +46,9 @@ namespace Streaming.Application.Command.Handlers.Video
             var manifest = new VideoManifest();
             manifest.SetHeaders(TargetDurationSeconds: 5);
 
-            foreach(var file in processedDirectory.GetFiles())
+            foreach(var file in splittedFiles)
             {
-                var length = double.Parse(await GetVideoLengthStringAsync(file.FullName));
+                var length = await processVideoService.GetVideoLengthAsync(file.FullName);
                 manifest.AddPart(VideoId, length);
             }
             return manifest;
@@ -78,12 +59,13 @@ namespace Streaming.Application.Command.Handlers.Video
             var timer = Stopwatch.StartNew();
 
             SetupProcessingEnvironment(Command);
-
-            await ffmpegProcessVideoAsync(Command.VideoId, Command.VideoPath);
+            var videoLength = await processVideoService.GetVideoLengthAsync(Command.VideoPath);
+            await processVideoService.ProcessVideoAsync(Command.VideoPath, 
+                processingDirectory.FullName);
 			var manifest = await CreateManifest(Command.VideoId);
 
             int partNum = 0;
-			foreach (var file in processedDirectory.GetFiles())
+			foreach (var file in splittedFiles)
 			{
 				using (var fileStream = file.OpenRead())
 				{
@@ -93,10 +75,7 @@ namespace Streaming.Application.Command.Handlers.Video
 
 			timer.Stop();
 
-            var cleanCommands = new string[] {
-                $"rm {processingDirectory.FullName}{Command.VideoId}.mp4",
-                $"rm {processingDirectory.FullName}{Command.VideoId}.ts" }
-                .Concat(processedDirectory.GetFiles().Select(x => $"rm {x}"));
+            var cleanCommands = processingDirectory.GetFiles().Select(x => $"rm {x}");
 
             foreach (var command in cleanCommands)
                 await command.ExecuteBashAsync();
@@ -107,7 +86,7 @@ namespace Streaming.Application.Command.Handlers.Video
 				.Set(x => x.FinishedProcessingDate, DateTime.UtcNow)
 				.Set(x => x.ProcessingInfo, $"Sucessfully processed after {timer.Elapsed.TotalMilliseconds}ms")
 				.Set(x => x.VideoManifestHLS, manifest.ToString())
-				.Set(x => x.Length, VideoLength);
+				.Set(x => x.Length, videoLength);
 
 			await videoCollection.UpdateOneAsync(searchFilter, updateDefinition);
         }
