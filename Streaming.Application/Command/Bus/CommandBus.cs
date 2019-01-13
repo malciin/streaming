@@ -1,5 +1,4 @@
 ﻿using Autofac;
-using Streaming.Application.Command.Commands.Video;
 using System;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
@@ -37,7 +36,7 @@ namespace Streaming.Application.Command.Bus
 				{
 					var dispatcher = scope.Resolve<ICommandDispatcher>();
                     await dispatcher.HandleAsync(command);
-				}
+                }
 			}
 			lock(lockObj)
 			{

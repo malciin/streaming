@@ -1,6 +1,4 @@
-﻿using Streaming.Application.Services;
-using Streaming.Application.Settings;
-using Streaming.Common.Helpers;
+﻿using Streaming.Common.Helpers;
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -9,25 +7,26 @@ namespace Streaming.Application.Services
 {
     public class VideoAzureBlobService : IVideoBlobService
 	{
-		private readonly AzureBlobClient blobClient;
-		public VideoAzureBlobService(IKeysSettings keysSettings)
+		private readonly IAzureBlobClient blobClient;
+        private readonly static string blobContainerName = "videos";
+		public VideoAzureBlobService(IAzureBlobClient blobClient)
 		{
-			blobClient = new AzureBlobClient(keysSettings.AzureBlobConnectionString);
+            this.blobClient = blobClient;
 		}
 
 		public async Task<Stream> GetVideoAsync(Guid VideoId, int PartNumber)
 		{
-			return await blobClient.GetFileAsync("videos", VideoBlobNameHelper.GetVideoName(VideoId, PartNumber));
+			return await blobClient.GetFileAsync(blobContainerName, BlobNameHelper.GetVideoFilename(VideoId, PartNumber));
 		}
 
         public string GetVideoUrl(Guid VideoId, int PartNumber)
         {
-            return blobClient.GetFileLinkSASAuthorization("videos", VideoBlobNameHelper.GetVideoName(VideoId, PartNumber));
+            return blobClient.GetFileLinkSecuredSAS(blobContainerName, BlobNameHelper.GetVideoFilename(VideoId, PartNumber));
         }
 
         public async Task UploadAsync(Guid VideoId, int PartNumber, Stream Stream)
 		{
-			await blobClient.UploadFileAsync("videos", VideoBlobNameHelper.GetVideoName(VideoId, PartNumber), Stream);
+			await blobClient.UploadFileAsync(blobContainerName, BlobNameHelper.GetVideoFilename(VideoId, PartNumber), Stream);
 		}
 	}
 }

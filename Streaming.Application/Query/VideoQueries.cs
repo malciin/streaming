@@ -1,6 +1,6 @@
-﻿using AutoMapper;
-using MongoDB.Driver;
+﻿using MongoDB.Driver;
 using Streaming.Application.DTO.Video;
+using Streaming.Application.Mappings;
 using Streaming.Application.Services;
 using Streaming.Application.Settings;
 using Streaming.Application.Strategies;
@@ -15,17 +15,18 @@ namespace Streaming.Application.Query
 {
     public class VideoQueries : IVideoQueries
     {
-        private readonly IMapper mapper;
+        private readonly VideoMappingService mapper;
         private readonly IMongoCollection<Video> collection;
 		private readonly IManifestEndpointStrategy manifestEndpointStrategy;
 		private readonly IDirectoriesSettings directorySettings;
 		private readonly IVideoBlobService videoBlobService;
 
-        public VideoQueries(IMapper mapper, 
+        public VideoQueries(VideoMappingService mapper, 
 			IMongoCollection<Video> collection,
             IManifestEndpointStrategy manifestEndpointStrategy, 
 			IDirectoriesSettings directorySettings,
-            IVideoBlobService videoBlobService)
+            IVideoBlobService videoBlobService,
+            IThumbnailService thumbnailService)
         {
             this.mapper = mapper;
             this.collection = collection;
@@ -38,7 +39,7 @@ namespace Streaming.Application.Query
         {
             var searchFilter = Builders<Video>.Filter.Eq(x => x.VideoId, VideoId);
             return await collection.Find<Video>(searchFilter)
-                .Project(x => mapper.Map<VideoMetadataDTO>(x))
+                .Project(x => mapper.MapVideoMetadataDTO(x))
                 .FirstOrDefaultAsync();
         }
 
@@ -69,7 +70,7 @@ namespace Streaming.Application.Query
 				.ToListAsync();
 
 			return results
-				.Select(x => mapper.Map<VideoMetadataDTO>(x));
+				.Select(x => mapper.MapVideoMetadataDTO(x));
 		}
 	}
 }

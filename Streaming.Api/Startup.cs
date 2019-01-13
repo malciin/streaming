@@ -1,7 +1,6 @@
 ﻿using System;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
-using AutoMapper;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -26,7 +25,7 @@ namespace Streaming.Api
             });
 
             services.AddScoped<ICustomLogger, CustomLogger>();
-            services.AddAutoMapper();
+
             services.AddMvc().AddFluentValidation(x =>
             {
                 x.RegisterValidatorsFromAssemblyContaining<Application.Validators.VideoUploadValidator>();

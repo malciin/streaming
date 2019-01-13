@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-using AutoMapper;
 using MongoDB.Driver;
 using MongoDB.Driver.GridFS;
 using Streaming.Application.Command.Bus;

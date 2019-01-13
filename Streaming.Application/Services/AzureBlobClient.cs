@@ -1,30 +1,24 @@
 ﻿using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
+using Streaming.Application.Settings;
 using System;
-using System.Collections.Specialized;
 using System.IO;
-using System.Linq;
-using System.Net.Http;
-using System.Security.Cryptography;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using System.Web;
 
 namespace Streaming.Application.Services
 {
-	public class AzureBlobClient
+    public class AzureBlobClient : IAzureBlobClient
 	{
         private CloudStorageAccount storageAccount;
-        private readonly CloudBlobClient client;
+        private readonly Lazy<CloudBlobClient> client;
 
-        public AzureBlobClient(string ConnectionString)
+        public AzureBlobClient(IKeysSettings keysSettings)
 		{
-            storageAccount = CloudStorageAccount.Parse(ConnectionString);
-            client = storageAccount.CreateCloudBlobClient();
+            storageAccount = CloudStorageAccount.Parse(keysSettings.AzureBlobConnectionString);
+            client = new Lazy<CloudBlobClient>(() => storageAccount.CreateCloudBlobClient());
         }
 
-        public string GetFileLinkSASAuthorization(string ContainerName, string FileName)
+        public string GetFileLinkSecuredSAS(string ContainerName, string FileName)
         {            
             SharedAccessAccountPolicy policy = new SharedAccessAccountPolicy()
             {
@@ -36,19 +30,22 @@ namespace Streaming.Application.Services
             };
 
             var token = storageAccount.GetSharedAccessSignature(policy);
-            return string.Format($"{storageAccount.BlobEndpoint}{ContainerName}/{FileName}{token}");
+            return $"{GetFileLink(ContainerName, FileName)}{token}";
         }
+
+        public string GetFileLink(string ContainerName, string FileName)
+            => string.Format($"{storageAccount.BlobEndpoint}{ContainerName}/{FileName}");
 
         public async Task<Stream> GetFileAsync(string ContainerName, string FileName)
 		{
-            var blob = await client.GetBlobReferenceFromServerAsync(new Uri($"{storageAccount.BlobEndpoint}{ContainerName}/{FileName}"));
+            var blob = await client.Value.GetBlobReferenceFromServerAsync(new Uri($"{storageAccount.BlobEndpoint}{ContainerName}/{FileName}"));
             return await blob.OpenReadAsync();
 		}
 
 		public async Task UploadFileAsync(string ContainerName, string FileName, Stream InputStream)
 		{
-            var blob = client.GetContainerReference(ContainerName).GetBlockBlobReference(FileName);
+            var blob = client.Value.GetContainerReference(ContainerName).GetBlockBlobReference(FileName);
             await blob.UploadFromStreamAsync(InputStream);
         }
-	}
+    }
 }
