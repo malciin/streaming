@@ -12,7 +12,8 @@ namespace Streaming.Application.Modules
             var currentAssembly = typeof(MappingModule).GetTypeInfo().Assembly;
 
             builder.RegisterAssemblyTypes(currentAssembly)
-                   .AssignableTo<IMappingService>();
+                   .AssignableTo<IMappingService>()
+                   .SingleInstance();
         }
     }
 }

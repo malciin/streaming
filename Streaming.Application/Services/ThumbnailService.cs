@@ -9,6 +9,12 @@ namespace Streaming.Application.Services
     {
         private readonly IAzureBlobClient blobClient;
         private readonly static string blobContainerName = "thumbnails";
+
+        public ThumbnailService(IAzureBlobClient blobClient)
+        {
+            this.blobClient = blobClient;
+        }
+
         public string GetThumbnailUrl(Guid VideoId)
         {
             return blobClient.GetFileLink(blobContainerName, BlobNameHelper.GetThumbnailFilename(VideoId));

@@ -31,6 +31,14 @@ namespace Streaming.Application.Modules
             builder.RegisterType<VideoAzureBlobService>()
                    .As<IVideoBlobService>()
                    .InstancePerLifetimeScope();
+
+            builder.RegisterType<ThumbnailService>()
+                   .As<IThumbnailService>()
+                   .InstancePerLifetimeScope();
+
+            builder.RegisterType<AzureBlobClient>()
+                   .As<IAzureBlobClient>()
+                   .InstancePerLifetimeScope();
         }
     }
 }

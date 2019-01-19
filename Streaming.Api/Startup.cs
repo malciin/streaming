@@ -47,13 +47,14 @@ namespace Streaming.Api
             builder.RegisterModule<Application.Modules.SettingsModule>();
 			builder.RegisterModule<Application.Modules.QueryModule>();
             builder.RegisterModule<Application.Modules.StrategiesModule>();
+            builder.RegisterModule<Application.Modules.MappingModule>();
 
             return new AutofacServiceProvider(builder.Build());
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            if (env.IsDevelopment())
+            if (!env.IsDevelopment())
             {
                 app.UseMiddleware<ExceptionHandlingMiddleware>();
             }
