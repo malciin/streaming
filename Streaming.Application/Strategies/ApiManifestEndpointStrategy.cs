@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Streaming.Common.Extensions;
 using Streaming.Common.Helpers;
+using Streaming.Domain.Models.Core;
 using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Streaming.Application.Strategies
 {
@@ -17,10 +18,16 @@ namespace Streaming.Application.Strategies
 
         public string SetEndpoints(Guid VideoId, string ManifestString)
         {
-            var getVideoPartEndpoint = UrlHelper.GetHostUrl(httpContextAccessor.HttpContext) + "/Video";
-            return ManifestString
-                .Replace("[ENDPOINT]", getVideoPartEndpoint)
-                .Replace("[ID]", VideoId.ToString());
+            var getVideoPartEndpoint = UrlHelper.GetHostUrl(httpContextAccessor.HttpContext) + $"/Video/{VideoId}/";
+            var pattern = VideoManifest.EndpointPlaceholder.Replace("[", "\\[");
+            var match = Regex.Match(ManifestString, pattern);
+            int partNum = 0;
+            while (match.Success)
+            {
+                ManifestString = ManifestString.Replace(match.Index, match.Length, $"{getVideoPartEndpoint}{partNum++}");
+                match = Regex.Match(ManifestString, pattern);
+            }
+            return ManifestString;
         }
     }
 }
