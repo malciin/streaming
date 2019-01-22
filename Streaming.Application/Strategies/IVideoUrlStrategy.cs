@@ -4,8 +4,8 @@ using System.Text;
 
 namespace Streaming.Application.Strategies
 {
-    public interface IManifestEndpointStrategy
+    public interface IVideoUrlStrategy
     {
-        string SetEndpoints(Guid VideoId, string ManifestString);
+        string GetVideoUrl(Guid VideoId, int PartNumber);
     }
 }

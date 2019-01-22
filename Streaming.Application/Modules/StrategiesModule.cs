@@ -12,8 +12,8 @@ namespace Streaming.Application.Modules
         {
             base.Load(builder);
 
-            builder.RegisterType<BlobManifestEndpointStrategy>()
-                   .As<IManifestEndpointStrategy>()
+            builder.RegisterType<BlobVideoUrlStrategy>()
+                   .As<IVideoUrlStrategy>()
                    .SingleInstance();
         }
     }

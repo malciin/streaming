@@ -4,11 +4,13 @@ using Streaming.Application.Mappings;
 using Streaming.Application.Services;
 using Streaming.Application.Settings;
 using Streaming.Application.Strategies;
+using Streaming.Common.Extensions;
 using Streaming.Domain.Models.Core;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Streaming.Application.Query
@@ -17,20 +19,20 @@ namespace Streaming.Application.Query
     {
         private readonly VideoMappingService mapper;
         private readonly IMongoCollection<Video> collection;
-		private readonly IManifestEndpointStrategy manifestEndpointStrategy;
+		private readonly IVideoUrlStrategy videoUrlStrategy;
 		private readonly IDirectoriesSettings directorySettings;
 		private readonly IVideoBlobService videoBlobService;
 
         public VideoQueries(VideoMappingService mapper, 
 			IMongoCollection<Video> collection,
-            IManifestEndpointStrategy manifestEndpointStrategy, 
+            IVideoUrlStrategy videoUrlStrategy, 
 			IDirectoriesSettings directorySettings,
             IVideoBlobService videoBlobService,
             IThumbnailService thumbnailService)
         {
             this.mapper = mapper;
             this.collection = collection;
-			this.manifestEndpointStrategy = manifestEndpointStrategy;
+			this.videoUrlStrategy = videoUrlStrategy;
 			this.directorySettings = directorySettings;
 			this.videoBlobService = videoBlobService;
         }
@@ -52,7 +54,16 @@ namespace Streaming.Application.Query
 				.Find<Video>(searchFilter)
 				.Project(x => x.VideoManifestHLS).FirstOrDefaultAsync();
 
-			return manifestEndpointStrategy.SetEndpoints(VideoId, rawManifest);
+            var pattern = VideoManifest.EndpointPlaceholder.Replace("[", "\\[");
+            var match = Regex.Match(rawManifest, pattern);
+            int partNum = 0;
+            while (match.Success)
+            {
+                rawManifest = rawManifest.Replace(match.Index, match.Length,
+                    videoUrlStrategy.GetVideoUrl(VideoId, partNum++));
+                match = Regex.Match(rawManifest, pattern);
+            }
+            return rawManifest;
 		}
 
 		public async Task<Stream> GetVideoPartAsync(Guid VideoId, int Part)
