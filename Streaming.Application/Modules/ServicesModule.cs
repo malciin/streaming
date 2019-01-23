@@ -13,7 +13,6 @@ namespace Streaming.Application.Modules
         {
             base.Load(builder);
 
-
 			builder.Register<IMongoDatabase>(context => {
                 var connectionString = context.Resolve<IDatabaseSettings>().ConnectionString;
                 return new MongoClient(connectionString)
@@ -26,6 +25,10 @@ namespace Streaming.Application.Modules
 			}).As<IMongoCollection<Video>>().InstancePerLifetimeScope();
 
             builder.Register<IGridFSBucket>(context => new GridFSBucket(context.Resolve<IMongoDatabase>()))
+                   .SingleInstance();
+
+            builder.RegisterType<FFmpegProcessVideoService>()
+                   .As<IProcessVideoService>()
                    .SingleInstance();
 
             builder.RegisterType<VideoAzureBlobService>()

@@ -1,8 +1,5 @@
 ﻿using Autofac;
 using Streaming.Application.Strategies;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Streaming.Application.Modules
 {

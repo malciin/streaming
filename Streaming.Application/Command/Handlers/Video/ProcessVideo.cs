@@ -2,6 +2,7 @@
 using Streaming.Application.Services;
 using Streaming.Application.Settings;
 using Streaming.Common.Extensions;
+using Streaming.Common.Helpers;
 using Streaming.Domain.Models.Core;
 using System;
 using System.Collections.Generic;
@@ -19,8 +20,13 @@ namespace Streaming.Application.Command.Handlers.Video
 		private readonly IVideoBlobService videoBlobService;
 		private readonly IDirectoriesSettings directoriesConfig;
         private readonly IProcessVideoService processVideoService;
+        private readonly IThumbnailService thumbnailService;
+
+        private static readonly string thumbnailFolderName = "thumbnails";
 
         private DirectoryInfo processingDirectory;
+        private DirectoryInfo thumbnailsDirectory;
+
         IEnumerable<FileInfo> splittedFiles => processingDirectory
             .GetFiles()
             .Where(x => Regex.IsMatch(x.Name, @"\d+\.ts"));
@@ -28,20 +34,24 @@ namespace Streaming.Application.Command.Handlers.Video
         public ProcessVideo(IDirectoriesSettings directoriesConfig,
 			IMongoCollection<Domain.Models.Core.Video> videoCollection,
 			IVideoBlobService videoBlobService,
-            IProcessVideoService processVideoService)
+            IProcessVideoService processVideoService,
+            IThumbnailService thumbnailService)
         {
             this.directoriesConfig = directoriesConfig;
 			this.videoCollection = videoCollection;
 			this.videoBlobService = videoBlobService;
             this.processVideoService = processVideoService;
+            this.thumbnailService = thumbnailService;
         }
 
-        void SetupProcessingEnvironment(Commands.Video.ProcessVideo command)
+        private void setupProcessingEnvironment(Commands.Video.ProcessVideo command)
         {
-            processingDirectory = Directory.CreateDirectory(String.Format($"{directoriesConfig.ProcessingDirectory}{{0}}", Path.DirectorySeparatorChar));
+            processingDirectory = Directory.CreateDirectory(String.Format($"{directoriesConfig.ProcessingDirectory}{{0}}{command.VideoId}{{0}}", Path.DirectorySeparatorChar));
+            thumbnailsDirectory = Directory.CreateDirectory(String.Format($"{processingDirectory.FullName}{thumbnailFolderName}{{0}}",
+                Path.DirectorySeparatorChar));
         }
 
-        async Task<VideoManifest> CreateManifest(Guid VideoId)
+        private async Task<VideoManifest> createManifest(Guid videoId)
         {
             var manifest = new VideoManifest();
             manifest.SetHeaders(TargetDurationSeconds: 5);
@@ -49,46 +59,66 @@ namespace Streaming.Application.Command.Handlers.Video
             foreach(var file in splittedFiles)
             {
                 var length = await processVideoService.GetVideoLengthAsync(file.FullName);
-                manifest.AddPart(VideoId, length);
+                manifest.AddPart(videoId, length);
             }
             return manifest;
+        }
+
+        private async Task uploadVideoParts(Guid videoId)
+        {
+            int partNum = 0;
+            foreach (var file in splittedFiles)
+            {
+                using (var fileStream = file.OpenRead())
+                {
+                    await videoBlobService.UploadAsync(videoId, partNum++, fileStream);
+                }
+            }
+        }
+
+        private async Task getThumbnails(Guid videoId, string videoPath, TimeSpan videoLength)
+        {
+            await processVideoService.TakeVideoScreenshot(
+                videoPath, $"{processingDirectory}{BlobNameHelper.GetThumbnailFilename(videoId)}", 
+                new TimeSpan(videoLength.Ticks / 2));
+
+            await processVideoService.GenerateVideoOverviewScreenshots(videoPath, 
+                thumbnailsDirectory.FullName, new TimeSpan(videoLength.Ticks / 30));
+        }
+
+        private async Task uploadVideoThumbnails(Guid videoId)
+        {
+            using (var fileStream = File.OpenRead($"{processingDirectory}{BlobNameHelper.GetThumbnailFilename(videoId)}"))
+            {
+                await thumbnailService.UploadAsync(videoId, fileStream);
+            }
         }
 
         public async Task HandleAsync(Commands.Video.ProcessVideo Command)
         {
             var timer = Stopwatch.StartNew();
 
-            SetupProcessingEnvironment(Command);
+            setupProcessingEnvironment(Command);
             var videoLength = await processVideoService.GetVideoLengthAsync(Command.VideoPath);
-            await processVideoService.ProcessVideoAsync(Command.VideoPath, 
+            await processVideoService.ProcessVideoAsync(Command.VideoPath,
                 processingDirectory.FullName);
-			var manifest = await CreateManifest(Command.VideoId);
+            var manifest = await createManifest(Command.VideoId);
+            await getThumbnails(Command.VideoId, Command.VideoPath, videoLength);
+            await uploadVideoParts(Command.VideoId);
+            await uploadVideoThumbnails(Command.VideoId);
 
-            int partNum = 0;
-			foreach (var file in splittedFiles)
-			{
-				using (var fileStream = file.OpenRead())
-				{
-					await videoBlobService.UploadAsync(Command.VideoId, partNum++, fileStream);
-				}
-			}
+            timer.Stop();
 
-			timer.Stop();
-
-            var cleanCommands = processingDirectory.GetFiles().Select(x => $"rm {x}");
-
-            foreach (var command in cleanCommands)
-                await command.ExecuteBashAsync();
+            processingDirectory.Delete(recursive: true);
 
             var searchFilter = Builders<Domain.Models.Core.Video>.Filter.Eq(x => x.VideoId, Command.VideoId);
-
             var updateDefinition = Builders<Domain.Models.Core.Video>.Update
-				.Set(x => x.FinishedProcessingDate, DateTime.UtcNow)
-				.Set(x => x.ProcessingInfo, $"Sucessfully processed after {timer.Elapsed.TotalMilliseconds}ms")
-				.Set(x => x.VideoManifestHLS, manifest.ToString())
-				.Set(x => x.Length, videoLength);
+                .Set(x => x.FinishedProcessingDate, DateTime.UtcNow)
+                .Set(x => x.ProcessingInfo, $"Sucessfully processed after {timer.Elapsed.TotalMilliseconds}ms")
+                .Set(x => x.VideoManifestHLS, manifest.ToString())
+                .Set(x => x.Length, videoLength);
 
-			await videoCollection.UpdateOneAsync(searchFilter, updateDefinition);
-        }
+            await videoCollection.UpdateOneAsync(searchFilter, updateDefinition);
+        }        
     }
 }

@@ -31,5 +31,19 @@ namespace Streaming.Application.Services
 
             await splitVideoIntoPartsCmd.ExecuteBashAsync();
         }
+
+        public async Task GenerateVideoOverviewScreenshots(string VideoPath, string ScreenshotOutputDirectory, TimeSpan ScreenshotInterval)
+        {
+            double interval = 1 / ScreenshotInterval.TotalSeconds;
+            var command = $"ffmpeg -i {VideoPath} -filter:v scale=\"140:-1\",fps={interval} {ScreenshotOutputDirectory}out%d.jpg";
+            await command.ExecuteBashAsync();
+        }
+
+        public async Task TakeVideoScreenshot(string VideoPath, string ScreenshotOutputPath, TimeSpan Time)
+        {
+            var lengthString = $"{Time.Hours}:{Time.Minutes}:{Time.Seconds}";
+            var command = $"ffmpeg -ss {lengthString} -i {VideoPath} -vframes 1 -q:v 2 {ScreenshotOutputPath}";
+            await command.ExecuteBashAsync();
+        }
     }
 }
