@@ -74,7 +74,7 @@ namespace Streaming.Application.Query
 		public async Task<IEnumerable<VideoMetadataDTO>> SearchAsync(VideoSearchDTO Search)
 		{
 			var results = await collection
-				.Find(x => x.FinishedProcessingDate != null)
+				.Find(x => x.State.HasFlag(VideoState.Processed))
 				.Skip(Search.Offset)
 				.Limit(Search.HowMuch)
                 .SortByDescending(x => x.FinishedProcessingDate)

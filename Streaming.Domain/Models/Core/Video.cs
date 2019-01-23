@@ -14,8 +14,5 @@ namespace Streaming.Domain.Models.Core
         public TimeSpan? Length { get; set; }
         public string VideoManifestHLS { get; set; }
         public string ProcessingInfo { get; set; }
-
-        public bool IsProcessed => (State & VideoState.Processed) != 0;
-        public bool IsManifestGenerated => (State & VideoState.ManifestGenerated) != 0;
     }
 }

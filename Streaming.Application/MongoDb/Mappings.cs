@@ -11,8 +11,6 @@ namespace Streaming.Application.MongoDb
             {
                 cm.AutoMap();
                 cm.MapIdMember(x => x.VideoId);
-                cm.UnmapProperty(x => x.IsProcessed);
-                cm.UnmapProperty(x => x.IsManifestGenerated);
                 cm.SetIgnoreExtraElements(true);
             });
         }
