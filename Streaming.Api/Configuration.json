@@ -8,6 +8,6 @@
     "ProcessedVideoDirectory": "processed"
   },
   "Database": {
-    "ConnectionString": "mongodb://192.168.99.100:27017"
+    "ConnectionString": "mongodb://localhost:27017"
   }
 }
