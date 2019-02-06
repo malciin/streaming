@@ -5,7 +5,8 @@
   },
   "Directories": {
     "VideoToProcessDirectory": "processing",
-    "ProcessedVideoDirectory": "processed"
+    "ProcessedVideoDirectory": "processed",
+    "LogsDirectory": "logs"
   },
   "Database": {
     "ConnectionString": "mongodb://localhost:27017"

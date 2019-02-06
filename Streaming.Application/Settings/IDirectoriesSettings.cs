@@ -8,5 +8,6 @@ namespace Streaming.Application.Settings
     {
         string ProcessingDirectory { get; }
         string ProcessedDirectory { get; }
+        string LogsDirectory { get; }
     }
 }

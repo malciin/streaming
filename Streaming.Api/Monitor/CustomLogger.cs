@@ -1,10 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Streaming.Api.Monitor
 {
@@ -50,10 +47,6 @@ namespace Streaming.Api.Monitor
             builder.AppendLine($"\t Headers: ");
             MapRequestHeaders(builder, httpContext.Request.Headers);
             builder.AppendLine($"\t Body:");
-            //MapRequestBody(builder, httpContext.Request.Body);
-
-            
-            
         }
 
         private void MapRequestBody(StringBuilder builder, Stream body)
@@ -92,14 +85,9 @@ namespace Streaming.Api.Monitor
 
             logStringBuilder.AppendLine("---");
             logStringBuilder.AppendLine();
-
-            var logString = Encoding.UTF8.GetBytes(logStringBuilder.ToString());
             
             lock (locker) {
-                using (FileStream file = new FileStream(fileName, FileMode.Append, FileAccess.Write, FileShare.Read))
-                {
-                    file.Write(logString);
-                }
+                File.AppendAllText(fileName, logStringBuilder.ToString(), Encoding.UTF8);
             }
         }
 

@@ -1,4 +1,5 @@
 ﻿using Autofac;
+using Streaming.Application.Services;
 using System;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
@@ -35,7 +36,14 @@ namespace Streaming.Application.Command.Bus
 				using (var scope = lifetimeScope.BeginLifetimeScope())
 				{
 					var dispatcher = scope.Resolve<ICommandDispatcher>();
-                    await dispatcher.HandleAsync(command);
+                    try
+                    {
+                        await dispatcher.HandleAsync(command);
+                    }
+                    catch(Exception ex)
+                    {
+                        scope.Resolve<ILoggerService>().Log(dispatcher, ex.Message);
+                    }
                 }
 			}
 			lock(lockObj)

@@ -20,20 +20,20 @@ namespace Streaming.Application.Query
         private readonly VideoMappingService mapper;
         private readonly IMongoCollection<Video> collection;
 		private readonly IVideoUrlStrategy videoUrlStrategy;
-		private readonly IDirectoriesSettings directorySettings;
+		private readonly IDirectoriesSettings directoriesSettings;
 		private readonly IVideoBlobService videoBlobService;
 
         public VideoQueries(VideoMappingService mapper, 
 			IMongoCollection<Video> collection,
             IVideoUrlStrategy videoUrlStrategy, 
-			IDirectoriesSettings directorySettings,
+			IDirectoriesSettings directoriesSettings,
             IVideoBlobService videoBlobService,
             IThumbnailService thumbnailService)
         {
             this.mapper = mapper;
             this.collection = collection;
 			this.videoUrlStrategy = videoUrlStrategy;
-			this.directorySettings = directorySettings;
+			this.directoriesSettings = directoriesSettings;
 			this.videoBlobService = videoBlobService;
         }
 

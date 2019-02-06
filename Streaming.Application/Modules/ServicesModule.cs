@@ -42,6 +42,10 @@ namespace Streaming.Application.Modules
             builder.RegisterType<AzureBlobClient>()
                    .As<IAzureBlobClient>()
                    .InstancePerLifetimeScope();
+
+            builder.RegisterType<LoggerService>()
+                   .As<ILoggerService>()
+                   .SingleInstance();
         }
     }
 }

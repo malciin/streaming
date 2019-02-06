@@ -18,11 +18,13 @@ namespace Streaming.Application.Command.Handlers.Video
     {
 		private readonly IMongoCollection<Domain.Models.Core.Video> videoCollection;
 		private readonly IVideoBlobService videoBlobService;
-		private readonly IDirectoriesSettings directoriesConfig;
+		private readonly IDirectoriesSettings directoriesSettings;
         private readonly IProcessVideoService processVideoService;
         private readonly IThumbnailService thumbnailService;
 
         private static readonly string thumbnailFolderName = "thumbnails";
+
+        private VideoState videoState = 0;
 
         private DirectoryInfo processingDirectory;
         private DirectoryInfo thumbnailsDirectory;
@@ -31,13 +33,13 @@ namespace Streaming.Application.Command.Handlers.Video
             .GetFiles()
             .Where(x => Regex.IsMatch(x.Name, @"\d+\.ts"));
 
-        public ProcessVideo(IDirectoriesSettings directoriesConfig,
+        public ProcessVideo(IDirectoriesSettings directoriesSettings,
 			IMongoCollection<Domain.Models.Core.Video> videoCollection,
 			IVideoBlobService videoBlobService,
             IProcessVideoService processVideoService,
             IThumbnailService thumbnailService)
         {
-            this.directoriesConfig = directoriesConfig;
+            this.directoriesSettings = directoriesSettings;
 			this.videoCollection = videoCollection;
 			this.videoBlobService = videoBlobService;
             this.processVideoService = processVideoService;
@@ -46,7 +48,7 @@ namespace Streaming.Application.Command.Handlers.Video
 
         private void setupProcessingEnvironment(Commands.Video.ProcessVideo command)
         {
-            processingDirectory = Directory.CreateDirectory(String.Format($"{directoriesConfig.ProcessingDirectory}{{0}}{command.VideoId}{{0}}", Path.DirectorySeparatorChar));
+            processingDirectory = Directory.CreateDirectory(String.Format($"{directoriesSettings.ProcessingDirectory}{{0}}{command.VideoId}{{0}}", Path.DirectorySeparatorChar));
             thumbnailsDirectory = Directory.CreateDirectory(String.Format($"{processingDirectory.FullName}{thumbnailFolderName}{{0}}",
                 Path.DirectorySeparatorChar));
         }
@@ -61,6 +63,7 @@ namespace Streaming.Application.Command.Handlers.Video
                 var length = await processVideoService.GetVideoLengthAsync(file.FullName);
                 manifest.AddPart(videoId, length);
             }
+            videoState |= VideoState.ManifestGenerated;
             return manifest;
         }
 
@@ -84,6 +87,7 @@ namespace Streaming.Application.Command.Handlers.Video
 
             await processVideoService.GenerateVideoOverviewScreenshots(videoPath, 
                 thumbnailsDirectory.FullName, new TimeSpan(videoLength.Ticks / 30));
+            videoState |= VideoState.MainThumbnailGenerated;
         }
 
         private async Task uploadVideoThumbnails(Guid videoId)
@@ -110,13 +114,15 @@ namespace Streaming.Application.Command.Handlers.Video
             timer.Stop();
 
             processingDirectory.Delete(recursive: true);
+            videoState |= VideoState.Processed;
 
             var searchFilter = Builders<Domain.Models.Core.Video>.Filter.Eq(x => x.VideoId, Command.VideoId);
             var updateDefinition = Builders<Domain.Models.Core.Video>.Update
                 .Set(x => x.FinishedProcessingDate, DateTime.UtcNow)
                 .Set(x => x.ProcessingInfo, $"Sucessfully processed after {timer.Elapsed.TotalMilliseconds}ms")
                 .Set(x => x.VideoManifestHLS, manifest.ToString())
-                .Set(x => x.Length, videoLength);
+                .Set(x => x.Length, videoLength)
+                .Set(x => x.State, videoState);
 
             await videoCollection.UpdateOneAsync(searchFilter, updateDefinition);
         }        
