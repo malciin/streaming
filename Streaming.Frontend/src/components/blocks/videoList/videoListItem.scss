@@ -1,22 +1,18 @@
-@import '../../shared/global.scss';
+@import '../../../shared/global.scss';
 
-
-
-.videoListItem {
+.video-list-item {
     display: flex;
     color: white;
-    .thumbnail {
+
+    .thumbnail-box {
         background-color: #1f1f1f;
         color: white;
         text-decoration: none; /* no underline */
-        height: 240px;
         width: 320px;
         display: table;
-        .thumbnailIcon {
-            font-size: 40px;
-            display: table-cell;
-            vertical-align: middle;
-            text-align: center;
+
+        .thumbnail-image {
+            max-width: 100%
         }
 
         &:hover {

@@ -1,8 +1,8 @@
 import React from 'react'
-import './videoList.scss'
+import './videoListItem.scss'
 import { Redirect } from 'react-router-dom'
 
-export default class VideoList extends React.Component {
+export default class VideoListItem extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -20,14 +20,14 @@ export default class VideoList extends React.Component {
     }
     
     render() {
-        // if (this.state.redirect) {
-        //     return <Redirect to="/Upload" />;
-        // }
+        console.log(this.state.video.thumbnailUrl);
 
-        return <div className="videoListItem">
+        return <div className="video-list-item">
             <a href={"/Vid/" + this.state.video.videoId }>
             <div className="thumbnail" onClick={this.handleClick}>
-                {!this.state.video.thumbnail && <div className="thumbnail"><span class="thumbnailIcon icon-video"></span></div>}
+                <div className="thumbnail-box">
+                    <img className="thumbnail-image icon-video" src={this.state.video.thumbnailUrl} />
+                </div>
             </div>
             </a>
             <div className="video-metadata">

@@ -21,29 +21,47 @@ $slider-bg-color: lighten($accent-color, 33%);
     }
 
     .vjs-control-bar {
-        background-color: rgba($accent-color, 0.7);
+        background-color: transparent;
+        
+        .vjs-play-control, .vjs-volume-panel,
+        .vjs-fullscreen-control, .vjs-remaining-time {
+            background-color: rgba($accent-color, 0.7);
+        }
 
-        .vjs-progress-holder{
-            height: 100%;
-            background-color: transparent;
-            
-            .vjs-load-progress, .vjs-load-progress div{
-                background-color: rgba(orange, 0.2);
+        .vjs-volume-panel {
+            .vjs-volume-control {
+                padding-right: 5px;
             }
+        }
 
-            .vjs-play-progress {
-                background-color: rgba(orange, 0.2);
-                &::before {
-                    content: "";
-                    width: 0px;
-                    height: 100%;
-                    background-color: $accent-color;
-                    display: block;
-                    top: 0;
-                    right: 0;
+        .vjs-progress-control {
+            align-items: flex-end;
+            
+            .vjs-progress-holder{
+
+                height: 10px;
+                background-color: darken(white, 80%);
+                margin-left: 0px;
+                margin-right: 0px;
+                .vjs-load-progress, .vjs-load-progress div{
+                    background-color: rgba(orange, 0.2);
+                }
+    
+                .vjs-play-progress {
+                    background-color: rgba(orange, 0.2);
+                    &::before {
+                        content: "";
+                        width: 0px;
+                        height: 100%;
+                        background-color: $accent-color;
+                        display: block;
+                        top: 0;
+                        right: 0;
+                    }
                 }
             }
         }
+        
     }
 }
 
