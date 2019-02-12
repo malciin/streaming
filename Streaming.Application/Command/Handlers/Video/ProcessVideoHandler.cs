@@ -1,7 +1,6 @@
 ﻿using MongoDB.Driver;
 using Streaming.Application.Services;
 using Streaming.Application.Settings;
-using Streaming.Common.Extensions;
 using Streaming.Common.Helpers;
 using Streaming.Domain.Models.Core;
 using System;
@@ -14,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Streaming.Application.Command.Handlers.Video
 {
-    public class ProcessVideo : ICommandHandler<Commands.Video.ProcessVideo>
+    public class ProcessVideoHandler : ICommandHandler<Commands.Video.ProcessVideo>
     {
 		private readonly IMongoCollection<Domain.Models.Core.Video> videoCollection;
 		private readonly IVideoBlobService videoBlobService;
@@ -33,7 +32,7 @@ namespace Streaming.Application.Command.Handlers.Video
             .GetFiles()
             .Where(x => Regex.IsMatch(x.Name, @"\d+\.ts"));
 
-        public ProcessVideo(IDirectoriesSettings directoriesSettings,
+        public ProcessVideoHandler(IDirectoriesSettings directoriesSettings,
 			IMongoCollection<Domain.Models.Core.Video> videoCollection,
 			IVideoBlobService videoBlobService,
             IProcessVideoService processVideoService,

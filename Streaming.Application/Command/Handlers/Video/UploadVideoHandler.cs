@@ -11,13 +11,13 @@ using Streaming.Application.Settings;
 
 namespace Streaming.Application.Command.Handlers.Video
 {
-	public class UploadVideo : ICommandHandler<Commands.Video.UploadVideo>
+	public class UploadVideoHandler : ICommandHandler<Commands.Video.UploadVideo>
 	{
 		private readonly ICommandBus commandBus;
 		private readonly IMongoCollection<Domain.Models.Core.Video> videoCollection;
 		private readonly IDirectoriesSettings directoriesSettings;
 
-		public UploadVideo(IMongoCollection<Domain.Models.Core.Video> videoCollection,
+		public UploadVideoHandler(IMongoCollection<Domain.Models.Core.Video> videoCollection,
 			IDirectoriesSettings directoriesSettings,
             ICommandBus commandBus)
 		{
