@@ -46,7 +46,6 @@ namespace Streaming.Api
             builder.RegisterModule<Application.Modules.ServicesModule>();
             builder.RegisterModule<Application.Modules.SettingsModule>();
 			builder.RegisterModule<Application.Modules.QueryModule>();
-            builder.RegisterModule<Application.Modules.StrategiesModule>();
             builder.RegisterModule<Application.Modules.MappingModule>();
 
             return new AutofacServiceProvider(builder.Build());

@@ -3,7 +3,6 @@ using Streaming.Application.DTO.Video;
 using Streaming.Application.Mappings;
 using Streaming.Application.Services;
 using Streaming.Application.Settings;
-using Streaming.Application.Strategies;
 using Streaming.Common.Extensions;
 using Streaming.Domain.Models.Core;
 using System;
@@ -19,20 +18,17 @@ namespace Streaming.Application.Query
     {
         private readonly VideoMappingService mapper;
         private readonly IMongoCollection<Video> collection;
-		private readonly IVideoUrlStrategy videoUrlStrategy;
 		private readonly IDirectoriesSettings directoriesSettings;
 		private readonly IVideoBlobService videoBlobService;
 
         public VideoQueries(VideoMappingService mapper, 
 			IMongoCollection<Video> collection,
-            IVideoUrlStrategy videoUrlStrategy, 
 			IDirectoriesSettings directoriesSettings,
             IVideoBlobService videoBlobService,
             IThumbnailService thumbnailService)
         {
             this.mapper = mapper;
             this.collection = collection;
-			this.videoUrlStrategy = videoUrlStrategy;
 			this.directoriesSettings = directoriesSettings;
 			this.videoBlobService = videoBlobService;
         }
@@ -60,7 +56,7 @@ namespace Streaming.Application.Query
             while (match.Success)
             {
                 rawManifest = rawManifest.Replace(match.Index, match.Length,
-                    videoUrlStrategy.GetVideoUrl(VideoId, partNum++));
+                    videoBlobService.GetVideoUrl(VideoId, partNum++));
                 match = Regex.Match(rawManifest, pattern);
             }
             return rawManifest;

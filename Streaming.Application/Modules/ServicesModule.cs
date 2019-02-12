@@ -31,7 +31,7 @@ namespace Streaming.Application.Modules
                    .As<IProcessVideoService>()
                    .SingleInstance();
 
-            builder.RegisterType<VideoAzureBlobService>()
+            builder.RegisterType<LocalStorageVideoBlobService>()
                    .As<IVideoBlobService>()
                    .InstancePerLifetimeScope();
 

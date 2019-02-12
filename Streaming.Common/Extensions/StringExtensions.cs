@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace Streaming.Common.Extensions
@@ -36,5 +37,14 @@ namespace Streaming.Common.Extensions
         {
             return Str.Replace(new char[] { '\r', '\n' }, String.Empty);
         }
+
+        /// <summary>
+        /// Return normalized Path for current OS
+        /// </summary>
+        /// <returns></returns>
+        public static string NormalizePathForOS(this string Str)
+            => Path.DirectorySeparatorChar == '/' ?
+                Str.Replace('\\', Path.DirectorySeparatorChar) :
+                Str.Replace('/', Path.DirectorySeparatorChar);
     }
 }

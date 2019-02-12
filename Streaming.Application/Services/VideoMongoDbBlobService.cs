@@ -1,19 +1,21 @@
-﻿using MongoDB.Driver.GridFS;
+﻿using Microsoft.AspNetCore.Http;
+using MongoDB.Driver.GridFS;
+using Streaming.Common.Helpers;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Streaming.Application.Services
 {
 	public class VideoMongoDbBlobService : IVideoBlobService
 	{
-		IGridFSBucket gridBucket;
+		private readonly IGridFSBucket gridBucket;
+        private readonly IHttpContextAccessor httpContextAccessor;
 
-		public VideoMongoDbBlobService(IGridFSBucket gridBucket)
+		public VideoMongoDbBlobService(IGridFSBucket gridBucket, IHttpContextAccessor httpContextAccessor)
 		{
 			this.gridBucket = gridBucket;
+            this.httpContextAccessor = httpContextAccessor;
 		}
 
 		public async Task<Stream> GetVideoAsync(Guid VideoId, int PartNumber)
@@ -23,7 +25,8 @@ namespace Streaming.Application.Services
 
         public string GetVideoUrl(Guid VideoId, int PartNumber)
         {
-            throw new NotImplementedException();
+            return UrlHelper.GetHostUrl(httpContextAccessor.HttpContext) +
+                $"/Video/{VideoId}/{PartNumber}";
         }
 
         public async Task UploadAsync(Guid VideoId, int PartNumber, Stream Stream)

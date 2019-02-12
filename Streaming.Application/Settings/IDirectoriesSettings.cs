@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Streaming.Application.Settings
+﻿namespace Streaming.Application.Settings
 {
-    public interface IDirectoriesSettings
+    public interface ILocalStorageDirectory
+    {
+        string LocalStorageDirectory { get; }
+    }
+
+    public interface IDirectoriesSettings : ILocalStorageDirectory
     {
         string ProcessingDirectory { get; }
-        string ProcessedDirectory { get; }
         string LogsDirectory { get; }
     }
 }

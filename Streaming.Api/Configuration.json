@@ -4,8 +4,8 @@
     "SecretServerKey": "Type your supersecretkeyhere"
   },
   "Directories": {
-    "VideoToProcessDirectory": "processing",
-    "ProcessedVideoDirectory": "processed",
+    "LocalStorageDirectory": "localStorage",
+    "VideoProcessingDirectory": "localStorage/processing",
     "LogsDirectory": "logs"
   },
   "Database": {

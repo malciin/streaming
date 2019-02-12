@@ -5,6 +5,5 @@
 */Properties/*
 */*.csproj.user
 Streaming.Api/logs/*
-Streaming.Api/processed/*
-Streaming.Api/processing/*
 Streaming.Application/Settings/KeysSettings.Secret.cs
+Streaming.Api/localStorage/*
