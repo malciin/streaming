@@ -10,8 +10,8 @@ namespace Streaming.Application.Services
         public async Task<TimeSpan> GetVideoLengthAsync(string VideoPath)
         {
             var videoLengthCmd = $"ffprobe -v error -show_entries " + 
-                "format=duration -of default=noprint_wrappers=1:nokey=1 " +
-                VideoPath;
+                "format=duration -of default=noprint_wrappers=1:nokey=1 '" +
+                VideoPath + "'";
             var result = (await videoLengthCmd.ExecuteBashAsync())
                     .Replace("\r\n", String.Empty).Replace("\n", String.Empty);
 
@@ -20,14 +20,14 @@ namespace Streaming.Application.Services
 
         public async Task ProcessVideoAsync(string VideoPath, string OutputDirectoryPath)
         {
-            var copyVideoCmd = $"ffmpeg -i {VideoPath} -c copy {OutputDirectoryPath}ts_file.ts";
+            var copyVideoCmd = $"ffmpeg -i '{VideoPath}' -c copy '{OutputDirectoryPath}ts_file.ts'";
 
             await copyVideoCmd.ExecuteBashAsync();
 
             var splitVideoIntoPartsCmd = String.Format("ffmpeg -i " +
-                $"{VideoPath} " +
+                $"'{VideoPath}' " +
                 "-c copy -map 0 -segment_time 5 -f segment " +
-                $"{OutputDirectoryPath}{{0}}%03d.ts", Path.DirectorySeparatorChar);
+                $"'{OutputDirectoryPath}{{0}}%03d.ts'", Path.DirectorySeparatorChar);
 
             await splitVideoIntoPartsCmd.ExecuteBashAsync();
         }
@@ -35,14 +35,14 @@ namespace Streaming.Application.Services
         public async Task GenerateVideoOverviewScreenshots(string VideoPath, string ScreenshotOutputDirectory, TimeSpan ScreenshotInterval)
         {
             double interval = 1 / ScreenshotInterval.TotalSeconds;
-            var command = $"ffmpeg -i {VideoPath} -filter:v scale=\"140:-1\",fps={interval} {ScreenshotOutputDirectory}out%d.jpg";
+            var command = $"ffmpeg -i '{VideoPath}' -filter:v scale=\"140:-1\",fps={interval} '{ScreenshotOutputDirectory}out%d.jpg'";
             await command.ExecuteBashAsync();
         }
 
         public async Task TakeVideoScreenshot(string VideoPath, string ScreenshotOutputPath, TimeSpan Time)
         {
             var lengthString = $"{Time.Hours}:{Time.Minutes}:{Time.Seconds}";
-            var command = $"ffmpeg -ss {lengthString} -i {VideoPath} -vframes 1 -q:v 2 {ScreenshotOutputPath}";
+            var command = $"ffmpeg -ss {lengthString} -i '{VideoPath}' -vframes 1 -q:v 2 '{ScreenshotOutputPath}'";
             await command.ExecuteBashAsync();
         }
     }
