@@ -8,7 +8,6 @@ class UploadVideoForm extends React.Component {
     constructor(props) {
         super(props);
         
-        console.log(props.apiDefinition);
         this.state = {
             videoTitle: null,
             videoDescription: null,
@@ -20,7 +19,6 @@ class UploadVideoForm extends React.Component {
     }
 
     uploadVideo(event) {
-        console.log("Test");
         var formData = new FormData();
         formData.append("Title", this.state.videoTitle);
         formData.append("Description", this.state.videoDescription);

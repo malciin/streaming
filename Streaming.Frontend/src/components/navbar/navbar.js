@@ -1,10 +1,16 @@
 import React from 'react';
 import './navbar.scss'
 import { NavLink } from "react-router-dom";
-import Authorization from '../authorization/authorization';
+import { AppContext } from '../../AppContext';
+import LoginControl from './loginControl/LoginControl';
 
 class Navbar extends React.Component {
+    constructor(props)
+    {
+        super(props);
+    }
     render() {
+        
         return (
             <nav className="navbar navbar-expand-lg navbar-light bg-light">
                 <div className="navbar-brand" href="#">
@@ -16,14 +22,14 @@ class Navbar extends React.Component {
                         <li className="nav-item"><NavLink className="nav-link" to="/Upload">Upload video</NavLink></li>
                     </ul>
                 </div>
-                <div class="collapse navbar-collapse justify-content-end" id="navbarCollapse">
-                    <ul class="navbar-nav">
-                        <li className="nav-item"><Authorization /></li>
+                <div className="collapse navbar-collapse justify-content-end" id="navbarCollapse">
+                    <ul className="navbar-nav">
+                        <li className="nav-item"><LoginControl /></li>
                     </ul>
                 </div>
             </nav>
         );
     }
 }
-
+Navbar.contextType = AppContext;
 export default Navbar;

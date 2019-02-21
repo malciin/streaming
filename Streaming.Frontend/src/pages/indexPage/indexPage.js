@@ -2,7 +2,7 @@ import React from 'react';
 import './indexPage.css'
 import Navbar from '../../components/navbar/navbar';
 import { Config } from '../../shared/config';
-import VideoListItem from '../../components/blocks/videoList/videoListItem';
+import VideoListItem from '../../components/blocks/videoListItem/videoListItem';
 
 class IndexPage extends React.Component{
     constructor(props) {
@@ -26,7 +26,6 @@ class IndexPage extends React.Component{
             })
         }).then(responsePromise => responsePromise.json())
         .then(jsonData => {
-            console.log(jsonData);
             this.setState ({
                 videos: jsonData
             });
@@ -37,7 +36,7 @@ class IndexPage extends React.Component{
         
         return (
             <div className="indexPage">
-                <Navbar />
+                <Navbar auth={this.props.auth}/>
                 <div className="container">
                     {
                         this.state.videos.map((video, i) => {

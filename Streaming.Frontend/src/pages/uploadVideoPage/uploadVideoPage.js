@@ -6,7 +6,6 @@ import { Config } from '../../shared/config';
 class UploadVideoPage extends React.Component{
 
     render() {
-        console.log( Config )
         return (
             <div className="uploadVideoPage">
                 <Navbar />
