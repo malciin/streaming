@@ -9,7 +9,7 @@ namespace Streaming.Application.Services
     {
         private readonly DirectoryInfo outputDirectory;
         private readonly StreamWriter fileStream;
-        private readonly object locker;
+        private readonly object locker = new object();
 
         public LoggerService(IDirectoriesSettings directoriesSettings)
         {
@@ -37,7 +37,7 @@ namespace Streaming.Application.Services
         {
             lock (locker)
             {
-                File.AppendAllText(getCurrentLogFileName(), createLogMessage(Caller, Message), Encoding.UTF8);
+                File.AppendAllText(getCurrentLogFileName(), createLogMessage(Caller, Message) + Environment.NewLine, Encoding.UTF8);
             }
         }
 

@@ -24,10 +24,10 @@ namespace Streaming.Application.Services
 
             await copyVideoCmd.ExecuteBashAsync();
 
-            var splitVideoIntoPartsCmd = String.Format("ffmpeg -i " +
+            var splitVideoIntoPartsCmd = "ffmpeg -i " +
                 $"'{VideoPath}' " +
-                "-c copy -map 0 -segment_time 5 -f segment " +
-                $"'{OutputDirectoryPath}{{0}}%03d.ts'", Path.DirectorySeparatorChar);
+                "-c copy -map 0 -segment_time 5 -bsf:v h264_mp4toannexb -f segment " +
+                $"'{OutputDirectoryPath}%03d.ts'";
 
             await splitVideoIntoPartsCmd.ExecuteBashAsync();
         }

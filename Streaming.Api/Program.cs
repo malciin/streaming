@@ -21,7 +21,7 @@ namespace Streaming.Api
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
-                .UseUrls($"http://localhost:{configurationRoot["Hosting:HttpPort"]}")
+                .UseUrls($"http://0.0.0.0:{configurationRoot["Hosting:HttpPort"]}")
                 .ConfigureAppConfiguration(config =>
                 {
                     config.AddJsonFile("Configuration.json", optional: false, reloadOnChange: false);

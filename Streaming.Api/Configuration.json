@@ -9,6 +9,6 @@
     "LogsDirectory": "logs"
   },
   "Database": {
-    "ConnectionString": "mongodb://localhost:27017"
+    "ConnectionString": "mongodb://streaming_mongodb"
   }
 }

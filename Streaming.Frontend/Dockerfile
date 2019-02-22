@@ -3,4 +3,5 @@ ADD . /code
 WORKDIR /code
 RUN npm install -g create-react-app
 RUN npm i
+RUN npm rebuild node-sass
 CMD npm start

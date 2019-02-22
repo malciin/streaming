@@ -6,8 +6,12 @@ services:
       context: .
       dockerfile: Dockerfile
     image: streaming_api
+    environment:
+    - ASPNETCORE_ENVIRONMENT=Docker
     ports:
       - "8086:8086"
+    networks:
+      - main-network
   frontend:
     container_name: streaming_frontend
     build:
@@ -16,3 +20,12 @@ services:
     image: streaming_frontend
     ports:
       - "8080:3000"
+    networks:
+      - main-network
+  database:
+    container_name: streaming_mongodb
+    image: mongo
+    networks:
+      - main-network
+networks:
+    main-network:

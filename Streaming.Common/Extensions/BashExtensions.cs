@@ -1,4 +1,6 @@
-﻿using Streaming.Common.Helpers;
+﻿using Streaming.Common.Exceptions;
+using Streaming.Common.Helpers;
+using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
@@ -26,16 +28,23 @@ namespace Streaming.Common.Extensions
 
         public static async Task<string> ExecuteBashAsync(this string Command)
         {
-            using (var process = Command.StartBashExecution())
+            string errorOutput = "";
+            try
             {
-                string error = await process.StandardError.ReadToEndAsync();
+                using (var process = Command.StartBashExecution())
+                {
+                    errorOutput = await process.StandardError.ReadToEndAsync();
 
-                if (!string.IsNullOrEmpty(error))
-                    return "error: " + error;
-
-                string output = await process.StandardOutput.ReadToEndAsync();
-                process.WaitForExit();
-                return output;
+                    string output = await process.StandardOutput.ReadToEndAsync();
+                    process.WaitForExit();
+                    if (process.ExitCode != 0)
+                        throw new CommandException(Command, errorOutput);
+                    return output;
+                }
+            }
+            catch(Exception ex)
+            {
+                throw new CommandException(Command, errorOutput, ex);
             }
         }
     }

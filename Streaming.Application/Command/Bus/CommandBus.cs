@@ -42,7 +42,7 @@ namespace Streaming.Application.Command.Bus
                     }
                     catch(Exception ex)
                     {
-                        scope.Resolve<ILoggerService>().Log(dispatcher, ex.Message);
+                        scope.Resolve<ILoggerService>().Log(dispatcher, ex);
                     }
                 }
 			}
