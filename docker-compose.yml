@@ -1,4 +1,4 @@
-version: "3"
+version: "0.1"
 services:
   api:
     container_name: streaming_api
