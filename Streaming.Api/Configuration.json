@@ -14,5 +14,9 @@
   "Jwt": {
     "Issuer": "https://id0.eu.auth0.com/",
     "Audience": "kkF9cfb31YAOvr8R5q1FQ8byH9YiQXyr"
+  },
+  "Auth0_ManagementApi": {
+    "Audience": "https://id0.eu.auth0.com/api/v2/",
+    "ClientId": "o0manqM8zThK5OQV7HUXKKIgitvhwx1r"
   }
 }

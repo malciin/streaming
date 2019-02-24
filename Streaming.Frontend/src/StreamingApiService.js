@@ -58,7 +58,7 @@ export default class ApiService {
                 'Content-Type': 'application/json',
             })
         }).then(responsePromise => responsePromise.json())
-          .then(callback);
+          .then(jsonData => callback.bind(null, jsonData));
     }
 
     uploadVideo(data, callback) {

@@ -12,9 +12,9 @@ namespace Streaming.Application.Services
         private CloudStorageAccount storageAccount;
         private readonly Lazy<CloudBlobClient> client;
 
-        public AzureBlobClient(IKeysSettings keysSettings)
+        public AzureBlobClient(IAzureBlobConnectionString blobConnectionString)
 		{
-            storageAccount = CloudStorageAccount.Parse(keysSettings.AzureBlobConnectionString);
+            storageAccount = CloudStorageAccount.Parse(blobConnectionString.AzureBlobConnectionString);
             client = new Lazy<CloudBlobClient>(() => storageAccount.CreateCloudBlobClient());
         }
 

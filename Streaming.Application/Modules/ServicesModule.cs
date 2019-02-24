@@ -46,6 +46,10 @@ namespace Streaming.Application.Modules
             builder.RegisterType<LoggerService>()
                    .As<ILoggerService>()
                    .SingleInstance();
+
+            builder.RegisterType<Auth0ManagementApiTokenAccessor>()
+                   .As<IAuth0ManagementApiTokenAccessor>()
+                   .SingleInstance();
         }
     }
 }

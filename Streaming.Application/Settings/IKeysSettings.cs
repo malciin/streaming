@@ -1,8 +1,22 @@
 ﻿namespace Streaming.Application.Settings
 {
-    public interface IKeysSettings
+    public interface IAzureBlobConnectionString
+    {
+        string AzureBlobConnectionString { get; }
+    }
+
+    public interface ISecretServerKey
     {
         string SecretServerKey { get; }
-		string AzureBlobConnectionString { get; }
+    }
+
+    public interface IAuth0SecretClientKey
+    {
+        string ClientSecret { get; }
+    }
+
+    public interface IKeysSettings : IAzureBlobConnectionString, ISecretServerKey, IAuth0SecretClientKey
+    {
+		
     }
 }

@@ -6,8 +6,9 @@ namespace Streaming.Application.Settings
     {
         public string SecretServerKey { get; private set; }
 		public string AzureBlobConnectionString { get; private set; }
+        public string ClientSecret { get; private set; }
 
-		public KeysSettings(IConfigurationRoot configuration)
+        public KeysSettings(IConfigurationRoot configuration)
         {
 			SecretServerKey = configuration["Hosting:ServerSecretKey"];
 			AzureBlobConnectionString = configuration["Hosting:AzureBlobConnectionString"];

@@ -40,9 +40,25 @@ export default class Auth {
     {
         this.auth0.parseHash((err, authResult) => {
             if (authResult && authResult.accessToken && authResult.idToken) {
-                this.setSession(authResult);
+                this.getManagementApiToken(authResult.idToken, function (token) {
+                    this.setSession(authResult);
+                }.bind(this));
             }
             history.replace('/');
+        });
+    }
+
+    getManagementApiToken(idToken, callback) {
+        
+        fetch(Config.apiPath + '/Auth0', {
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${idToken}`
+            }
+        }).then(responsePromise => responsePromise.json())
+        .then(jsonData => {
+            callback(jsonData.token);
         });
     }
 
@@ -50,19 +66,22 @@ export default class Auth {
         if (localStorage.getItem(this.loggedInSessionKey) === 'true' && !this.idToken)
         {
             this.pendingSilentLogin = true;
-            this.auth0.checkSession({}, (err, authResult) => {
+            this.auth0.checkSession({}, function (err, authResult) {
                 if (authResult && authResult.accessToken && authResult.idToken) {
-                    this.setSession(authResult);
-                    this.pendingSilentLogin = false;
-                    // Todo: how to elegantly refresh page to make components
-                    // using AuthContext to update if the user is logged in
-                    history.replace(history.location.pathname);
+
+                    this.getManagementApiToken(authResult.idToken, function (token) {
+                        this.setSession(authResult);
+                        this.pendingSilentLogin = false;
+
+                        // Todo: how to elegantly refresh page to make components
+                        // using AuthContext to update if the user is logged in
+                        history.replace(history.location.pathname);
+                    }.bind(this));
+                    
                 } else if (err) {
                     this.logout();
-
                 }
-                
-             });
+             }.bind(this));
         }
     }
 
