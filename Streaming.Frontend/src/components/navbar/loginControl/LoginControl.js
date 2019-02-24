@@ -15,18 +15,18 @@ export default class LoginControl extends React.Component {
 
     loginCallback()
     {
-        this.context.authContext.login();
+        this.context.auth.login();
     }
 
     render() {
-        if(this.context.authContext.pendingSilentLogin) {
+        if(this.context.auth.pendingSilentLogin) {
             return <div className="nav-item"></div>
-        }
+        }        
 
-        if (!this.context.authContext.isAuthenticated())
+        if (!this.context.auth.isAuthenticated())
             return <div className="nav-link hoverable" onClick={this.loginCallback}>Login</div>;
         else
-            return <div className="nav-link">Hello {this.context.authContext.getUserInfo().nickname}!</div>
+            return <div className="nav-link">Hello {this.context.auth.getUserInfo().nickname}!</div>
     }
 }
 

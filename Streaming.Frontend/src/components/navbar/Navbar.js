@@ -11,10 +11,6 @@ class Navbar extends React.Component {
         this.onClickSmth = this.onClickSmth.bind(this);
     }
 
-    onClickSmth() {
-        console.log(this.context.apiService);
-    }
-
     render() {
         
         return (
@@ -26,7 +22,6 @@ class Navbar extends React.Component {
                     <ul className="navbar-nav">
                         <li className="nav-item"><NavLink className="nav-link" to="/">Homepage</NavLink></li>
                         <li className="nav-item"><NavLink className="nav-link" to="/Upload">Upload video</NavLink></li>
-                        <li className="nav-item"><a href="#" onClick={this.onClickSmth}>Test</a></li>
                     </ul>
                 </div>
                 <div className="collapse navbar-collapse justify-content-end" id="navbarCollapse">

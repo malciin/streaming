@@ -12,11 +12,10 @@ class IndexPage extends React.Component{
         }
     }
     componentDidMount() {
-        this.context.apiService.getVideos({}, jsonData => {
+        this.context.streamingApi.getVideos({}, jsonData =>
             this.setState ({
                 videos: jsonData
-            });
-        });
+            }));
     }
 
     render() {

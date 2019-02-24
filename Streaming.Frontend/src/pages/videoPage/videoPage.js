@@ -4,6 +4,7 @@ import VideoPlayer from '../../components/blocks/videoPlayer/videoPlayer';
 import { Config } from '../../shared/config';
 import './videoPage.scss';
 import moment from 'moment/moment.js'
+import { AppContext } from '../../AppContext';
 
 export default class VideoPage extends React.Component {
     constructor(props) {
@@ -14,16 +15,11 @@ export default class VideoPage extends React.Component {
     }
 
     componentWillMount() {
-        fetch(`${Config.apiPath}/Video/${this.props.match.params.id}`)
-            .then(responsePromise => responsePromise.json())
-            .then(jsonData => {
-                this.setState ({
-                    videoInfo: jsonData
-                });
-            });
+        this.context.streamingApi.getVideo(this.props.match.params.id, 
+            jsonData => this.setState({
+                videoInfo: jsonData
+            }));
     }
-
-    
 
     render() {
 
@@ -46,3 +42,5 @@ export default class VideoPage extends React.Component {
         </div>
     }
 }
+
+VideoPage.contextType = AppContext;

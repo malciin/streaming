@@ -13,7 +13,7 @@ class App extends Component {
 
   componentWillMount()
   {
-    this.context.authContext.silentLogin();
+    this.context.auth.silentLogin();
   }
 
   render() {
@@ -24,7 +24,7 @@ class App extends Component {
           <Route exact path="/Upload" component={UploadVideoPage} />
           <Route exact path="/Vid/:id" component={VideoPage} />
           <Route path="/sign-in" render={(props) => {
-            this.context.authContext.loginCallback(props);
+            this.context.auth.loginCallback(props);
             return <Callback />
           }} />
         </div>

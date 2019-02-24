@@ -15,17 +15,6 @@ class UploadVideoForm extends React.Component {
         }
 
         this.handleInputChange = this.handleInputChange.bind(this);
-        this.uploadVideo = this.uploadVideo.bind(this);
-    }
-
-    uploadVideo(event) {
-        var formData = new FormData();
-        formData.append("Title", this.state.videoTitle);
-        formData.append("Description", this.state.videoDescription);
-        formData.append("File", this.state.video);
-        var xhr = new XMLHttpRequest();
-        xhr.open("POST", this.props.apiDefinition.post);
-        xhr.send(formData);
     }
 
     handleInputChange(event) {
@@ -45,7 +34,7 @@ class UploadVideoForm extends React.Component {
                 <TextField onChange={this.handleInputChange} label="Please enter a video title" name="videoTitle" />
                 <TextField onChange={this.handleInputChange} label="Please enter a video description" name="videoDescription"/>
                 <Mp4Upload onChange={this.handleInputChange} name="video" />
-                { this.state.video && <ButtonField style={{marginTop: '5px'}} onClick={this.uploadVideo} btnType="btn-primary" label="Upload" center /> }
+                { this.state.video && <ButtonField style={{marginTop: '5px'}} onClick={this.props.submit.bind(null, this.state)} btnType="btn-primary" label="Upload" center /> }
             </div>
         );
     }

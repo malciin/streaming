@@ -41,10 +41,8 @@ export default class Auth {
         this.auth0.parseHash((err, authResult) => {
             if (authResult && authResult.accessToken && authResult.idToken) {
                 this.setSession(authResult);
-                history.replace('/');
-            } else {
-                history.replace('/');
             }
+            history.replace('/');
         });
     }
 
@@ -54,14 +52,16 @@ export default class Auth {
             this.pendingSilentLogin = true;
             this.auth0.checkSession({}, (err, authResult) => {
                 if (authResult && authResult.accessToken && authResult.idToken) {
-                  this.setSession(authResult);
-                  // Todo: how to elegantly refresh page to make components
-                  // using AuthContext to update if the user is logged in
-                  history.replace(history.location.pathname);
+                    this.setSession(authResult);
+                    this.pendingSilentLogin = false;
+                    // Todo: how to elegantly refresh page to make components
+                    // using AuthContext to update if the user is logged in
+                    history.replace(history.location.pathname);
                 } else if (err) {
                     this.logout();
+
                 }
-                this.pendingSilentLogin = false;
+                
              });
         }
     }

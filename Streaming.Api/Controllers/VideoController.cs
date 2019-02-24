@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Streaming.Application.Command;
 using Streaming.Application.Command.Commands.Video;
@@ -19,8 +20,8 @@ namespace Streaming.Api.Controllers
             this.queries = queries;
         }
 
-        [DisableRequestSizeLimit]
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> UploadVideo(UploadVideo UploadVideo)
         {
             await CommandDispatcher.HandleAsync(UploadVideo);

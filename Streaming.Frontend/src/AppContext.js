@@ -1,11 +1,11 @@
 import Auth from './Auth';
 import React from 'react';
-import ApiService from './ApiService';
+import StreamingApiService from './StreamingApiService';
 
 const auth = new Auth();
-const apiService = new ApiService({ authContext: auth });
+const streamingApiService = new StreamingApiService({ auth: auth });
 
 export const AppContext = React.createContext({
-    authContext: auth,
-    apiService: apiService
+    auth: auth,
+    streamingApi: streamingApiService,
 });
