@@ -1,5 +1,5 @@
 import React from 'react';
-import './navbar.scss'
+import './Navbar.scss'
 import { NavLink } from "react-router-dom";
 import { AppContext } from '../../AppContext';
 import LoginControl from './loginControl/LoginControl';
@@ -9,6 +9,7 @@ class Navbar extends React.Component {
     {
         super(props);
     }
+
     render() {
         
         return (

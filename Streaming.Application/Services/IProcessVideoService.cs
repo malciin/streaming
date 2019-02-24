@@ -1,6 +1,4 @@
-﻿using Streaming.Domain.Models.Core;
-using System;
-using System.IO;
+﻿using System;
 using System.Threading.Tasks;
 
 namespace Streaming.Application.Services

@@ -24,8 +24,7 @@ namespace Streaming.Application.Query
         public VideoQueries(VideoMappingService mapper, 
 			IMongoCollection<Video> collection,
 			IDirectoriesSettings directoriesSettings,
-            IVideoBlobService videoBlobService,
-            IThumbnailService thumbnailService)
+            IVideoBlobService videoBlobService)
         {
             this.mapper = mapper;
             this.collection = collection;

@@ -10,5 +10,9 @@
   },
   "Database": {
     "ConnectionString": "mongodb://streaming_mongodb"
+  },
+  "Jwt": {
+    "Issuer": "https://id0.eu.auth0.com/",
+    "Audience": "kkF9cfb31YAOvr8R5q1FQ8byH9YiQXyr"
   }
 }

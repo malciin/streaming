@@ -7,3 +7,4 @@
 Streaming.Api/logs/*
 Streaming.Application/Settings/KeysSettings.Secret.cs
 Streaming.Api/localStorage/*
+Streaming.Api/auth0_jwsk.json

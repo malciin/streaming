@@ -17,6 +17,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Remove="auth0_jwsk.json" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="wwwroot\" />
   </ItemGroup>
 
@@ -35,6 +39,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Streaming.Application\Streaming.Application.csproj" />
+    <ProjectReference Include="..\Streaming.Auth0.Extensions\Streaming.Auth0.csproj" />
     <ProjectReference Include="..\Streaming.Domain\Streaming.Domain.csproj" />
   </ItemGroup>
 
