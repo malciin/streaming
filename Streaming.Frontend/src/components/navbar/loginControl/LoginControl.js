@@ -19,7 +19,7 @@ export default class LoginControl extends React.Component {
     }
 
     render() {
-        if(this.context.authContext.isPendingLogin()) {
+        if(this.context.authContext.pendingSilentLogin) {
             return <div className="nav-item"></div>
         }
 

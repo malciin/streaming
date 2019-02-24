@@ -11,7 +11,7 @@ import history from './History';
 
 class App extends Component {
 
-  componentDidMount()
+  componentWillMount()
   {
     this.context.authContext.silentLogin();
   }

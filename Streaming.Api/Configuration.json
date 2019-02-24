@@ -9,7 +9,7 @@
     "LogsDirectory": "logs"
   },
   "Database": {
-    "ConnectionString": "mongodb://streaming_mongodb"
+    "ConnectionString": "mongodb://localhost:27017"
   },
   "Jwt": {
     "Issuer": "https://id0.eu.auth0.com/",

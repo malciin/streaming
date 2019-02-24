@@ -1,8 +1,8 @@
 import React from 'react';
 import './indexPage.css'
-import Navbar from '../../components/navbar/navbar';
-import { Config } from '../../shared/config';
+import Navbar from '../../components/navbar/Navbar';
 import VideoListItem from '../../components/blocks/videoListItem/videoListItem';
+import { AppContext } from '../../AppContext';
 
 class IndexPage extends React.Component{
     constructor(props) {
@@ -12,24 +12,11 @@ class IndexPage extends React.Component{
         }
     }
     componentDidMount() {
-
-        fetch(Config.apiPath + '/Video/Search', {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                Offset: 0,
-                HowMuch: 10,
-                Keywords: []
-            })
-        }).then(responsePromise => responsePromise.json())
-        .then(jsonData => {
+        this.context.apiService.getVideos({}, jsonData => {
             this.setState ({
                 videos: jsonData
             });
-        })
+        });
     }
 
     render() {
@@ -55,5 +42,7 @@ class IndexPage extends React.Component{
         );
     }
 }
+
+IndexPage.contextType = AppContext;
 
 export default IndexPage;

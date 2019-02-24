@@ -1,5 +1,5 @@
 import React from 'react'
-import Navbar from '../../components/navbar/navbar';
+import Navbar from '../../components/navbar/Navbar';
 import VideoPlayer from '../../components/blocks/videoPlayer/videoPlayer';
 import { Config } from '../../shared/config';
 import './videoPage.scss';

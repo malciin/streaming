@@ -1,5 +1,5 @@
 import React from 'react';
-import Navbar from '../../components/navbar/navbar';
+import Navbar from '../../components/navbar/Navbar';
 import UploadVideoForm from '../../components/forms/uploadVideoForm/uploadVideoForm'
 import { Config } from '../../shared/config';
 
