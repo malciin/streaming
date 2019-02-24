@@ -22,7 +22,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Streaming.Common", "Streami
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Streaming.Tests", "Streaming.Tests\Streaming.Tests.csproj", "{BF2F333C-C57B-4C12-A17D-85B7E5BF3A34}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Streaming.Auth0", "Streaming.Auth0.Extensions\Streaming.Auth0.csproj", "{2923CF10-B591-472F-BB94-86AFDFA01362}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Streaming.Auth0", "Streaming.Auth0\Streaming.Auth0.csproj", "{3C042F4F-41A1-4143-B453-21B8AE2C838F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -50,10 +50,10 @@ Global
 		{BF2F333C-C57B-4C12-A17D-85B7E5BF3A34}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BF2F333C-C57B-4C12-A17D-85B7E5BF3A34}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BF2F333C-C57B-4C12-A17D-85B7E5BF3A34}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2923CF10-B591-472F-BB94-86AFDFA01362}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2923CF10-B591-472F-BB94-86AFDFA01362}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2923CF10-B591-472F-BB94-86AFDFA01362}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2923CF10-B591-472F-BB94-86AFDFA01362}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3C042F4F-41A1-4143-B453-21B8AE2C838F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3C042F4F-41A1-4143-B453-21B8AE2C838F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3C042F4F-41A1-4143-B453-21B8AE2C838F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3C042F4F-41A1-4143-B453-21B8AE2C838F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
