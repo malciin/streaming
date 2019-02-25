@@ -2,7 +2,7 @@
 
 namespace Streaming.Application.Command.Commands.Video
 {
-    public class ProcessVideo : ICommand
+    public class ProcessVideoCommand : ICommand
     {
         public Guid VideoId { get; set; }
         public string VideoPath { get; set; }

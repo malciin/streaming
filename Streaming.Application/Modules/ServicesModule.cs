@@ -3,7 +3,7 @@ using MongoDB.Driver;
 using MongoDB.Driver.GridFS;
 using Streaming.Application.Services;
 using Streaming.Application.Settings;
-using Streaming.Domain.Models.Core;
+using Streaming.Domain.Models;
 
 namespace Streaming.Application.Modules
 {

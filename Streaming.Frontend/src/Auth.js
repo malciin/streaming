@@ -42,9 +42,9 @@ export default class Auth {
             if (authResult && authResult.accessToken && authResult.idToken) {
                 this.getManagementApiToken(authResult.idToken, function (token) {
                     this.setSession(authResult);
+                    history.replace('/');
                 }.bind(this));
             }
-            history.replace('/');
         });
     }
 

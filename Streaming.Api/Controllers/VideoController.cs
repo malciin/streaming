@@ -22,9 +22,15 @@ namespace Streaming.Api.Controllers
 
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> UploadVideo(UploadVideo UploadVideo)
+        public async Task<IActionResult> UploadVideo(UploadVideoDTO UploadVideo)
         {
-            await CommandDispatcher.HandleAsync(UploadVideo);
+            await CommandDispatcher.HandleAsync(new UploadVideoCommand
+            {
+                Title = UploadVideo.Title,
+                Description = UploadVideo.Description,
+                File = UploadVideo.File,
+                User = HttpContext.User
+            });
             return Ok();
         }
 
@@ -52,5 +58,12 @@ namespace Streaming.Api.Controllers
 			var manifest = await queries.GetVideoManifestAsync(Id);
 			return File(Encoding.UTF8.GetBytes(manifest), "application/x-mpegURL", $"{Id}.m3u8");
 		}
+
+        [HttpDelete]
+        [Authorize]
+        public async Task<IActionResult> DeleteVideo(Guid Id)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

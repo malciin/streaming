@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Streaming.Domain.Models.Core
+namespace Streaming.Domain.Enums
 {
     [Flags]
     public enum VideoState

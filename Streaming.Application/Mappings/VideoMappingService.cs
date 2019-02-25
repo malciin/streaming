@@ -1,9 +1,8 @@
 ﻿using Streaming.Application.DTO.Video;
 using Streaming.Application.Services;
-using Streaming.Domain.Models.Core;
+using Streaming.Domain.Enums;
+using Streaming.Domain.Models;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Streaming.Application.Mappings
 {

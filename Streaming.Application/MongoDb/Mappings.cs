@@ -1,5 +1,5 @@
 ﻿using MongoDB.Bson.Serialization;
-using Streaming.Domain.Models.Core;
+using Streaming.Domain.Models;
 
 namespace Streaming.Application.MongoDb
 {

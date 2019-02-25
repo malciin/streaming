@@ -2,7 +2,8 @@
 using Streaming.Application.Services;
 using Streaming.Application.Settings;
 using Streaming.Common.Helpers;
-using Streaming.Domain.Models.Core;
+using Streaming.Domain.Enums;
+using Streaming.Domain.Models;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -13,9 +14,9 @@ using System.Threading.Tasks;
 
 namespace Streaming.Application.Command.Handlers.Video
 {
-    public class ProcessVideoHandler : ICommandHandler<Commands.Video.ProcessVideo>
+    public class ProcessVideoHandler : ICommandHandler<Commands.Video.ProcessVideoCommand>
     {
-		private readonly IMongoCollection<Domain.Models.Core.Video> videoCollection;
+		private readonly IMongoCollection<Domain.Models.Video> videoCollection;
 		private readonly IVideoBlobService videoBlobService;
 		private readonly IDirectoriesSettings directoriesSettings;
         private readonly IProcessVideoService processVideoService;
@@ -33,7 +34,7 @@ namespace Streaming.Application.Command.Handlers.Video
             .Where(x => Regex.IsMatch(x.Name, @"\d+\.ts"));
 
         public ProcessVideoHandler(IDirectoriesSettings directoriesSettings,
-			IMongoCollection<Domain.Models.Core.Video> videoCollection,
+			IMongoCollection<Domain.Models.Video> videoCollection,
 			IVideoBlobService videoBlobService,
             IProcessVideoService processVideoService,
             IThumbnailService thumbnailService)
@@ -45,7 +46,7 @@ namespace Streaming.Application.Command.Handlers.Video
             this.thumbnailService = thumbnailService;
         }
 
-        private void setupProcessingEnvironment(Commands.Video.ProcessVideo command)
+        private void setupProcessingEnvironment(Commands.Video.ProcessVideoCommand command)
         {
             processingDirectory = Directory.CreateDirectory(String.Format($"{directoriesSettings.ProcessingDirectory}{{0}}{command.VideoId}{{0}}", Path.DirectorySeparatorChar));
             thumbnailsDirectory = Directory.CreateDirectory(String.Format($"{processingDirectory.FullName}{thumbnailFolderName}{{0}}",
@@ -97,7 +98,7 @@ namespace Streaming.Application.Command.Handlers.Video
             }
         }
 
-        public async Task HandleAsync(Commands.Video.ProcessVideo Command)
+        public async Task HandleAsync(Commands.Video.ProcessVideoCommand Command)
         {
             var timer = Stopwatch.StartNew();
 
@@ -115,8 +116,8 @@ namespace Streaming.Application.Command.Handlers.Video
             processingDirectory.Delete(recursive: true);
             videoState |= VideoState.Processed;
 
-            var searchFilter = Builders<Domain.Models.Core.Video>.Filter.Eq(x => x.VideoId, Command.VideoId);
-            var updateDefinition = Builders<Domain.Models.Core.Video>.Update
+            var searchFilter = Builders<Domain.Models.Video>.Filter.Eq(x => x.VideoId, Command.VideoId);
+            var updateDefinition = Builders<Domain.Models.Video>.Update
                 .Set(x => x.FinishedProcessingDate, DateTime.UtcNow)
                 .Set(x => x.ProcessingInfo, $"Sucessfully processed after {timer.Elapsed.TotalMilliseconds}ms")
                 .Set(x => x.VideoManifestHLS, manifest.ToString())

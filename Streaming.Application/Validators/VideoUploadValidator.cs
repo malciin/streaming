@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Streaming.Application.Validators
 {
-    public class VideoUploadValidator : AbstractValidator<UploadVideo>
+    public class VideoUploadValidator : AbstractValidator<UploadVideoCommand>
     {
         public VideoUploadValidator()
         {

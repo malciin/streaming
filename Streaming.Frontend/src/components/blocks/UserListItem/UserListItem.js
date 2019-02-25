@@ -14,8 +14,8 @@ export default class UserListItem extends React.Component {
         alert('Are you sure to remove claim?');
     }
 
-    addClaim() {
-        alert('Select a claim');
+    addClaim(data) {
+        console.log(data);
     }
 
     render() {

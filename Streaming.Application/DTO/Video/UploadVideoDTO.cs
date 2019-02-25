@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 
-namespace Streaming.Application.Command.Commands.Video
+namespace Streaming.Application.DTO.Video
 {
-    public class UploadVideo : ICommand
+    public class UploadVideoDTO
     {
         public string Title { get; set; }
         public string Description { get; set; }

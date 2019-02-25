@@ -6,18 +6,17 @@ using System.Threading.Tasks;
 using MongoDB.Driver;
 using MongoDB.Driver.GridFS;
 using Streaming.Application.Command.Bus;
-using Streaming.Application.Command.Commands.Video;
 using Streaming.Application.Settings;
 
 namespace Streaming.Application.Command.Handlers.Video
 {
-	public class UploadVideoHandler : ICommandHandler<Commands.Video.UploadVideo>
+	public class UploadVideoHandler : ICommandHandler<Commands.Video.UploadVideoCommand>
 	{
 		private readonly ICommandBus commandBus;
-		private readonly IMongoCollection<Domain.Models.Core.Video> videoCollection;
+		private readonly IMongoCollection<Domain.Models.Video> videoCollection;
 		private readonly IDirectoriesSettings directoriesSettings;
 
-		public UploadVideoHandler(IMongoCollection<Domain.Models.Core.Video> videoCollection,
+		public UploadVideoHandler(IMongoCollection<Domain.Models.Video> videoCollection,
 			IDirectoriesSettings directoriesSettings,
             ICommandBus commandBus)
 		{
@@ -26,10 +25,10 @@ namespace Streaming.Application.Command.Handlers.Video
             this.commandBus = commandBus;
 		}
 
-		public async Task HandleAsync(Commands.Video.UploadVideo Command)
+		public async Task HandleAsync(Commands.Video.UploadVideoCommand Command)
 		{
-			var video = new Domain.Models.Core.Video
-			{
+			var video = new Domain.Models.Video
+            {
 				CreatedDate = DateTime.Now,
 				Title = Command.Title,
 				Description = Command.Description,
@@ -46,7 +45,7 @@ namespace Streaming.Application.Command.Handlers.Video
 				await Command.File.CopyToAsync(fileStream);
 			}
 
-			commandBus.Push(new Commands.Video.ProcessVideo
+			commandBus.Push(new Commands.Video.ProcessVideoCommand
 			{
 				VideoId = video.VideoId,
 				VideoPath = filePath
