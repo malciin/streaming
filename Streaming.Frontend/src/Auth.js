@@ -68,9 +68,9 @@ export default class Auth {
             this.pendingSilentLogin = true;
             this.auth0.checkSession({}, function (err, authResult) {
                 if (authResult && authResult.accessToken && authResult.idToken) {
-
                     this.getManagementApiToken(authResult.idToken, function (token) {
                         this.setSession(authResult);
+                        this.managementApiIdToken = token;
                         this.pendingSilentLogin = false;
 
                         // Todo: how to elegantly refresh page to make components

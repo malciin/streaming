@@ -1,0 +1,33 @@
+.user-list-card-container {
+    display: flex;
+
+    .gravatar-container {
+        width: 50px;
+        img {
+            width: 100%;
+        }
+        margin-right: 10px;
+    }
+
+    .user-metadata {
+
+    }
+
+    .claims {
+        margin-left: 10px;
+
+        .claim {
+            background-color: red;
+            padding: 5px;
+            border-radius: 10px;
+
+            .delete {
+                cursor: pointer;
+            }
+        }
+
+        .addClaim {
+            cursor: pointer;
+        }
+    }
+}

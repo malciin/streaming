@@ -20,7 +20,10 @@ class Navbar extends React.Component {
                 <div className="navbar">
                     <ul className="navbar-nav">
                         <li className="nav-item"><NavLink className="nav-link" to="/">Homepage</NavLink></li>
-                        <li className="nav-item"><NavLink className="nav-link" to="/Upload">Upload video</NavLink></li>
+                        { this.context.auth.isAuthenticated() && 
+                        <li className="nav-item"><NavLink className="nav-link" to="/Upload">Upload video</NavLink></li> }
+                        { this.context.auth.isAuthenticated() && 
+                        <li className="nav-item"><NavLink className="nav-link" to="/Admin">Admin panel</NavLink></li> }
                     </ul>
                 </div>
                 <div className="collapse navbar-collapse justify-content-end" id="navbarCollapse">

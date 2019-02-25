@@ -8,6 +8,7 @@ import VideoPage from './pages/videoPage/videoPage';
 import { AppContext } from './AppContext';
 import Callback from './pages/callback/callback';
 import history from './History';
+import AdminPage from './pages/adminPage/AdminPage';
 
 class App extends Component {
 
@@ -23,6 +24,7 @@ class App extends Component {
           <Route exact path="/" component={() => <IndexPage tea={this.updated}/>} />
           <Route exact path="/Upload" component={UploadVideoPage} />
           <Route exact path="/Vid/:id" component={VideoPage} />
+          <Route exact path="/Admin" component={AdminPage} />
           <Route path="/sign-in" render={(props) => {
             this.context.auth.loginCallback(props);
             return <Callback />
