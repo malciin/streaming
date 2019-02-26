@@ -4,7 +4,6 @@ import moment from 'moment/moment.js'
 export default class UserListItem extends React.Component {
     constructor(props) {
         super(props);
-        console.log(props.model);
 
         this.removeClaim = this.removeClaim.bind(this);
         this.addClaim = this.addClaim.bind(this);

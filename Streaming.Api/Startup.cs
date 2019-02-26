@@ -71,7 +71,7 @@ namespace Streaming.Api
 
             services.AddMvc().AddFluentValidation(x =>
             {
-                x.RegisterValidatorsFromAssemblyContaining<Application.Validators.VideoUploadValidator>();
+                x.RegisterValidatorsFromAssemblyContaining<Application.Validators.UploadVideoDTOValidator>();
             });
 
             var builder = new ContainerBuilder();

@@ -12,9 +12,9 @@ import AdminPage from './pages/adminPage/AdminPage';
 
 class App extends Component {
 
-  componentWillMount()
+  async componentWillMount()
   {
-    this.context.auth.silentLogin();
+    await this.context.auth.silentLogin();
   }
 
   render() {

@@ -14,11 +14,11 @@ export default class VideoPage extends React.Component {
         }
     }
 
-    componentWillMount() {
-        this.context.streamingApi.getVideo(this.props.match.params.id, 
-            jsonData => this.setState({
-                videoInfo: jsonData
-            }));
+    async componentWillMount() {
+        var videoInfo = await this.context.streamingApi.getVideo(this.props.match.params.id); 
+        this.setState({
+            videoInfo: videoInfo
+        });
     }
 
     render() {

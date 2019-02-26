@@ -1,11 +1,9 @@
-﻿using Microsoft.AspNetCore.Http;
-
-namespace Streaming.Application.DTO.Video
+﻿namespace Streaming.Application.DTO.Video
 {
     public class UploadVideoDTO
     {
+        public string UploadToken { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
-        public IFormFile File { get; set; }
     }
 }

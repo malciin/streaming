@@ -11,7 +11,7 @@ namespace Streaming.Application.Services
     {
         private readonly string localStorageDirectoryPath;
         private readonly IHttpContextAccessor httpContextAccessor;
-        public LocalStorageVideoBlobService(ILocalStorageDirectory localStorageDirectory, IHttpContextAccessor httpContextAccessor)
+        public LocalStorageVideoBlobService(ILocalStorageDirectorySettings localStorageDirectory, IHttpContextAccessor httpContextAccessor)
         {
             this.httpContextAccessor = httpContextAccessor;
             localStorageDirectoryPath = $"{localStorageDirectory.LocalStorageDirectory}{Path.DirectorySeparatorChar}localStorageVideoBlob";

@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Streaming.Api.Attributes;
+using Streaming.Api.Models;
 using Streaming.Application.Command;
 using Streaming.Application.Command.Commands.Video;
 using Streaming.Application.DTO.Video;
 using Streaming.Application.Query;
+using Streaming.Application.Services;
 
 namespace Streaming.Api.Controllers
 {
@@ -15,21 +17,45 @@ namespace Streaming.Api.Controllers
     public class VideoController : _ApiControllerBase
     {
         private readonly IVideoQueries queries;
-        public VideoController(ICommandDispatcher commandDispatcher, IVideoQueries queries) : base(commandDispatcher)
+        private readonly IMessageSignerService messageSigner;
+        public VideoController(ICommandDispatcher commandDispatcher, IVideoQueries queries, IMessageSignerService messageSigner) : base(commandDispatcher)
         {
             this.queries = queries;
+            this.messageSigner = messageSigner;
         }
 
         [HttpPost]
-        [Authorize]
-        public async Task<IActionResult> UploadVideo(UploadVideoDTO UploadVideo)
+        [ClaimAuthorize(Claims.CanUploadVideo)]
+        public async Task<IActionResult> UploadVideo([FromBody] UploadVideoDTO UploadVideo)
         {
             await CommandDispatcher.HandleAsync(new UploadVideoCommand
             {
+                UploadToken = UploadVideo.UploadToken,
                 Title = UploadVideo.Title,
                 Description = UploadVideo.Description,
-                File = UploadVideo.File,
                 User = HttpContext.User
+            });
+            return Ok();
+        }
+
+        [HttpGet("UploadToken")]
+        //[ClaimAuthorize(Claims.CanUploadVideo)]
+        public string GetUploadToken()
+        {
+            // Too tired when I wrote this, to move this to dedicated serivice or something...
+            var signedMessage = messageSigner.SignMessage(Guid.NewGuid().ToByteArray());
+            return Convert.ToBase64String(signedMessage);
+        }
+
+        [HttpPost("UploadPart")]
+        [ClaimAuthorize(Claims.CanUploadVideo)]
+        public async Task<IActionResult> UploadPart(UploadVideoPartDTO VideoPart)
+        {
+            await CommandDispatcher.HandleAsync(new UploadVideoPartCommand
+            {
+                PartMD5Hash = VideoPart.PartMD5Hash,
+                UploadToken = VideoPart.UploadToken,
+                PartBytes = VideoPart.PartBytes
             });
             return Ok();
         }
@@ -41,7 +67,7 @@ namespace Streaming.Api.Controllers
         }
 
         [HttpPost("Search")]
-        public async Task<IEnumerable<VideoMetadataDTO>> Search(VideoSearchDTO Search)
+        public async Task<IEnumerable<VideoMetadataDTO>> Search([FromBody] VideoSearchDTO Search)
         {
 			return await queries.SearchAsync(Search);
         }
@@ -60,7 +86,7 @@ namespace Streaming.Api.Controllers
 		}
 
         [HttpDelete("{Id}")]
-        [Authorize]
+        [ClaimAuthorize(Claims.CanDeleteVideo)]
         public async Task<IActionResult> DeleteVideo(Guid Id)
         {
             await CommandDispatcher.HandleAsync(new DeleteVideoCommand

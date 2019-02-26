@@ -1,4 +1,5 @@
 import { Config } from "./shared/config";
+import { AsyncFunctions } from "./shared/AsyncFunctions";
 
 export default class Auth0ApiService {
 
@@ -13,29 +14,21 @@ export default class Auth0ApiService {
 
     // TODO: Propably not the correct way for waiting to silent authentication
     // Waiting for authentication
-    waitForAuth(callback) {
-        if (this.authContext.pendingSilentLogin)
+    async waitForAuth() {
+        while (this.authContext.pendingSilentLogin)
         {
-            setTimeout(this.waitForAuth.bind(null, callback), 10);
-        }
-        else
-        {
-            callback();
+            await AsyncFunctions.timeout(10);
         }
     }
 
-    getUsers(filterObject, callback) {
-       
-        this.waitForAuth(
-            function (filterObject) {
-                fetch(`${this.api}users`, {
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${this.authContext.managementApiIdToken}`
-                }}).then(responsePromise => responsePromise.json())
-                .then(callback);
-            }.bind(this,filterObject)
-        );
+    async getUsers(filterObject) {
+        await this.waitForAuth();
+        const response = await fetch(`${this.api}users`, {
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${this.authContext.managementApiIdToken}`
+            }});
+        return await response.json();
     }
 }

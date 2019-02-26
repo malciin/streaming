@@ -50,6 +50,10 @@ namespace Streaming.Application.Modules
             builder.RegisterType<Auth0ManagementApiTokenAccessor>()
                    .As<IAuth0ManagementApiTokenAccessor>()
                    .SingleInstance();
+
+            builder.RegisterType<SHA256MessageSignerService>()
+                   .As<IMessageSignerService>()
+                   .SingleInstance();
         }
     }
 }

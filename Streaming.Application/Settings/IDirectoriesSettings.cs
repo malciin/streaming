@@ -1,13 +1,18 @@
 ﻿namespace Streaming.Application.Settings
 {
-    public interface ILocalStorageDirectory
+    public interface ILocalStorageDirectorySettings
     {
         string LocalStorageDirectory { get; }
     }
 
-    public interface IDirectoriesSettings : ILocalStorageDirectory
+    public interface IProcessingDirectorySettings
     {
         string ProcessingDirectory { get; }
+    }
+
+    public interface IDirectoriesSettings : IProcessingDirectorySettings, ILocalStorageDirectorySettings
+    {
+        
         string LogsDirectory { get; }
     }
 }

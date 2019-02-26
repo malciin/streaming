@@ -3,6 +3,7 @@ import './indexPage.css'
 import Navbar from '../../components/navbar/Navbar';
 import VideoListItem from '../../components/blocks/videoListItem/videoListItem';
 import { AppContext } from '../../AppContext';
+import ButtonField from '../../components/blocks/buttonField/buttonField';
 
 class IndexPage extends React.Component{
     constructor(props) {
@@ -11,21 +12,20 @@ class IndexPage extends React.Component{
             videos: []
         }
 
-        this.deleteVideo = this.deleteVideo.bind(this);
+        this.deletedVideoCallback = this.deletedVideoCallback.bind(this);
     }
-    componentDidMount() {
-        this.context.streamingApi.getVideos({}, jsonData =>
-            this.setState ({
-                videos: jsonData
-            }));
+    
+    async componentDidMount() {
+        var jsonData = await this.context.streamingApi.getVideos({});
+        this.setState ({
+            videos: jsonData
+        });
     }
 
-    deleteVideo(id) {
-        this.context.streamingApi.deleteVideo(id, function(id) {
-            this.setState({
-                videos: this.state.videos.filter(x => x.videoId != id)
-            });
-        }.bind(this, id));
+    deletedVideoCallback(videoId) {
+        this.setState({
+            videos: this.state.videos.filter(x => x.videoId != videoId)
+        });
     }
 
     render() {
@@ -43,7 +43,7 @@ class IndexPage extends React.Component{
                                 description: video.description,
                                 length: video.length,
                                 thumbnailUrl: video.thumbnailUrl
-                            }} deleteVideoCallback={this.deleteVideo} />
+                            }} deletedVideoCallback={this.deletedVideoCallback} />
                         })
                     }
                 </div>
@@ -53,5 +53,4 @@ class IndexPage extends React.Component{
 }
 
 IndexPage.contextType = AppContext;
-
 export default IndexPage;

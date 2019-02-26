@@ -1,6 +1,7 @@
 import auth0 from 'auth0-js';
 import { Config } from './shared/config';
 import history from './History';
+import { AsyncFunctions } from './shared/AsyncFunctions';
 
 export default class Auth {
 
@@ -37,53 +38,38 @@ export default class Auth {
         history.replace(history.location.pathname);
     }
 
-    loginCallback(props)
-    {
-        this.auth0.parseHash((err, authResult) => {
-            if (authResult && authResult.accessToken && authResult.idToken) {
-                this.getManagementApiToken(authResult.idToken, function (token) {
-                    this.setSession(authResult);
-                    this.managementApiIdToken = token;
-                    history.replace('/');
-                }.bind(this));
-            }
-        });
+    async loginCallback() {
+        var authResult = await AsyncFunctions.auth0.parseHash(this.auth0);
+        if (authResult && authResult.accessToken && authResult.idToken) {
+            authResult.managementApiIdToken = await this.getManagementApiToken(authResult.idToken);
+            this.setSession(authResult);
+            history.replace('/');
+        }
     }
 
-    getManagementApiToken(idToken, callback) {
-        
-        fetch(Config.apiPath + '/Auth0', {
+    async getManagementApiToken(idToken) {
+        const response = await fetch(Config.apiPath + '/Auth0', {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${idToken}`
             }
-        }).then(responsePromise => responsePromise.json())
-        .then(jsonData => {
-            callback(jsonData.token);
         });
+
+        const jsonData = await response.json();
+        return jsonData.token;
     }
 
-    silentLogin() {
+    async silentLogin()
+    {
         if (localStorage.getItem(this.loggedInSessionKey) === 'true' && !this.idToken)
         {
             this.pendingSilentLogin = true;
-            this.auth0.checkSession({}, function (err, authResult) {
-                if (authResult && authResult.accessToken && authResult.idToken) {
-                    this.getManagementApiToken(authResult.idToken, function (token) {
-                        this.setSession(authResult);
-                        this.managementApiIdToken = token;
-                        this.pendingSilentLogin = false;
-
-                        // Todo: how to elegantly refresh page to make components
-                        // using AuthContext to update if the user is logged in
-                        history.replace(history.location.pathname);
-                    }.bind(this));
-                    
-                } else if (err) {
-                    this.logout();
-                }
-             }.bind(this));
+            var authResult = await AsyncFunctions.auth0.checkSession(this.auth0);
+            authResult.managementApiIdToken = await this.getManagementApiToken(authResult.idToken);
+            this.setSession(authResult);
+            this.pendingSilentLogin = false;
+            history.replace(history.location.pathname);
         }
     }
 
@@ -92,9 +78,8 @@ export default class Auth {
 
         let expiresAt = (authResult.expiresIn * 1000) + new Date().getTime();
         this.idTokenPayload = authResult.idTokenPayload;
-        console.log('token');
-        console.log(this.idTokenPayload);
         this.accessToken = authResult.accessToken;
+        this.managementApiIdToken = authResult.managementApiIdToken;
         this.idToken = authResult.idToken;
         this.expiresAt = expiresAt;
     }

@@ -2,3 +2,8 @@
     color: white;
     padding: 20px;
 }
+
+.btn {
+    color: red;
+    background-color: white;
+}

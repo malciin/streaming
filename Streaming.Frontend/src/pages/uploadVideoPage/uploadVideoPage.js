@@ -10,8 +10,8 @@ class UploadVideoPage extends React.Component{
         this.uploadVideo = this.uploadVideo.bind(this);
     }
 
-    uploadVideo(data) {
-        this.context.streamingApi.uploadVideo(data, null);
+    async uploadVideo(data) {
+        await this.context.streamingApi.uploadVideo(data);
     }
 
     render() {

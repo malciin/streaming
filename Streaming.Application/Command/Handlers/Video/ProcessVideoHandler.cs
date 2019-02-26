@@ -48,7 +48,7 @@ namespace Streaming.Application.Command.Handlers.Video
 
         private void setupProcessingEnvironment(Commands.Video.ProcessVideoCommand command)
         {
-            processingDirectory = Directory.CreateDirectory(String.Format($"{directoriesSettings.ProcessingDirectory}{{0}}{command.VideoId}{{0}}", Path.DirectorySeparatorChar));
+            processingDirectory = Directory.CreateDirectory(String.Format($"{directoriesSettings.ProcessingDirectory}{{0}}{command.VideoId}_dir{{0}}", Path.DirectorySeparatorChar));
             thumbnailsDirectory = Directory.CreateDirectory(String.Format($"{processingDirectory.FullName}{thumbnailFolderName}{{0}}",
                 Path.DirectorySeparatorChar));
         }

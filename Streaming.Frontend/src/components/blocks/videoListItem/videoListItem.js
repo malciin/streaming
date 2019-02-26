@@ -1,27 +1,32 @@
 import React from 'react'
 import './videoListItem.scss'
-import { Redirect } from 'react-router-dom'
 import { Link } from "react-router-dom";
 import { AppContext } from '../../../AppContext';
+import { Claims } from '../../../shared/Claims';
 
 export default class VideoListItem extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            redirect: false
+            inProgress: false
         }
 
-        this.handleClick = this.handleClick.bind(this);
+        this.deleteVideo = this.deleteVideo.bind(this);
     }
 
-    handleClick(event) {
+    deleteVideo(id) {
         this.setState({
-            redirect: true
-        })
+            inProgress:true
+        });
+        this.context.streamingApi.deleteVideo(id, function(id) {
+            this.setState({
+                inProgress: false
+            })
+            this.props.deletedVideoCallback(id);
+        }.bind(this, id));
     }
     
     render() {
-        console.log(this.props);
         return <div className="video-list-item">
             <Link to={"/Vid/" + this.props.model.videoId }>
             <div className="thumbnail" onClick={this.handleClick}>
@@ -39,9 +44,8 @@ export default class VideoListItem extends React.Component {
                 </div>
             </div>
             <div className="management">
-                { this.context.auth.haveClaim("canDeleteVideo") && <i style={{
-                   cursor: 'pointer'
-                }} className="icon-trash" onClick={this.props.deleteVideoCallback.bind(null, this.props.model.videoId)}></i> }
+                { !this.state.inProgress && this.context.auth.haveClaim(Claims.canDeleteVideo) && 
+                    <i className="icon-trash cursor-pointer" onClick={this.deleteVideo.bind(this, this.props.model.videoId)}></i> }
             </div>
         </div>;
     }

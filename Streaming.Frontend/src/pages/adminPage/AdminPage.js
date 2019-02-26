@@ -12,12 +12,11 @@ export default class AdminPage extends React.Component {
             users: []
         }
     }
-    componentDidMount() {
-        console.log(this.context);
-        this.context.auth0Api.getUsers({}, data => {
-            this.setState({
-                users: data
-            }) });
+    async componentDidMount() {
+        var data = await this.context.auth0Api.getUsers({});
+        this.setState({
+            users: data
+        })
     }
 
     render() {
