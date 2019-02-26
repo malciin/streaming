@@ -59,11 +59,15 @@ namespace Streaming.Api.Controllers
 			return File(Encoding.UTF8.GetBytes(manifest), "application/x-mpegURL", $"{Id}.m3u8");
 		}
 
-        [HttpDelete]
+        [HttpDelete("{Id}")]
         [Authorize]
         public async Task<IActionResult> DeleteVideo(Guid Id)
         {
-            throw new NotImplementedException();
+            await CommandDispatcher.HandleAsync(new DeleteVideoCommand
+            {
+                VideoId = Id
+            });
+            return Ok();
         }
     }
 }

@@ -1,4 +1,5 @@
 import { Config } from "./shared/config";
+import { request } from "https";
 
 export default class ApiService {
     constructor(props) {
@@ -9,6 +10,7 @@ export default class ApiService {
         this.getVideos = this.getVideos.bind(this);
         this.getVideo = this.getVideo.bind(this);
         this.uploadVideo = this.uploadVideo.bind(this);
+        this.deleteVideo = this.deleteVideo.bind(this);
     }
 
     // TODO: Propably not the correct way for waiting to silent authentication
@@ -58,7 +60,7 @@ export default class ApiService {
                 'Content-Type': 'application/json',
             })
         }).then(responsePromise => responsePromise.json())
-          .then(jsonData => callback.bind(null, jsonData));
+          .then(callback);
     }
 
     uploadVideo(data, callback) {
@@ -70,7 +72,11 @@ export default class ApiService {
             
             var xhr = new XMLHttpRequest();
             if (callback)
-                xhr.onreadystatechange = callback;
+                xhr.onreadystatechange = function () {
+                    if (request.readyState == 4 && request.statu == 200) {
+                        callback(request.reponseText);
+                    }
+                };
             xhr.open("POST", `${Config.apiPath}/Video`);
             
             if (this.authContext.getIdToken())
@@ -78,5 +84,18 @@ export default class ApiService {
             
             xhr.send(formData);
         }.bind(this, data));        
+    }
+
+    deleteVideo(videoId, callback) {
+        this.waitForAuth(function(videoId) {
+            fetch(`${Config.apiPath}/Video/${videoId}`, {
+                method: 'DELETE',
+                headers: this.addBearerTokenHeader({
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                })
+            }).then(responsePromise => responsePromise)
+              .then(callback);
+        }.bind(this, videoId));
     }
 }

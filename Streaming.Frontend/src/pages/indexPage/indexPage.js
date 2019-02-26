@@ -10,12 +10,22 @@ class IndexPage extends React.Component{
         this.state = {
             videos: []
         }
+
+        this.deleteVideo = this.deleteVideo.bind(this);
     }
     componentDidMount() {
         this.context.streamingApi.getVideos({}, jsonData =>
             this.setState ({
                 videos: jsonData
             }));
+    }
+
+    deleteVideo(id) {
+        this.context.streamingApi.deleteVideo(id, function(id) {
+            this.setState({
+                videos: this.state.videos.filter(x => x.videoId != id)
+            });
+        }.bind(this, id));
     }
 
     render() {
@@ -33,7 +43,7 @@ class IndexPage extends React.Component{
                                 description: video.description,
                                 length: video.length,
                                 thumbnailUrl: video.thumbnailUrl
-                            }} />
+                            }} deleteVideoCallback={this.deleteVideo} />
                         })
                     }
                 </div>

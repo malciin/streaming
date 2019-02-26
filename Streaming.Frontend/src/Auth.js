@@ -18,6 +18,7 @@ export default class Auth {
         this.logout = this.logout.bind(this);
         this.getUserInfo = this.getUserInfo.bind(this);
         this.isAuthenticated = this.isAuthenticated.bind(this);
+        this.haveClaim = this.haveClaim.bind(this);
     }
     
     login() {
@@ -42,6 +43,7 @@ export default class Auth {
             if (authResult && authResult.accessToken && authResult.idToken) {
                 this.getManagementApiToken(authResult.idToken, function (token) {
                     this.setSession(authResult);
+                    this.managementApiIdToken = token;
                     history.replace('/');
                 }.bind(this));
             }
@@ -90,9 +92,17 @@ export default class Auth {
 
         let expiresAt = (authResult.expiresIn * 1000) + new Date().getTime();
         this.idTokenPayload = authResult.idTokenPayload;
+        console.log('token');
+        console.log(this.idTokenPayload);
         this.accessToken = authResult.accessToken;
         this.idToken = authResult.idToken;
         this.expiresAt = expiresAt;
+    }
+
+    haveClaim(claim) {
+        if (this.idTokenPayload)
+            return this.idTokenPayload["http://streaming.com/claims"].includes(claim);
+        return false;
     }
 
     getIdToken()
