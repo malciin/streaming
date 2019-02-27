@@ -1,6 +1,6 @@
 ﻿using Streaming.Application.Command.Commands.Video;
 using Streaming.Application.Services;
-using Streaming.Application.Settings;
+using Streaming.Application.Strategies;
 using Streaming.Common.Exceptions;
 using System;
 using System.IO;
@@ -11,11 +11,11 @@ namespace Streaming.Application.Command.Handlers.Video
 {
     public class UploadVideoPartHandler : ICommandHandler<UploadVideoPartCommand>
     {
-        private readonly string processingDir;
+        private readonly IPathStrategy pathStrategy;
         private readonly IMessageSignerService messageSigner;
-        public UploadVideoPartHandler(IProcessingDirectorySettings processingDirectory, IMessageSignerService messageSigner)
+        public UploadVideoPartHandler(IPathStrategy pathStrategy, IMessageSignerService messageSigner)
         {
-            processingDir = processingDirectory.ProcessingDirectory;
+            this.pathStrategy = pathStrategy;
             this.messageSigner = messageSigner;
         }
 
@@ -39,9 +39,8 @@ namespace Streaming.Application.Command.Handlers.Video
                 {
                     throw new HashesNotEqualException();
                 }
-                var filePath = String.Format($"{processingDir}{{0}}{videoId}", Path.DirectorySeparatorChar);
-                Directory.CreateDirectory($"{processingDir}");
-                using (var fileStream = File.Open(filePath, FileMode.Append))
+                Directory.CreateDirectory(pathStrategy.VideoProcessingMainDirectoryPath());
+                using (var fileStream = File.Open(pathStrategy.VideoProcessingFilePath(videoId), FileMode.Append))
                 {
                     partStream.Position = 0;
                     await partStream.CopyToAsync(fileStream);

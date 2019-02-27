@@ -23,6 +23,9 @@ class IndexPage extends React.Component{
     }
 
     deletedVideoCallback(videoId) {
+        console.log('callback');
+        console.log(this.state.videos);
+        console.log(this.state.videos.filter(x => x.videoId != videoId))
         this.setState({
             videos: this.state.videos.filter(x => x.videoId != videoId)
         });

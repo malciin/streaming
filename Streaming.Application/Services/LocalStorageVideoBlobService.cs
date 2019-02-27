@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
-using Streaming.Application.Settings;
+using Streaming.Application.Strategies;
 using Streaming.Common.Helpers;
 using System;
 using System.IO;
@@ -9,21 +9,17 @@ namespace Streaming.Application.Services
 {
     public class LocalStorageVideoBlobService : IVideoBlobService
     {
-        private readonly string localStorageDirectoryPath;
         private readonly IHttpContextAccessor httpContextAccessor;
-        public LocalStorageVideoBlobService(ILocalStorageDirectorySettings localStorageDirectory, IHttpContextAccessor httpContextAccessor)
+        private readonly IPathStrategy pathStrategy;
+        public LocalStorageVideoBlobService(IHttpContextAccessor httpContextAccessor, IPathStrategy pathStrategy)
         {
             this.httpContextAccessor = httpContextAccessor;
-            localStorageDirectoryPath = $"{localStorageDirectory.LocalStorageDirectory}{Path.DirectorySeparatorChar}localStorageVideoBlob";
-            Directory.CreateDirectory(localStorageDirectoryPath);
+            this.pathStrategy = pathStrategy;
         }
-
-        private string getVideoPath(Guid videoId, int partNumber)
-            => $"{localStorageDirectoryPath}{Path.DirectorySeparatorChar}{BlobNameHelper.GetVideoFilename(videoId, partNumber)}";
 
         public Task<Stream> GetVideoAsync(Guid VideoId, int PartNumber)
         {
-            return Task.FromResult(File.OpenRead(getVideoPath(VideoId, PartNumber)) as Stream);
+            return Task.FromResult(File.OpenRead(pathStrategy.VideoProcessedFilePath(VideoId, PartNumber)) as Stream);
         }
 
         public string GetVideoUrl(Guid VideoId, int PartNumber)
@@ -34,7 +30,8 @@ namespace Streaming.Application.Services
 
         public async Task UploadAsync(Guid VideoId, int PartNumber, Stream Stream)
         {
-            using (var writeStream = File.OpenWrite(getVideoPath(VideoId, PartNumber)))
+            Directory.CreateDirectory(pathStrategy.VideoProcessedDirectoryPath(VideoId));
+            using (var writeStream = File.OpenWrite(pathStrategy.VideoProcessedFilePath(VideoId, PartNumber)))
             {
                 await Stream.CopyToAsync(writeStream);
             }

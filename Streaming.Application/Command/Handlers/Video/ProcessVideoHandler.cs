@@ -1,6 +1,7 @@
 ﻿using MongoDB.Driver;
 using Streaming.Application.Services;
 using Streaming.Application.Settings;
+using Streaming.Application.Strategies;
 using Streaming.Common.Helpers;
 using Streaming.Domain.Enums;
 using Streaming.Domain.Models;
@@ -18,11 +19,10 @@ namespace Streaming.Application.Command.Handlers.Video
     {
 		private readonly IMongoCollection<Domain.Models.Video> videoCollection;
 		private readonly IVideoBlobService videoBlobService;
-		private readonly IDirectoriesSettings directoriesSettings;
         private readonly IProcessVideoService processVideoService;
         private readonly IThumbnailService thumbnailService;
-
-        private static readonly string thumbnailFolderName = "thumbnails";
+        private readonly IPathStrategy pathStrategy;
+        private readonly IFileNameStrategy fileNameStrategy;
 
         private VideoState videoState = 0;
 
@@ -33,24 +33,26 @@ namespace Streaming.Application.Command.Handlers.Video
             .GetFiles()
             .Where(x => Regex.IsMatch(x.Name, @"\d+\.ts"));
 
-        public ProcessVideoHandler(IDirectoriesSettings directoriesSettings,
-			IMongoCollection<Domain.Models.Video> videoCollection,
+        public ProcessVideoHandler(
+            IMongoCollection<Domain.Models.Video> videoCollection,
 			IVideoBlobService videoBlobService,
             IProcessVideoService processVideoService,
-            IThumbnailService thumbnailService)
+            IThumbnailService thumbnailService,
+            IPathStrategy pathStrategy,
+            IFileNameStrategy fileNameStrategy)
         {
-            this.directoriesSettings = directoriesSettings;
 			this.videoCollection = videoCollection;
 			this.videoBlobService = videoBlobService;
             this.processVideoService = processVideoService;
             this.thumbnailService = thumbnailService;
+            this.pathStrategy = pathStrategy;
+            this.fileNameStrategy = fileNameStrategy;
         }
 
         private void setupProcessingEnvironment(Commands.Video.ProcessVideoCommand command)
         {
-            processingDirectory = Directory.CreateDirectory(String.Format($"{directoriesSettings.ProcessingDirectory}{{0}}{command.VideoId}_dir{{0}}", Path.DirectorySeparatorChar));
-            thumbnailsDirectory = Directory.CreateDirectory(String.Format($"{processingDirectory.FullName}{thumbnailFolderName}{{0}}",
-                Path.DirectorySeparatorChar));
+            processingDirectory = Directory.CreateDirectory(pathStrategy.VideoProcessingDirectoryPath(command.VideoId));
+            thumbnailsDirectory = Directory.CreateDirectory(pathStrategy.VideoThumbnailsDirectoryPath(command.VideoId));
         }
 
         private async Task<VideoManifest> createManifest(Guid videoId)
@@ -82,7 +84,7 @@ namespace Streaming.Application.Command.Handlers.Video
         private async Task getThumbnails(Guid videoId, string videoPath, TimeSpan videoLength)
         {
             await processVideoService.TakeVideoScreenshot(
-                videoPath, $"{processingDirectory}{BlobNameHelper.GetThumbnailFilename(videoId)}", 
+                videoPath, pathStrategy.VideoOverviewThumbnailPath(videoId), 
                 new TimeSpan(videoLength.Ticks / 2));
 
             await processVideoService.GenerateVideoOverviewScreenshots(videoPath, 
@@ -92,7 +94,7 @@ namespace Streaming.Application.Command.Handlers.Video
 
         private async Task uploadVideoThumbnails(Guid videoId)
         {
-            using (var fileStream = File.OpenRead($"{processingDirectory}{BlobNameHelper.GetThumbnailFilename(videoId)}"))
+            using (var fileStream = File.OpenRead(pathStrategy.VideoOverviewThumbnailPath(videoId)))
             {
                 await thumbnailService.UploadAsync(videoId, fileStream);
             }
@@ -103,11 +105,12 @@ namespace Streaming.Application.Command.Handlers.Video
             var timer = Stopwatch.StartNew();
 
             setupProcessingEnvironment(Command);
-            var videoLength = await processVideoService.GetVideoLengthAsync(Command.VideoPath);
-            await processVideoService.ProcessVideoAsync(Command.VideoPath,
-                processingDirectory.FullName);
+
+            var videoPath = pathStrategy.VideoProcessingFilePath(Command.VideoId);
+            var videoLength = await processVideoService.GetVideoLengthAsync(videoPath);
+            await processVideoService.ProcessVideoAsync(videoPath, processingDirectory.FullName);
             var manifest = await createManifest(Command.VideoId);
-            await getThumbnails(Command.VideoId, Command.VideoPath, videoLength);
+            await getThumbnails(Command.VideoId, videoPath, videoLength);
             await uploadVideoParts(Command.VideoId);
             await uploadVideoThumbnails(Command.VideoId);
 

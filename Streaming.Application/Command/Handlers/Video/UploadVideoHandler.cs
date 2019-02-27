@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
 using System.Threading.Tasks;
 using MongoDB.Driver;
-using MongoDB.Driver.GridFS;
 using Streaming.Application.Command.Bus;
 using Streaming.Application.Services;
 using Streaming.Application.Settings;
@@ -48,13 +44,9 @@ namespace Streaming.Application.Command.Handlers.Video
 
 			await videoCollection.InsertOneAsync(video);
 
-            Directory.CreateDirectory($"{directoriesSettings.ProcessingDirectory}");
-            var filePath = String.Format($"{directoriesSettings.ProcessingDirectory}{{0}}{video.VideoId}", Path.DirectorySeparatorChar);
-
             commandBus.Push(new Commands.Video.ProcessVideoCommand
 			{
-				VideoId = video.VideoId,
-                VideoPath = filePath
+				VideoId = video.VideoId
             });
 		}
 	}

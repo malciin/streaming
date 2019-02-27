@@ -14,16 +14,15 @@ export default class VideoListItem extends React.Component {
         this.deleteVideo = this.deleteVideo.bind(this);
     }
 
-    deleteVideo(id) {
+    async deleteVideo(id) {
         this.setState({
             inProgress:true
         });
-        this.context.streamingApi.deleteVideo(id, function(id) {
-            this.setState({
-                inProgress: false
-            })
-            this.props.deletedVideoCallback(id);
-        }.bind(this, id));
+        await this.context.streamingApi.deleteVideo(id);
+        this.setState({
+            inProgress: false
+        })
+        this.props.deletedVideoCallback(id);
     }
     
     render() {
