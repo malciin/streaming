@@ -13,7 +13,6 @@ export default class Auth {
         this.auth0 = new auth0.WebAuth(Config.auth0);
 
         this.login = this.login.bind(this);
-        this.getIdToken = this.getIdToken.bind(this);
         this.setSession = this.setSession.bind(this);
         this.silentLogin = this.silentLogin.bind(this);
         this.logout = this.logout.bind(this);
@@ -88,11 +87,6 @@ export default class Auth {
         if (this.idTokenPayload)
             return this.idTokenPayload["http://streaming.com/claims"].includes(claim);
         return false;
-    }
-
-    getIdToken()
-    {
-        return this.idToken;
     }
 
     getUserInfo()

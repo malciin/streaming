@@ -5,10 +5,6 @@ import { AppContext } from '../../AppContext';
 import LoginControl from './loginControl/LoginControl';
 
 class Navbar extends React.Component {
-    constructor(props)
-    {
-        super(props);
-    }
 
     render() {
         

@@ -2,7 +2,6 @@ import Navbar from "../../components/navbar/Navbar";
 import React from 'react';
 import { AppContext } from "../../AppContext";
 import './AdminPage.scss';
-import { UV_UDP_REUSEADDR } from "constants";
 import UserListItem from "../../components/blocks/UserListItem/UserListItem";
 
 export default class AdminPage extends React.Component {

@@ -1,5 +1,4 @@
 import React from 'react'
-import Hls from 'hls.js'
 import videojs from 'video.js'
 import './videoPlayer.scss'
 

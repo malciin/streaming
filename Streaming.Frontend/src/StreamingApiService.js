@@ -1,5 +1,4 @@
 import { Config } from "./shared/config";
-import { request } from "https";
 import { AsyncFunctions } from "./shared/AsyncFunctions";
 var crypto = require("crypto-js");
 
@@ -49,11 +48,10 @@ export default class ApiService {
         return await response.json();
     }
 
-    async getVideo(id, callback) {
+    async getVideo(id) {
         const response = await fetch(`${Config.apiPath}/Video/${id}`, {
             headers: this.getJsonRequestHeaders()
         });
-
         return await response.json();
     }
 
@@ -122,7 +120,7 @@ export default class ApiService {
         })
     }
 
-    async deleteVideo(videoId, callback) {
+    async deleteVideo(videoId) {
         await this.waitForAuth();
         return await fetch(`${Config.apiPath}/Video/${videoId}`, {
             method: 'DELETE',
