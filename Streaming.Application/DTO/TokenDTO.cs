@@ -1,4 +1,4 @@
-﻿namespace Streaming.Application.DTO.Auth0
+﻿namespace Streaming.Application.DTO
 {
     public class TokenDTO
     {

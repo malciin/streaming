@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Streaming.Api.Attributes;
 using Streaming.Application.Command;
 using Streaming.Application.Command.Commands.Video;
-using Streaming.Application.DTO.Auth0;
+using Streaming.Application.DTO;
 using Streaming.Application.DTO.Video;
 using Streaming.Application.Models;
 using Streaming.Application.Query;

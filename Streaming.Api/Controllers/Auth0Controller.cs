@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Streaming.Api.Attributes;
-using Streaming.Application.DTO.Auth0;
+using Streaming.Application.DTO;
 using Streaming.Application.Models;
 using Streaming.Application.Services;
 using System.Threading.Tasks;

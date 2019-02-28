@@ -1,4 +1,4 @@
-﻿using Streaming.Application.DTO.Auth0;
+﻿using Streaming.Application.DTO;
 using System.Threading.Tasks;
 
 namespace Streaming.Application.Services

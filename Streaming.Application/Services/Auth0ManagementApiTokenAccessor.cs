@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Streaming.Application.DTO.Auth0;
+using Streaming.Application.DTO;
 using Streaming.Application.Settings;
 using System;
 using System.Net.Http;
