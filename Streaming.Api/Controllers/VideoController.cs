@@ -4,10 +4,11 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Streaming.Api.Attributes;
-using Streaming.Api.Models;
 using Streaming.Application.Command;
 using Streaming.Application.Command.Commands.Video;
+using Streaming.Application.DTO.Auth0;
 using Streaming.Application.DTO.Video;
+using Streaming.Application.Models;
 using Streaming.Application.Query;
 using Streaming.Application.Services;
 
@@ -26,36 +27,39 @@ namespace Streaming.Api.Controllers
 
         [HttpPost]
         [ClaimAuthorize(Claims.CanUploadVideo)]
-        public async Task<IActionResult> UploadVideo([FromBody] UploadVideoDTO UploadVideo)
+        public async Task<IActionResult> UploadVideo([FromBody] UploadVideoDTO uploadVideo)
         {
             await CommandDispatcher.HandleAsync(new UploadVideoCommand
             {
-                UploadToken = UploadVideo.UploadToken,
-                Title = UploadVideo.Title,
-                Description = UploadVideo.Description,
+                UploadToken = uploadVideo.UploadToken,
+                Title = uploadVideo.Title,
+                Description = uploadVideo.Description,
                 User = HttpContext.User
             });
             return Ok();
         }
 
         [HttpGet("UploadToken")]
-        //[ClaimAuthorize(Claims.CanUploadVideo)]
-        public string GetUploadToken()
+        [ClaimAuthorize(Claims.CanUploadVideo)]
+        public TokenDTO GetUploadToken()
         {
             // Too tired when I wrote this, to move this to dedicated serivice or something...
             var signedMessage = messageSigner.SignMessage(Guid.NewGuid().ToByteArray());
-            return Convert.ToBase64String(signedMessage);
+            return new TokenDTO
+            {
+                Token = Convert.ToBase64String(signedMessage)
+            };
         }
 
         [HttpPost("UploadPart")]
         [ClaimAuthorize(Claims.CanUploadVideo)]
-        public async Task<IActionResult> UploadPart(UploadVideoPartDTO VideoPart)
+        public async Task<IActionResult> UploadPart(UploadVideoPartDTO videoPart)
         {
             await CommandDispatcher.HandleAsync(new UploadVideoPartCommand
             {
-                PartMD5Hash = VideoPart.PartMD5Hash,
-                UploadToken = VideoPart.UploadToken,
-                PartBytes = VideoPart.PartBytes
+                PartMD5Hash = videoPart.PartMD5Hash,
+                UploadToken = videoPart.UploadToken,
+                PartBytes = videoPart.PartBytes
             });
             return Ok();
         }
@@ -67,9 +71,9 @@ namespace Streaming.Api.Controllers
         }
 
         [HttpPost("Search")]
-        public async Task<IEnumerable<VideoMetadataDTO>> Search([FromBody] VideoSearchDTO Search)
+        public async Task<IEnumerable<VideoMetadataDTO>> Search([FromBody] VideoSearchDTO search)
         {
-			return await queries.SearchAsync(Search);
+			return await queries.SearchAsync(search);
         }
 
         [HttpGet("{Id}/{Part}")]
@@ -92,6 +96,20 @@ namespace Streaming.Api.Controllers
             await CommandDispatcher.HandleAsync(new DeleteVideoCommand
             {
                 VideoId = Id
+            });
+            return Ok();
+        }
+
+        [HttpPut]
+        [ClaimAuthorize(Claims.CanEditAnyVideo, Claims.CanEditOwnVideo)]
+        public async Task<IActionResult> ActionResult([FromBody] UpdateVideoDTO update)
+        {
+            await CommandDispatcher.HandleAsync(new UpdateVideoCommand
+            {
+                VideoId = update.VideoId,
+                NewTitle = update.Title,
+                NewDescription = update.Description,
+                User = User
             });
             return Ok();
         }

@@ -5,6 +5,13 @@ namespace Streaming.Domain.Models
 {
     public class Video
     {
+        public class UserDetails
+        {
+            public string Identifier { get; set; }
+            public string Nickname { get; set; }
+            public string Email { get; set; }
+        }
+
         public Guid VideoId { get; set; }
         public string Title { get; set; }
         public DateTime CreatedDate { get; set; }
@@ -15,5 +22,7 @@ namespace Streaming.Domain.Models
         public TimeSpan? Length { get; set; }
         public string VideoManifestHLS { get; set; }
         public string ProcessingInfo { get; set; }
+
+        public UserDetails Owner { get; set; }
     }
 }

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Filters;
 using System;
 using System.Linq;
+using Streaming.Common.Extensions;
 
 namespace Streaming.Api.Attributes
 {
@@ -23,9 +24,7 @@ namespace Streaming.Api.Attributes
 
         public void OnAuthorization(AuthorizationFilterContext context)
         {
-            var hasNeededClaim = context.HttpContext.User.Claims.Where(x => x.Type == "http://streaming.com/claims")
-                .Any(x => Array.Exists(claims, y => y.Equals(x.Value)));
-            if (!hasNeededClaim)
+            if (!context.HttpContext.User.HasAnyStreamingClaim(claims))
             {
                 context.Result = new ForbidResult();
             }

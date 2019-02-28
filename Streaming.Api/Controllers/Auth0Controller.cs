@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Streaming.Api.Attributes;
-using Streaming.Api.Models;
 using Streaming.Application.DTO.Auth0;
+using Streaming.Application.Models;
 using Streaming.Application.Services;
 using System.Threading.Tasks;
 
@@ -18,7 +18,7 @@ namespace Streaming.Api.Controllers
         }
 
         [HttpGet]
-        [ClaimAuthorize(Claims.CanAccessAuth0Api, Claims.CanDeleteVideo)]
+        [ClaimAuthorize(Claims.CanAccessAuth0Api)]
         public async Task<TokenDTO> GetToken()
             => await tokenAccessor.GetTokenAsync();
     }

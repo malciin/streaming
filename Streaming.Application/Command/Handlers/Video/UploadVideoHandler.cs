@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using MongoDB.Driver;
 using Streaming.Application.Command.Bus;
@@ -39,7 +40,13 @@ namespace Streaming.Application.Command.Handlers.Video
 				CreatedDate = DateTime.Now,
 				Title = Command.Title,
 				Description = Command.Description,
-				VideoId = getVideoIdFromUploadToken(Command.UploadToken)
+				VideoId = getVideoIdFromUploadToken(Command.UploadToken),
+                Owner = new Domain.Models.Video.UserDetails
+                {
+                    Identifier = Command.User.FindFirst(ClaimTypes.NameIdentifier).Value,
+                    Email = Command.User.FindFirst(ClaimTypes.Email).Value,
+                    Nickname = Command.User.FindFirst(x => x.Type == "nickname")?.Value
+                }
 			};
 
 			await videoCollection.InsertOneAsync(video);

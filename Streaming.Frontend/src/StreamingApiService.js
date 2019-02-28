@@ -59,8 +59,11 @@ export default class ApiService {
 
     async getUploadToken() {
         await this.waitForAuth();
-        const resp = await fetch(`${Config.apiPath}/Video/UploadToken`);
-        return await resp.text();
+        const resp = await fetch(`${Config.apiPath}/Video/UploadToken`, {
+            headers: this.getJsonRequestHeaders()
+        });
+        var jsonData = await resp.json();
+        return jsonData.token;
     }
 
     async uploadVideo(data) {

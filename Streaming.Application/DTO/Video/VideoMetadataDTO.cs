@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Streaming.Application.DTO.Video
 {
@@ -15,5 +13,7 @@ namespace Streaming.Application.DTO.Video
         public string ThumbnailUrl { get; set; }
 
         public TimeSpan Length { get; set; }
+
+        public Domain.Models.Video.UserDetails Owner { get; set; }
     }
 }
