@@ -1,5 +1,4 @@
-﻿using Streaming.Application.Command.Commands.Video;
-using Streaming.Application.Interfaces.Services;
+﻿using Streaming.Application.Interfaces.Services;
 using Streaming.Application.Interfaces.Strategies;
 using Streaming.Common.Exceptions;
 using System;
@@ -7,7 +6,7 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 
-namespace Streaming.Application.Command.Handlers.Video
+namespace Streaming.Application.Commands.Video
 {
     public class UploadVideoPartHandler : ICommandHandler<UploadVideoPartCommand>
     {

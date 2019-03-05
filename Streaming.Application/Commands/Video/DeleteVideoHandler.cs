@@ -1,9 +1,8 @@
 ﻿
 using System.Threading.Tasks;
 using MongoDB.Driver;
-using Streaming.Application.Command.Commands.Video;
 
-namespace Streaming.Application.Command.Handlers.Video
+namespace Streaming.Application.Commands.Video
 {
     public class DeleteVideoHandler : ICommandHandler<DeleteVideoCommand>
     {

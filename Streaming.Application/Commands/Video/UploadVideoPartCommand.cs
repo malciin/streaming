@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 
-namespace Streaming.Application.Command.Commands.Video
+namespace Streaming.Application.Commands.Video
 {
     public class UploadVideoPartCommand : ICommand
     {

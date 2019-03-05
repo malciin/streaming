@@ -2,11 +2,10 @@
 using System.Security.Claims;
 using System.Threading.Tasks;
 using MongoDB.Driver;
-using Streaming.Application.Command.Commands.Video;
 using Streaming.Application.Models;
 using Streaming.Common.Extensions;
 
-namespace Streaming.Application.Command.Handlers.Video
+namespace Streaming.Application.Commands.Video
 {
     public class UpdateVideoHandler : ICommandHandler<UpdateVideoCommand>
     {

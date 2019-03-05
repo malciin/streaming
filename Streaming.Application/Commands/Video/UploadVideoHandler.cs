@@ -2,11 +2,10 @@
 using System.Security.Claims;
 using System.Threading.Tasks;
 using MongoDB.Driver;
-using Streaming.Application.Command.Bus;
 using Streaming.Application.Interfaces.Services;
 using Streaming.Application.Interfaces.Settings;
 
-namespace Streaming.Application.Command.Handlers.Video
+namespace Streaming.Application.Commands.Video
 {
 	public class UploadVideoHandler : ICommandHandler<Commands.Video.UploadVideoCommand>
 	{

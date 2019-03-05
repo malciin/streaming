@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Streaming.Application.Command.Commands.Video
+namespace Streaming.Application.Commands.Video
 {
     public class ProcessVideoCommand : ICommand
     {

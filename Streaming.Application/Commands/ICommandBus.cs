@@ -1,8 +1,7 @@
-﻿namespace Streaming.Application.Command.Bus
+﻿namespace Streaming.Application.Commands
 {
     public interface ICommandBus
 	{
-		Status GetBusStatus();
 		void Push(ICommand Command);
 	}
 }

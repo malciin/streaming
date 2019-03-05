@@ -11,9 +11,9 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace Streaming.Application.Command.Handlers.Video
+namespace Streaming.Application.Commands.Video
 {
-    public class ProcessVideoHandler : ICommandHandler<Commands.Video.ProcessVideoCommand>
+    public class ProcessVideoHandler : ICommandHandler<ProcessVideoCommand>
     {
 		private readonly IMongoCollection<Domain.Models.Video> videoCollection;
 		private readonly IVideoBlobService videoBlobService;
@@ -47,7 +47,7 @@ namespace Streaming.Application.Command.Handlers.Video
             this.fileNameStrategy = fileNameStrategy;
         }
 
-        private void setupProcessingEnvironment(Commands.Video.ProcessVideoCommand command)
+        private void setupProcessingEnvironment(ProcessVideoCommand command)
         {
             processingDirectory = Directory.CreateDirectory(pathStrategy.VideoProcessingDirectoryPath(command.VideoId));
             thumbnailsDirectory = Directory.CreateDirectory(pathStrategy.VideoThumbnailsDirectoryPath(command.VideoId));
@@ -98,7 +98,7 @@ namespace Streaming.Application.Command.Handlers.Video
             }
         }
 
-        public async Task HandleAsync(Commands.Video.ProcessVideoCommand Command)
+        public async Task HandleAsync(ProcessVideoCommand Command)
         {
             var timer = Stopwatch.StartNew();
 

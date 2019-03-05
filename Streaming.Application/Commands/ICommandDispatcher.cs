@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace Streaming.Application.Command
+namespace Streaming.Application.Commands
 {
     public interface ICommandDispatcher
     {

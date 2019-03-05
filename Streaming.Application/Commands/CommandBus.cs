@@ -4,9 +4,9 @@ using System;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
 
-namespace Streaming.Application.Command.Bus
+namespace Streaming.Application.Commands
 {
-    public class CommandBus : ICommandBus
+    public class CommandBus
 	{
 		private readonly ILifetimeScope lifetimeScope;
 		private ConcurrentQueue<dynamic> queue = new ConcurrentQueue<dynamic>();
@@ -19,11 +19,6 @@ namespace Streaming.Application.Command.Bus
 		public CommandBus(ILifetimeScope lifetimeScope)
 		{
 			this.lifetimeScope = lifetimeScope;
-		}
-
-		public Status GetBusStatus()
-		{
-			throw new NotImplementedException();
 		}
 
 		async Task WorkerTask()

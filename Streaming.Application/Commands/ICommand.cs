@@ -1,4 +1,4 @@
-﻿namespace Streaming.Application.Command
+﻿namespace Streaming.Application.Commands
 {
     public interface ICommand
     {

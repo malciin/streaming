@@ -1,7 +1,6 @@
 ﻿using System.Reflection;
 using Autofac;
-using Streaming.Application.Command;
-using Streaming.Application.Command.Bus;
+using Streaming.Application.Commands;
 
 namespace Streaming.Infrastructure.IoC
 {

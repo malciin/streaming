@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Security.Claims;
 
-namespace Streaming.Application.Command.Commands.Video
+namespace Streaming.Application.Commands.Video
 {
     public class UpdateVideoCommand : ICommand
     {

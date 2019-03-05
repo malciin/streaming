@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Streaming.Application.Command;
+using Streaming.Application.Commands;
 
 namespace Streaming.Api.Controllers
 {
