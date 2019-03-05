@@ -41,7 +41,7 @@ namespace Streaming.Application.Command.Handlers.Video
 				Title = Command.Title,
 				Description = Command.Description,
 				VideoId = getVideoIdFromUploadToken(Command.UploadToken),
-                Owner = new Domain.Models.Video.UserDetails
+                Owner = new Domain.Models.UserDetails
                 {
                     Identifier = Command.User.FindFirst(ClaimTypes.NameIdentifier).Value,
                     Email = Command.User.FindFirst(ClaimTypes.Email).Value,

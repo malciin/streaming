@@ -5,7 +5,7 @@ using Streaming.Application.Services;
 using Streaming.Application.Settings;
 using Streaming.Domain.Models;
 
-namespace Streaming.Application.Modules
+namespace Streaming.IoC
 {
     public class ServicesModule : Autofac.Module
     {

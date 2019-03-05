@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Streaming.Domain.Models;
+using System;
 
 namespace Streaming.Application.DTO.Video
 {
@@ -14,6 +15,6 @@ namespace Streaming.Application.DTO.Video
 
         public TimeSpan Length { get; set; }
 
-        public Domain.Models.Video.UserDetails Owner { get; set; }
+        public UserDetails Owner { get; set; }
     }
 }

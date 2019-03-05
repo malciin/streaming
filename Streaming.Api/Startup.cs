@@ -15,6 +15,7 @@ using Newtonsoft.Json.Linq;
 using Streaming.Api.Middlewares;
 using Streaming.Api.Monitor;
 using Streaming.Auth0;
+using Streaming.IoC.Extensions;
 
 namespace Streaming.Api
 {
@@ -79,20 +80,9 @@ namespace Streaming.Api
             Application.MongoDb.Mappings.Map();
 
             builder.Populate(services);
-
-            builder.RegisterModule<Application.Modules.CommandModule>();
-            builder.RegisterModule<Application.Modules.ServicesModule>();
-            builder.RegisterModule<Application.Modules.SettingsModule>();
-			builder.RegisterModule<Application.Modules.QueryModule>();
-            builder.RegisterModule<Application.Modules.MappingModule>();
-            builder.RegisterModule<Application.Modules.StrategiesModule>();
+            builder.UseDefaultModules();
 
             return new AutofacServiceProvider(builder.Build());
-        }
-
-        private RSAParameters GetRSA256(string v)
-        {
-            throw new NotImplementedException();
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)

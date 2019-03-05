@@ -3,14 +3,14 @@ using Autofac;
 using Streaming.Application.Command;
 using Streaming.Application.Command.Bus;
 
-namespace Streaming.Application.Modules
+namespace Streaming.IoC
 {
     public class CommandModule : Autofac.Module
     {
         protected override void Load(ContainerBuilder builder)
         {
             base.Load(builder);
-            var currentAssembly = typeof(CommandModule).GetTypeInfo().Assembly;
+            var assembly = typeof(CommandDispatcher).GetTypeInfo().Assembly;
 
             builder.RegisterType<CommandDispatcher>()
                    .As<ICommandDispatcher>()
@@ -20,7 +20,7 @@ namespace Streaming.Application.Modules
 				   .As<ICommandBus>()
 				   .SingleInstance();
 
-            builder.RegisterAssemblyTypes(currentAssembly)
+            builder.RegisterAssemblyTypes(assembly)
                    .AsClosedTypesOf(typeof(ICommandHandler<>))
                    .InstancePerLifetimeScope();
         }

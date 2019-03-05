@@ -31,7 +31,6 @@ export default class Auth {
         this.expiresAt = 0;
 
         localStorage.removeItem(this.loggedInSessionKey);
-
         // Todo: how to elegantly refresh page to make components
         // using AuthContext to update if the user is logged in
         history.replace(history.location.pathname);
@@ -65,8 +64,16 @@ export default class Auth {
         {
             this.pendingSilentLogin = true;
             var authResult = await AsyncFunctions.auth0.checkSession(this.auth0);
-            authResult.managementApiIdToken = await this.getManagementApiToken(authResult.idToken);
-            this.setSession(authResult);
+            
+            if (authResult && authResult.accessToken && authResult.idToken)
+            {
+                authResult.managementApiIdToken = await this.getManagementApiToken(authResult.idToken);
+                this.setSession(authResult);
+            }
+            else
+            {
+                this.logout();
+            }
             this.pendingSilentLogin = false;
             history.replace(history.location.pathname);
         }

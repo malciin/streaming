@@ -2,16 +2,16 @@
 using Streaming.Application.Mappings;
 using System.Reflection;
 
-namespace Streaming.Application.Modules
+namespace Streaming.IoC
 {
     public class MappingModule : Autofac.Module
     {
         protected override void Load(ContainerBuilder builder)
         {
             base.Load(builder);
-            var currentAssembly = typeof(MappingModule).GetTypeInfo().Assembly;
+            var assembly = typeof(VideoMappingService).GetTypeInfo().Assembly;
 
-            builder.RegisterAssemblyTypes(currentAssembly)
+            builder.RegisterAssemblyTypes(assembly)
                    .AssignableTo<IMappingService>()
                    .SingleInstance();
         }

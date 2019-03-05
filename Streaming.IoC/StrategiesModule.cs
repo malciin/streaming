@@ -2,16 +2,16 @@
 using Streaming.Application.Strategies;
 using System.Reflection;
 
-namespace Streaming.Application.Modules
+namespace Streaming.IoC
 {
     public class StrategiesModule : Autofac.Module
     {
         protected override void Load(ContainerBuilder builder)
         {
             base.Load(builder);
-            var currentAssembly = typeof(StrategiesModule).GetTypeInfo().Assembly;
+            var assembly = typeof(IPathStrategy).GetTypeInfo().Assembly;
 
-            builder.RegisterAssemblyTypes(currentAssembly)
+            builder.RegisterAssemblyTypes(assembly)
                    .InNamespaceOf<IPathStrategy>()
                    .AsImplementedInterfaces()
                    .SingleInstance();

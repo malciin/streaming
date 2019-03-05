@@ -9,7 +9,7 @@ export const AsyncFunctions = {
                     if (authResult)
                         resolve(authResult);
                     else
-                        reject(err);
+                        resolve(err);
                 }))
         },
 

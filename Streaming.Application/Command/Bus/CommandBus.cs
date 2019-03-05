@@ -6,8 +6,7 @@ using System.Threading.Tasks;
 
 namespace Streaming.Application.Command.Bus
 {
-
-    class CommandBus : ICommandBus
+    public class CommandBus : ICommandBus
 	{
 		private readonly ILifetimeScope lifetimeScope;
 		private ConcurrentQueue<dynamic> queue = new ConcurrentQueue<dynamic>();
