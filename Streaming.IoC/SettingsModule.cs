@@ -1,5 +1,6 @@
 ﻿using Autofac;
 using Microsoft.Extensions.Configuration;
+using Streaming.Application.Interfaces.Settings;
 using Streaming.Application.Settings;
 using System.Reflection;
 
@@ -10,7 +11,7 @@ namespace Streaming.IoC
         protected override void Load(ContainerBuilder builder)
         {
             base.Load(builder);
-            var assembly = typeof(IKeysSettings).GetTypeInfo().Assembly;
+            var assembly = typeof(KeysSettings).GetTypeInfo().Assembly;
 
             builder.Register(context => (IConfigurationRoot)context.Resolve<IConfiguration>())
                    .As<IConfigurationRoot>();

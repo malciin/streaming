@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
-using Streaming.Application.Strategies;
+using Streaming.Application.Interfaces.Services;
+using Streaming.Application.Interfaces.Strategies;
 using Streaming.Common.Helpers;
 using System;
 using System.IO;

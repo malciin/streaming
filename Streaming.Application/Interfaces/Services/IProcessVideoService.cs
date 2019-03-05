@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace Streaming.Application.Services
+namespace Streaming.Application.Interfaces.Services
 {
     public interface IProcessVideoService
     {

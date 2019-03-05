@@ -1,8 +1,9 @@
 ﻿using Autofac;
 using MongoDB.Driver;
 using MongoDB.Driver.GridFS;
+using Streaming.Application.Interfaces.Services;
+using Streaming.Application.Interfaces.Settings;
 using Streaming.Application.Services;
-using Streaming.Application.Settings;
 using Streaming.Domain.Models;
 
 namespace Streaming.IoC

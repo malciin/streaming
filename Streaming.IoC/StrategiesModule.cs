@@ -1,4 +1,5 @@
 ﻿using Autofac;
+using Streaming.Application.Interfaces.Strategies;
 using Streaming.Application.Strategies;
 using System.Reflection;
 
@@ -9,7 +10,7 @@ namespace Streaming.IoC
         protected override void Load(ContainerBuilder builder)
         {
             base.Load(builder);
-            var assembly = typeof(IPathStrategy).GetTypeInfo().Assembly;
+            var assembly = typeof(PathStrategy).GetTypeInfo().Assembly;
 
             builder.RegisterAssemblyTypes(assembly)
                    .InNamespaceOf<IPathStrategy>()

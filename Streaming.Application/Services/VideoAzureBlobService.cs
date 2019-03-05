@@ -1,4 +1,5 @@
-﻿using Streaming.Application.Strategies;
+﻿using Streaming.Application.Interfaces.Services;
+using Streaming.Application.Interfaces.Strategies;
 using System;
 using System.IO;
 using System.Threading.Tasks;

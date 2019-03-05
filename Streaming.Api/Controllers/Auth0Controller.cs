@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Streaming.Api.Attributes;
 using Streaming.Application.DTO;
+using Streaming.Application.Interfaces.Services;
 using Streaming.Application.Models;
-using Streaming.Application.Services;
 using System.Threading.Tasks;
 
 namespace Streaming.Api.Controllers

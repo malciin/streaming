@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using MongoDB.Driver.GridFS;
+using Streaming.Application.Interfaces.Services;
 using Streaming.Common.Helpers;
 using System;
 using System.IO;

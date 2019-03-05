@@ -3,8 +3,8 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using MongoDB.Driver;
 using Streaming.Application.Command.Bus;
-using Streaming.Application.Services;
-using Streaming.Application.Settings;
+using Streaming.Application.Interfaces.Services;
+using Streaming.Application.Interfaces.Settings;
 
 namespace Streaming.Application.Command.Handlers.Video
 {

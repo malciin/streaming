@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Streaming.Application.Interfaces.Settings;
 using Streaming.Common.Extensions;
-using System.IO;
 
 namespace Streaming.Application.Settings
 {

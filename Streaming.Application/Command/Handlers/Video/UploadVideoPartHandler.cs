@@ -1,6 +1,6 @@
 ﻿using Streaming.Application.Command.Commands.Video;
-using Streaming.Application.Services;
-using Streaming.Application.Strategies;
+using Streaming.Application.Interfaces.Services;
+using Streaming.Application.Interfaces.Strategies;
 using Streaming.Common.Exceptions;
 using System;
 using System.IO;

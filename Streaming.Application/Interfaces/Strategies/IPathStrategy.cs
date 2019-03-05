@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Streaming.Application.Strategies
+namespace Streaming.Application.Interfaces.Strategies
 {
     public interface IPathStrategy
     {

@@ -1,4 +1,5 @@
-﻿using Streaming.Application.Settings;
+﻿using Streaming.Application.Interfaces.Settings;
+using Streaming.Application.Interfaces.Strategies;
 using System;
 using System.IO;
 

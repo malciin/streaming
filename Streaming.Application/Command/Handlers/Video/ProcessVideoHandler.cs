@@ -1,8 +1,6 @@
 ﻿using MongoDB.Driver;
-using Streaming.Application.Services;
-using Streaming.Application.Settings;
-using Streaming.Application.Strategies;
-using Streaming.Common.Helpers;
+using Streaming.Application.Interfaces.Services;
+using Streaming.Application.Interfaces.Strategies;
 using Streaming.Domain.Enums;
 using Streaming.Domain.Models;
 using System;

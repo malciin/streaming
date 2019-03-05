@@ -1,4 +1,4 @@
-﻿namespace Streaming.Application.Settings
+﻿namespace Streaming.Application.Interfaces.Settings
 {
     public interface IAzureBlobConnectionString
     {

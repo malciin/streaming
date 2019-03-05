@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Streaming.Application.Interfaces.Strategies;
+using System;
 
 namespace Streaming.Application.Strategies
 {

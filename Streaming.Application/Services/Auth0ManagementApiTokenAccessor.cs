@@ -1,7 +1,8 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Streaming.Application.DTO;
-using Streaming.Application.Settings;
+using Streaming.Application.Interfaces.Services;
+using Streaming.Application.Interfaces.Settings;
 using System;
 using System.Net.Http;
 using System.Text;

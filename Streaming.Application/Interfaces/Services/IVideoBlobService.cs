@@ -2,7 +2,7 @@
 using System.IO;
 using System.Threading.Tasks;
 
-namespace Streaming.Application.Services
+namespace Streaming.Application.Interfaces.Services
 {
 	public interface IVideoBlobService
 	{

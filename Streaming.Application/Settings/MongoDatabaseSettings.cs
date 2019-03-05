@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Streaming.Application.Interfaces.Settings;
 
 namespace Streaming.Application.Settings
 {
