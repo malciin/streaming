@@ -13,7 +13,7 @@ namespace Streaming.Infrastructure.IoC
             var assembly = typeof(PathStrategy).GetTypeInfo().Assembly;
 
             builder.RegisterAssemblyTypes(assembly)
-                   .InNamespaceOf<IPathStrategy>()
+                   .InNamespaceOf<PathStrategy>()
                    .AsImplementedInterfaces()
                    .SingleInstance();
         }

@@ -1,6 +1,5 @@
 ﻿using Autofac;
 using Microsoft.Extensions.Configuration;
-using Streaming.Application.Interfaces.Settings;
 using Streaming.Application.Settings;
 using System.Reflection;
 
@@ -17,7 +16,7 @@ namespace Streaming.Infrastructure.IoC
                    .As<IConfigurationRoot>();
 
             builder.RegisterAssemblyTypes(assembly)
-                   .InNamespaceOf<IKeysSettings>()
+                   .InNamespaceOf<KeysSettings>()
                    .AsImplementedInterfaces()
                    .SingleInstance();
         }
