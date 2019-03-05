@@ -15,6 +15,7 @@ using Streaming.Application.Query;
 namespace Streaming.Api.Controllers
 {
     [Route("/Video")]
+    [ApiController]
     public class VideoController : _ApiControllerBase
     {
         private readonly IVideoQueries queries;
@@ -53,7 +54,7 @@ namespace Streaming.Api.Controllers
 
         [HttpPost("UploadPart")]
         [ClaimAuthorize(Claims.CanUploadVideo)]
-        public async Task<IActionResult> UploadPart(UploadVideoPartDTO videoPart)
+        public async Task<IActionResult> UploadPart([FromForm] UploadVideoPartDTO videoPart)
         {
             await CommandDispatcher.HandleAsync(new UploadVideoPartCommand
             {
