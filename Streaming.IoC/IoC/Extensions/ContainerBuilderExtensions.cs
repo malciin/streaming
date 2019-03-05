@@ -1,6 +1,6 @@
 ﻿using Autofac;
 
-namespace Streaming.IoC.Extensions
+namespace Streaming.Infrastructure.IoC.Extensions
 {
     public static class ContainerBuilderExtensions
     {

@@ -3,9 +3,9 @@ using Autofac;
 using Streaming.Application.Command;
 using Streaming.Application.Command.Bus;
 
-namespace Streaming.IoC
+namespace Streaming.Infrastructure.IoC
 {
-    public class CommandModule : Autofac.Module
+    class CommandModule : Autofac.Module
     {
         protected override void Load(ContainerBuilder builder)
         {

@@ -2,9 +2,9 @@
 using Streaming.Application.Query;
 using System.Reflection;
 
-namespace Streaming.IoC
+namespace Streaming.Infrastructure.IoC
 {
-    public class QueryModule : Autofac.Module
+    class QueryModule : Autofac.Module
     {
         protected override void Load(ContainerBuilder builder)
         {

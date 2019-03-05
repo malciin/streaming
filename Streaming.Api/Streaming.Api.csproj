@@ -45,7 +45,7 @@
     <ProjectReference Include="..\Streaming.Application\Streaming.Application.csproj" />
     <ProjectReference Include="..\Streaming.Auth0\Streaming.Auth0.csproj" />
     <ProjectReference Include="..\Streaming.Domain\Streaming.Domain.csproj" />
-    <ProjectReference Include="..\Streaming.IoC\Streaming.IoC.csproj" />
+    <ProjectReference Include="..\Streaming.IoC\Streaming.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

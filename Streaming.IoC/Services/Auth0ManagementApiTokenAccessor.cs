@@ -8,7 +8,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Streaming.Application.Services
+namespace Streaming.Infrastructure.Services
 {
     public class Auth0ManagementApiTokenAccessor : IAuth0ManagementApiTokenAccessor
     {

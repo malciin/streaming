@@ -1,10 +1,9 @@
 ﻿using Streaming.Application.Interfaces.Services;
 using Streaming.Common.Extensions;
 using System;
-using System.IO;
 using System.Threading.Tasks;
 
-namespace Streaming.Application.Services
+namespace Streaming.Infrastructure.Services
 {
     public class FFmpegProcessVideoService : IProcessVideoService
     {

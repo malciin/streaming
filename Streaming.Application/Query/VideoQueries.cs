@@ -17,12 +17,12 @@ namespace Streaming.Application.Query
 {
     public class VideoQueries : IVideoQueries
     {
-        private readonly VideoMappingService mapper;
+        private readonly VideoMappings mapper;
         private readonly IMongoCollection<Video> collection;
 		private readonly IDirectoriesSettings directoriesSettings;
 		private readonly IVideoBlobService videoBlobService;
 
-        public VideoQueries(VideoMappingService mapper, 
+        public VideoQueries(VideoMappings mapper, 
 			IMongoCollection<Video> collection,
 			IDirectoriesSettings directoriesSettings,
             IVideoBlobService videoBlobService)

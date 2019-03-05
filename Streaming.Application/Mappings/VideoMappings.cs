@@ -1,17 +1,16 @@
 ﻿using Streaming.Application.DTO.Video;
 using Streaming.Application.Interfaces.Services;
-using Streaming.Application.Services;
 using Streaming.Domain.Enums;
 using Streaming.Domain.Models;
 using System;
 
 namespace Streaming.Application.Mappings
 {
-    public class VideoMappingService : IMappingService
+    public class VideoMappings
     {
         private readonly IThumbnailService thumbnailService;
 
-        public VideoMappingService(IThumbnailService thumbnailService)
+        public VideoMappings(IThumbnailService thumbnailService)
         {
             this.thumbnailService = thumbnailService;
         }

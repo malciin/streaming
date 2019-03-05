@@ -2,28 +2,15 @@
 using MongoDB.Driver;
 using MongoDB.Driver.GridFS;
 using Streaming.Application.Interfaces.Services;
-using Streaming.Application.Interfaces.Settings;
-using Streaming.Application.Services;
-using Streaming.Domain.Models;
+using Streaming.Infrastructure.Services;
 
-namespace Streaming.IoC
+namespace Streaming.Infrastructure.IoC
 {
-    public class ServicesModule : Autofac.Module
+    class ServicesModule : Autofac.Module
     {
         protected override void Load(ContainerBuilder builder)
         {
             base.Load(builder);
-
-			builder.Register<IMongoDatabase>(context => {
-                var connectionString = context.Resolve<IDatabaseSettings>().ConnectionString;
-                return new MongoClient(connectionString)
-                       .GetDatabase("streaming");
-            }).SingleInstance();
-
-			builder.Register(context =>
-			{
-				return context.Resolve<IMongoDatabase>().GetCollection<Video>("Videos");
-			}).As<IMongoCollection<Video>>().InstancePerLifetimeScope();
 
             builder.Register<IGridFSBucket>(context => new GridFSBucket(context.Resolve<IMongoDatabase>()))
                    .SingleInstance();

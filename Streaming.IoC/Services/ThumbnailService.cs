@@ -4,7 +4,7 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace Streaming.Application.Services
+namespace Streaming.Infrastructure.Services
 {
     public class ThumbnailService : IThumbnailService
     {

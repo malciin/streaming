@@ -3,9 +3,9 @@ using Streaming.Application.Interfaces.Strategies;
 using Streaming.Application.Strategies;
 using System.Reflection;
 
-namespace Streaming.IoC
+namespace Streaming.Infrastructure.IoC
 {
-    public class StrategiesModule : Autofac.Module
+    class StrategiesModule : Autofac.Module
     {
         protected override void Load(ContainerBuilder builder)
         {

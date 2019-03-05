@@ -2,17 +2,17 @@
 using Streaming.Application.Mappings;
 using System.Reflection;
 
-namespace Streaming.IoC
+namespace Streaming.Infrastructure.IoC
 {
-    public class MappingModule : Autofac.Module
+    class MappingModule : Autofac.Module
     {
         protected override void Load(ContainerBuilder builder)
         {
             base.Load(builder);
-            var assembly = typeof(VideoMappingService).GetTypeInfo().Assembly;
+            var assembly = typeof(VideoMappings).GetTypeInfo().Assembly;
 
             builder.RegisterAssemblyTypes(assembly)
-                   .AssignableTo<IMappingService>()
+                   .InNamespaceOf<VideoMappings>()
                    .SingleInstance();
         }
     }

@@ -15,7 +15,8 @@ using Newtonsoft.Json.Linq;
 using Streaming.Api.Middlewares;
 using Streaming.Api.Monitor;
 using Streaming.Auth0;
-using Streaming.IoC.Extensions;
+using Streaming.Infrastructure.IoC.Extensions;
+using Streaming.Infrastructure.MongoDb.Extensions;
 
 namespace Streaming.Api
 {
@@ -77,10 +78,9 @@ namespace Streaming.Api
 
             var builder = new ContainerBuilder();
 
-            Application.MongoDb.Mappings.Map();
-
             builder.Populate(services);
             builder.UseDefaultModules();
+            builder.UseMongoDb(configuration["Database:ConnectionString"], "streaming");
 
             return new AutofacServiceProvider(builder.Build());
         }

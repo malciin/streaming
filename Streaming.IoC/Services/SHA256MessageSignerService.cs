@@ -5,7 +5,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Streaming.Application.Services
+namespace Streaming.Infrastructure.Services
 {
     public class SHA256MessageSignerService : IMessageSignerService
     {

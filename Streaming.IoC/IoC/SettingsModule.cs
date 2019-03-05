@@ -4,9 +4,9 @@ using Streaming.Application.Interfaces.Settings;
 using Streaming.Application.Settings;
 using System.Reflection;
 
-namespace Streaming.IoC
+namespace Streaming.Infrastructure.IoC
 {
-    public class SettingsModule : Autofac.Module
+    class SettingsModule : Autofac.Module
     {
         protected override void Load(ContainerBuilder builder)
         {

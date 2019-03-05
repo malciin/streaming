@@ -1,9 +1,9 @@
 ﻿using MongoDB.Bson.Serialization;
 using Streaming.Domain.Models;
 
-namespace Streaming.Application.MongoDb
+namespace Streaming.Infrastructure.MongoDb.Mappings
 {
-    public static class Mappings
+    public static class VideoMappings
     {
         public static void Map()
         {
