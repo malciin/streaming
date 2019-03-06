@@ -1,18 +1,20 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
 
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="nunit" Version="3.10.1" />
-    <PackageReference Include="NUnit3TestAdapter" Version="3.10.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.8.0" />
+    <PackageReference Include="Moq" Version="4.10.1" />
+    <PackageReference Include="nunit" Version="3.11.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.13.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.0.1" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Streaming.Api\Streaming.Api.csproj" />
     <ProjectReference Include="..\Streaming.Application\Streaming.Application.csproj" />
     <ProjectReference Include="..\Streaming.Common\Streaming.Common.csproj" />
     <ProjectReference Include="..\Streaming.Domain\Streaming.Domain.csproj" />
