@@ -4,7 +4,7 @@ using Streaming.Application.Commands;
 
 namespace Streaming.Infrastructure.IoC
 {
-    class CommandModule : Autofac.Module
+    public class CommandModule : Autofac.Module
     {
         protected override void Load(ContainerBuilder builder)
         {

@@ -11,11 +11,13 @@
     <PackageReference Include="nunit" Version="3.11.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.13.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Streaming.Api\Streaming.Api.csproj" />
     <ProjectReference Include="..\Streaming.Application\Streaming.Application.csproj" />
+    <ProjectReference Include="..\Streaming.Infrastructure\Streaming.Infrastructure.csproj" />
     <ProjectReference Include="..\Streaming.Common\Streaming.Common.csproj" />
     <ProjectReference Include="..\Streaming.Domain\Streaming.Domain.csproj" />
   </ItemGroup>

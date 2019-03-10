@@ -28,7 +28,7 @@ namespace Streaming.Api.Controllers
 
         [HttpPost]
         [ClaimAuthorize(Claims.CanUploadVideo)]
-        public async Task<IActionResult> UploadVideo([FromBody] UploadVideoDTO uploadVideo)
+        public async Task<IActionResult> UploadVideoAsync([FromBody] UploadVideoDTO uploadVideo)
         {
             await CommandDispatcher.HandleAsync(new UploadVideoCommand
             {
@@ -42,7 +42,7 @@ namespace Streaming.Api.Controllers
 
         [HttpGet("UploadToken")]
         [ClaimAuthorize(Claims.CanUploadVideo)]
-        public TokenDTO GetUploadToken()
+        public TokenDTO GetUploadTokenAsync()
         {
             // Too tired when I wrote this, to move this to dedicated serivice or something...
             var signedMessage = messageSigner.SignMessage(Guid.NewGuid().ToByteArray());
@@ -54,7 +54,7 @@ namespace Streaming.Api.Controllers
 
         [HttpPost("UploadPart")]
         [ClaimAuthorize(Claims.CanUploadVideo)]
-        public async Task<IActionResult> UploadPart([FromForm] UploadVideoPartDTO videoPart)
+        public async Task<IActionResult> UploadPartAsync ([FromForm] UploadVideoPartDTO videoPart)
         {
             await CommandDispatcher.HandleAsync(new UploadVideoPartCommand
             {
@@ -66,25 +66,25 @@ namespace Streaming.Api.Controllers
         }
 
         [HttpGet("{Id}")]
-        public async Task<VideoMetadataDTO> GetById(Guid id)
+        public async Task<VideoMetadataDTO> GetByIdAsync (Guid id)
         {
             return await queries.GetBasicVideoMetadataAsync(id);
         }
 
         [HttpPost("Search")]
-        public async Task<IEnumerable<VideoMetadataDTO>> Search([FromBody] VideoSearchDTO search)
+        public async Task<IEnumerable<VideoMetadataDTO>> SearchAsync ([FromBody] VideoSearchDTO search)
         {
 			return await queries.SearchAsync(search);
         }
 
         [HttpGet("{Id}/{Part}")]
-        public async Task<IActionResult> GetVideoPart(Guid Id, int Part)
+        public async Task<IActionResult> GetVideoPartAsync (Guid Id, int Part)
         {
             return File(await queries.GetVideoPartAsync(Id, Part), "video/MP2T", $"{Part}.ts");
         }
 
         [HttpGet("Manifest/{Id}")]
-        public async Task<IActionResult> GetVideoManifest(Guid Id)
+        public async Task<IActionResult> GetVideoManifestAsync (Guid Id)
         {
 			var manifest = await queries.GetVideoManifestAsync(Id);
 			return File(Encoding.UTF8.GetBytes(manifest), "application/x-mpegURL", $"{Id}.m3u8");
@@ -92,7 +92,7 @@ namespace Streaming.Api.Controllers
 
         [HttpDelete("{Id}")]
         [ClaimAuthorize(Claims.CanDeleteVideo)]
-        public async Task<IActionResult> DeleteVideo(Guid Id)
+        public async Task<IActionResult> DeleteVideoAsync (Guid Id)
         {
             await CommandDispatcher.HandleAsync(new DeleteVideoCommand
             {
@@ -103,7 +103,7 @@ namespace Streaming.Api.Controllers
 
         [HttpPut]
         [ClaimAuthorize(Claims.CanEditAnyVideo, Claims.CanEditOwnVideo)]
-        public async Task<IActionResult> ActionResult([FromBody] UpdateVideoDTO update)
+        public async Task<IActionResult> UpdateVideoAsync([FromBody] UpdateVideoDTO update)
         {
             await CommandDispatcher.HandleAsync(new UpdateVideoCommand
             {

@@ -1,6 +1,4 @@
 ﻿using Autofac;
-using MongoDB.Driver;
-using MongoDB.Driver.GridFS;
 using Streaming.Application.Interfaces.Services;
 using Streaming.Infrastructure.Services;
 
@@ -11,9 +9,6 @@ namespace Streaming.Infrastructure.IoC
         protected override void Load(ContainerBuilder builder)
         {
             base.Load(builder);
-
-            builder.Register<IGridFSBucket>(context => new GridFSBucket(context.Resolve<IMongoDatabase>()))
-                   .SingleInstance();
 
             builder.RegisterType<FFmpegProcessVideoService>()
                    .As<IProcessVideoService>()

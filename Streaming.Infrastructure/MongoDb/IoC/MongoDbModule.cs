@@ -1,5 +1,6 @@
 ﻿using Autofac;
 using MongoDB.Driver;
+using MongoDB.Driver.GridFS;
 using Streaming.Domain.Models;
 
 namespace Streaming.Infrastructure.MongoDb.IoC
@@ -20,6 +21,9 @@ namespace Streaming.Infrastructure.MongoDb.IoC
             base.Load(builder);
 
             builder.Register<IMongoDatabase>(context => new MongoClient(connectionString).GetDatabase(databaseName))
+                   .SingleInstance();
+
+            builder.Register<IGridFSBucket>(context => new GridFSBucket(context.Resolve<IMongoDatabase>()))
                    .SingleInstance();
 
             builder.Register(context => context.Resolve<IMongoDatabase>().GetCollection<Video>("Videos"))
