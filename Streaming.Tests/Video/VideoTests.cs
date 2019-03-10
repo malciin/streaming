@@ -1,17 +1,25 @@
 using Autofac;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http;
 using MongoDB.Driver;
 using Moq;
 using NUnit.Framework;
 using Streaming.Api.Controllers;
 using Streaming.Application.Commands;
+using Streaming.Application.DTO.Video;
 using Streaming.Application.Interfaces.Services;
 using Streaming.Application.Interfaces.Settings;
 using Streaming.Application.Mappings;
+using Streaming.Application.Models;
 using Streaming.Application.Query;
+using Streaming.Domain.Enums;
 using Streaming.Domain.Models;
 using Streaming.Infrastructure.Services;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
+using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -19,9 +27,7 @@ namespace Streaming.Tests
 {
     public class VideoTests
     {
-        VideoController videoController;
-
-        public ContainerBuilder GetMockedContainerBuilder()
+        public ContainerBuilder GetBaseMockedContainerBuilder()
         {
             var builder = new ContainerBuilder();
             //builder.RegisterModule<Infrastructure.IoC.CommandModule>();
@@ -54,35 +60,82 @@ namespace Streaming.Tests
             var videoBlobService = new Mock<IVideoBlobService>();
             builder.Register(x => videoBlobService.Object).AsImplementedInterfaces();
 
-            var videoCollection = new Mock<IMongoCollection<Video>>();
-            videoCollection.Setup(x => x.InsertOneAsync(It.IsAny<Video>(), It.IsAny<InsertOneOptions>(), It.IsAny<CancellationToken>()))
-                .Returns((Video video, InsertOneOptions options, CancellationToken cancellationToken) =>
-                {
+            builder.Register(x => new SHA256MessageSignerService(x.Resolve<ISecretServerKey>()))
+                .As<IMessageSignerService>();
 
-                    return Task.FromResult(0);
-                });
-            builder.Register(x => videoCollection.Object).AsImplementedInterfaces();
+            builder.Register(x => new VideoQueries(new VideoMappings(
+                x.Resolve<IThumbnailService>()),
+                x.Resolve<IMongoCollection<Video>>(),
+                x.Resolve<IDirectoriesSettings>(),
+                x.Resolve<IVideoBlobService>()))
+                .As<IVideoQueries>();
+
+            builder.Register<VideoController>(context =>
+            {
+                var controller = new VideoController(
+                    context.Resolve<ICommandDispatcher>(),
+                    context.Resolve<IVideoQueries>(),
+                    context.Resolve<IMessageSignerService>());
+                controller.ControllerContext.HttpContext = new DefaultHttpContext();
+                return controller;
+            });
 
             return builder;
         }
 
         [SetUp]
         public void Setup()
+        {            
+        }
+
+        [Test]
+        public void Adding_New_Video()
         {
-            var componentContext = GetMockedContainerBuilder().Build();
+            var videos = new List<Video>();
+            var container = GetBaseMockedContainerBuilder();
 
-            var commandDispatcher = new CommandDispatcher(componentContext);
-            var videoQueries = new VideoQueries(new VideoMappings(
-                componentContext.Resolve<IThumbnailService>()), 
-                componentContext.Resolve<IMongoCollection<Video>>(), 
-                componentContext.Resolve<IDirectoriesSettings>(),
-                componentContext.Resolve<IVideoBlobService>());
+            var videoCollection = new Mock<IMongoCollection<Video>>();
+            videoCollection.Setup(x => x.InsertOneAsync(It.IsAny<Video>(), It.IsAny<InsertOneOptions>(), It.IsAny<CancellationToken>()))
+                .Returns((Video video, InsertOneOptions options, CancellationToken cancellationToken) =>
+                {
+                    videos.Add(video);
+                    return Task.FromResult(0);
+                });
+            container.Register(x => videoCollection.Object).AsImplementedInterfaces();
 
-            var messageSignerService = new SHA256MessageSignerService(componentContext.Resolve<ISecretServerKey>());
+            var componentContext = container.Build();
 
-            videoController = new VideoController(
-                commandDispatcher, 
-                videoQueries, messageSignerService);
+            var signer = componentContext.Resolve<IMessageSignerService>();
+
+            var videoController = componentContext.Resolve<VideoController>();
+            videoController.HttpContext.User = new ClaimsPrincipal();
+            videoController.User.AddIdentity(new System.Security.Claims.ClaimsIdentity(new List<Claim>
+            {
+                new Claim("http://streaming.com/claims", Claims.CanUploadVideo),
+                new Claim(ClaimTypes.NameIdentifier, "testUser"),
+                new Claim(ClaimTypes.Email, "testEmail@email.co")
+            }, JwtBearerDefaults.AuthenticationScheme));
+
+            videoController.UploadVideoAsync(new UploadVideoDTO
+            {
+                Title = "Title",
+                Description = "Description",
+                UploadToken = videoController.GetUploadToken().Token
+            }).GetAwaiter().GetResult();
+
+            Assert.AreEqual(1, videos.Count);
+            Assert.AreEqual("Title", videos[0].Title);
+            Assert.AreEqual("Description", videos[0].Description);
+            Assert.AreEqual((VideoState)0, videos[0].State);
+            Assert.AreEqual("testUser", videos[0].Owner.Identifier);
+            Assert.AreEqual("testEmail@email.co", videos[0].Owner.Email);
+
+            Assert.IsNull(videos[0].ProcessingInfo);
+            Assert.IsNull(videos[0].VideoManifestHLS);
+            Assert.IsNull(videos[0].FinishedProcessingDate);
+            Assert.IsNull(videos[0].Length);
+            Assert.IsTrue(DateTime.UtcNow.Subtract(videos.First().CreatedDate).TotalSeconds < 10);  // check if the correct date is setted
+            
         }
     }
 }

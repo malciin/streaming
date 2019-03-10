@@ -42,7 +42,7 @@ namespace Streaming.Api.Controllers
 
         [HttpGet("UploadToken")]
         [ClaimAuthorize(Claims.CanUploadVideo)]
-        public TokenDTO GetUploadTokenAsync()
+        public TokenDTO GetUploadToken()
         {
             // Too tired when I wrote this, to move this to dedicated serivice or something...
             var signedMessage = messageSigner.SignMessage(Guid.NewGuid().ToByteArray());
