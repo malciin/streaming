@@ -1,10 +1,10 @@
 ﻿using MongoDB.Driver;
 using Streaming.Application.DTO.Video;
+using Streaming.Application.Interfaces.Repositories;
 using Streaming.Application.Interfaces.Services;
 using Streaming.Application.Interfaces.Settings;
 using Streaming.Application.Mappings;
 using Streaming.Common.Extensions;
-using Streaming.Domain.Enums;
 using Streaming.Domain.Models;
 using System;
 using System.Collections.Generic;
@@ -18,12 +18,12 @@ namespace Streaming.Application.Query
     public class VideoQueries : IVideoQueries
     {
         private readonly VideoMappings mapper;
-        private readonly IMongoCollection<Video> collection;
+        private readonly IVideoRepository collection;
 		private readonly IDirectoriesSettings directoriesSettings;
 		private readonly IVideoBlobService videoBlobService;
 
         public VideoQueries(VideoMappings mapper, 
-			IMongoCollection<Video> collection,
+			IVideoRepository collection,
 			IDirectoriesSettings directoriesSettings,
             IVideoBlobService videoBlobService)
         {
@@ -36,19 +36,12 @@ namespace Streaming.Application.Query
         public async Task<VideoMetadataDTO> GetBasicVideoMetadataAsync(Guid VideoId)
         {
             var searchFilter = Builders<Video>.Filter.Eq(x => x.VideoId, VideoId);
-            return await collection.Find<Video>(searchFilter)
-                .Project(x => mapper.MapVideoMetadataDTO(x))
-                .FirstOrDefaultAsync();
+            return mapper.MapVideoMetadataDTO(await collection.GetAsync(VideoId));
         }
 
 		public async Task<string> GetVideoManifestAsync(Guid VideoId)
 		{
-			var searchFilter = Builders<Video>.Filter.Eq(x => x.VideoId, VideoId);
-			var results = collection.Find<Video>(searchFilter).ToList();
-
-			var rawManifest = await collection
-				.Find<Video>(searchFilter)
-				.Project(x => x.VideoManifestHLS).FirstOrDefaultAsync();
+            var rawManifest = (await collection.GetAsync(VideoId)).VideoManifestHLS;
 
             var pattern = VideoManifest.EndpointPlaceholder.Replace("[", "\\[");
             var match = Regex.Match(rawManifest, pattern);
@@ -69,14 +62,7 @@ namespace Streaming.Application.Query
 
 		public async Task<IEnumerable<VideoMetadataDTO>> SearchAsync(VideoSearchDTO Search)
 		{
-			var results = await collection
-				.Find(x => x.State.HasFlag(VideoState.Processed))
-				.Skip(Search.Offset)
-				.Limit(Search.HowMuch)
-                .SortByDescending(x => x.FinishedProcessingDate)
-				.ToListAsync();
-
-			return results
+			return (await collection.SearchAsync(Search))
 				.Select(x => mapper.MapVideoMetadataDTO(x));
 		}
 	}

@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 using MongoDB.Driver;
 using Streaming.Application.DTO.Video;
 using Streaming.Application.Interfaces.Repositories;
+using Streaming.Application.Models.Repository.Video;
+using Streaming.Domain.Enums;
 using Streaming.Domain.Models;
 
 namespace Streaming.Infrastructure.MongoDb.Repositories
@@ -19,24 +21,73 @@ namespace Streaming.Infrastructure.MongoDb.Repositories
 
 		public async Task AddAsync(Video video)
 		{
-			await videoCollection.InsertOneAsync(await this.getCurrentSessionHandlerAsync(), video);
+            var session = await this.getCurrentSessionHandlerAsync();
+            await videoCollection.InsertOneAsync(session, video);
 		}
 
-		public Task<IEnumerable<Video>> SearchAsync(VideoSearchDTO filter)
+		public async Task<IEnumerable<Video>> SearchAsync(VideoSearchDTO filter)
 		{
-			throw new NotImplementedException();
-		}
+            return await videoCollection
+                .Find(x => x.State.HasFlag(VideoState.Processed))
+                .Skip(filter.Offset)
+                .Limit(filter.HowMuch)
+                .SortByDescending(x => x.FinishedProcessingDate)
+                .ToListAsync();
+        }
 
-		public Task<Video> GetAsync(Guid videoId)
+		public async Task<Video> GetAsync(Guid videoId)
 		{
-			throw new NotImplementedException();
-		}
+            var searchFilter = Builders<Domain.Models.Video>.Filter.Eq(x => x.VideoId, videoId);
+            return await videoCollection.Find(searchFilter).FirstAsync();
+        }
 
 		public async Task UpdateAsync(Video video)
 		{
 			var idFilter = Builders<Video>.Filter.Eq(x => x.VideoId, video.VideoId);
 			var updateDefinition = Builders<Video>.Update.Set(x => x.Title, video.Title);
-			await videoCollection.UpdateOneAsync(await this.getCurrentSessionHandlerAsync(), idFilter, updateDefinition);
+            var session = await this.getCurrentSessionHandlerAsync();
+            await videoCollection.UpdateOneAsync(session, idFilter, updateDefinition);
 		}
-	}
+
+        public async Task UpdateAsync(UpdateVideoInfo updateVideoInfo)
+        {
+            var filters = new List<FilterDefinition<Domain.Models.Video>>();
+            filters.Add(Builders<Domain.Models.Video>.Filter
+                .Eq(x => x.VideoId, updateVideoInfo.UpdateByVideoId));
+
+            if (!String.IsNullOrEmpty(updateVideoInfo.UpdateByUserIdentifier))
+            {
+                filters.Add(Builders<Domain.Models.Video>.Filter
+                    .Eq(x => x.Owner.Identifier, updateVideoInfo.UpdateByUserIdentifier));
+            }
+
+            var updateDefinition = Builders<Domain.Models.Video>.Update
+                .Set(x => x.Title, updateVideoInfo.NewVideoTitle)
+                .Set(x => x.Description, updateVideoInfo.NewVideoDescription);
+
+            var session = await this.getCurrentSessionHandlerAsync();
+            await videoCollection.UpdateOneAsync(session, Builders<Domain.Models.Video>.Filter.And(filters), updateDefinition);
+        }
+
+        public async Task UpdateAsync(UpdateVideoAfterProcessing updateVideoAfterProcessing)
+        {
+            var searchFilter = Builders<Domain.Models.Video>.Filter.Eq(x => x.VideoId, updateVideoAfterProcessing.VideoId);
+            var updateDefinition = Builders<Domain.Models.Video>.Update
+                .Set(x => x.FinishedProcessingDate, updateVideoAfterProcessing.FinishedProcessingDate)
+                .Set(x => x.ProcessingInfo, updateVideoAfterProcessing.ProcessingInfo)
+                .Set(x => x.VideoManifestHLS, updateVideoAfterProcessing.VideoManifestHLS)
+                .Set(x => x.Length, updateVideoAfterProcessing.VideoLength)
+                .Set(x => x.State, updateVideoAfterProcessing.VideoState);
+
+            var session = await this.getCurrentSessionHandlerAsync();
+            await videoCollection.UpdateOneAsync(session, searchFilter, updateDefinition);
+        }
+
+        public async Task DeleteAsync(Guid VideoId)
+        {
+            var searchFilter = Builders<Domain.Models.Video>.Filter.Eq(x => x.VideoId, VideoId);
+            var session = await this.getCurrentSessionHandlerAsync();
+            await videoCollection.DeleteOneAsync(session, searchFilter);
+        }
+    }
 }
