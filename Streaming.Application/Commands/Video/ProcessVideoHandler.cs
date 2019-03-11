@@ -1,6 +1,7 @@
-﻿using MongoDB.Driver;
+﻿using Streaming.Application.Interfaces.Repositories;
 using Streaming.Application.Interfaces.Services;
 using Streaming.Application.Interfaces.Strategies;
+using Streaming.Application.Models.Repository.Video;
 using Streaming.Domain.Enums;
 using Streaming.Domain.Models;
 using System;
@@ -15,7 +16,7 @@ namespace Streaming.Application.Commands.Video
 {
     public class ProcessVideoHandler : ICommandHandler<ProcessVideoCommand>
     {
-		private readonly IMongoCollection<Domain.Models.Video> videoCollection;
+		private readonly IVideoRepository videoRepo;
 		private readonly IVideoBlobService videoBlobService;
         private readonly IProcessVideoService processVideoService;
         private readonly IThumbnailService thumbnailService;
@@ -32,14 +33,14 @@ namespace Streaming.Application.Commands.Video
             .Where(x => Regex.IsMatch(x.Name, @"\d+\.ts"));
 
         public ProcessVideoHandler(
-            IMongoCollection<Domain.Models.Video> videoCollection,
+            IVideoRepository videoRepo,
 			IVideoBlobService videoBlobService,
             IProcessVideoService processVideoService,
             IThumbnailService thumbnailService,
             IPathStrategy pathStrategy,
             IFileNameStrategy fileNameStrategy)
         {
-			this.videoCollection = videoCollection;
+			this.videoRepo = videoRepo;
 			this.videoBlobService = videoBlobService;
             this.processVideoService = processVideoService;
             this.thumbnailService = thumbnailService;
@@ -117,15 +118,16 @@ namespace Streaming.Application.Commands.Video
             processingDirectory.Delete(recursive: true);
             videoState |= VideoState.Processed;
 
-            var searchFilter = Builders<Domain.Models.Video>.Filter.Eq(x => x.VideoId, Command.VideoId);
-            var updateDefinition = Builders<Domain.Models.Video>.Update
-                .Set(x => x.FinishedProcessingDate, DateTime.UtcNow)
-                .Set(x => x.ProcessingInfo, $"Sucessfully processed after {timer.Elapsed.TotalMilliseconds}ms")
-                .Set(x => x.VideoManifestHLS, manifest.ToString())
-                .Set(x => x.Length, videoLength)
-                .Set(x => x.State, videoState);
-
-            await videoCollection.UpdateOneAsync(searchFilter, updateDefinition);
+            await videoRepo.UpdateAsync(new UpdateVideoAfterProcessing
+            {
+                FinishedProcessingDate = DateTime.UtcNow,
+                ProcessingInfo = $"Sucessfully processed after {timer.Elapsed.TotalMilliseconds}ms",
+                VideoState = videoState,
+                VideoId = Command.VideoId,
+                VideoLength = videoLength,
+                VideoManifestHLS = manifest.ToString()
+            });
+            await videoRepo.CommitAsync();
         }        
     }
 }

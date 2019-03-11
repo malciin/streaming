@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using MongoDB.Driver;
+using Streaming.Application.Interfaces.Repositories;
 using Streaming.Application.Interfaces.Services;
 using Streaming.Application.Interfaces.Settings;
 
@@ -11,15 +11,15 @@ namespace Streaming.Application.Commands.Video
 	{
 		private readonly ICommandBus commandBus;
         private readonly IMessageSignerService messageSigner;
-        private readonly IMongoCollection<Domain.Models.Video> videoCollection;
+        private readonly IVideoRepository videoRepo;
 		private readonly IDirectoriesSettings directoriesSettings;
 
-		public UploadVideoHandler(IMongoCollection<Domain.Models.Video> videoCollection,
+		public UploadVideoHandler(IVideoRepository videoRepo,
 			IDirectoriesSettings directoriesSettings,
             ICommandBus commandBus,
             IMessageSignerService messageSigner)
 		{
-			this.videoCollection = videoCollection;
+			this.videoRepo = videoRepo;
             this.directoriesSettings = directoriesSettings;
             this.commandBus = commandBus;
             this.messageSigner = messageSigner;
@@ -48,7 +48,8 @@ namespace Streaming.Application.Commands.Video
                 }
 			};
 
-			await videoCollection.InsertOneAsync(video);
+			await videoRepo.AddAsync(video);
+            await videoRepo.CommitAsync();
 
             commandBus.Push(new Commands.Video.ProcessVideoCommand
 			{

@@ -1,37 +1,36 @@
-﻿using System.Collections.Generic;
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using System.Threading.Tasks;
-using MongoDB.Driver;
+using Streaming.Application.Interfaces.Repositories;
 using Streaming.Application.Models;
+using Streaming.Application.Models.Repository.Video;
 using Streaming.Common.Extensions;
 
 namespace Streaming.Application.Commands.Video
 {
     public class UpdateVideoHandler : ICommandHandler<UpdateVideoCommand>
     {
-        private readonly IMongoCollection<Domain.Models.Video> videoCollection;
-        public UpdateVideoHandler(IMongoCollection<Domain.Models.Video> videoCollection)
+        private readonly IVideoRepository videoRepo;
+        public UpdateVideoHandler(IVideoRepository videoRepo)
         {
-            this.videoCollection = videoCollection;
+            this.videoRepo = videoRepo;
         }
 
         public async Task HandleAsync(UpdateVideoCommand Command)
         {
-            var filters = new List<FilterDefinition<Domain.Models.Video>>();
-            filters.Add(Builders<Domain.Models.Video>.Filter
-                .Eq(x => x.VideoId, Command.VideoId));
+            var updateVideoInfo = new UpdateVideoInfo
+            {
+                UpdateByVideoId = Command.VideoId,
+                NewVideoTitle = Command.NewTitle,
+                NewVideoDescription = Command.NewDescription
+            };
 
             if (!Command.User.HasStreamingClaim(Claims.CanEditAnyVideo))
             {
-                filters.Add(Builders<Domain.Models.Video>.Filter
-                    .Eq(x => x.Owner.Identifier, Command.User.FindFirst(ClaimTypes.NameIdentifier).Value));
+                updateVideoInfo.UpdateByUserIdentifier = Command.User.FindFirst(ClaimTypes.NameIdentifier).Value;
             }
 
-            var updateDefinition = Builders<Domain.Models.Video>.Update
-                .Set(x => x.Title, Command.NewTitle)
-                .Set(x => x.Description, Command.NewDescription);
-
-            await videoCollection.UpdateOneAsync(Builders<Domain.Models.Video>.Filter.And(filters), updateDefinition);
+            await videoRepo.UpdateAsync(updateVideoInfo);
+            await videoRepo.CommitAsync();
         }
     }
 }
