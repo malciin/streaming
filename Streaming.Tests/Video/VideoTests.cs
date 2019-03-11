@@ -95,14 +95,13 @@ namespace Streaming.Tests
             var videos = new List<Video>();
             var container = GetBaseMockedContainerBuilder();
 
-            var videoCollection = new Mock<IMongoCollection<Video>>();
-            videoCollection.Setup(x => x.InsertOneAsync(It.IsAny<Video>(), It.IsAny<InsertOneOptions>(), It.IsAny<CancellationToken>()))
-                .Returns((Video video, InsertOneOptions options, CancellationToken cancellationToken) =>
-                {
-                    videos.Add(video);
-                    return Task.FromResult(0);
-                });
-            container.Register(x => videoCollection.Object).AsImplementedInterfaces();
+            var videoRepository = new Mock<IVideoRepository>();
+            videoRepository.Setup(x => x.AddAsync(It.IsAny<Video>())).Returns((Video vid) =>
+            {
+                videos.Add(vid);
+                return Task.FromResult(0);
+            });
+            container.Register(x => videoRepository.Object).AsImplementedInterfaces();
 
             var componentContext = container.Build();
 
@@ -136,7 +135,6 @@ namespace Streaming.Tests
             Assert.IsNull(videos[0].FinishedProcessingDate);
             Assert.IsNull(videos[0].Length);
             Assert.IsTrue(DateTime.UtcNow.Subtract(videos.First().CreatedDate).TotalSeconds < 10);  // check if the correct date is setted
-            
         }
     }
 }
