@@ -7,6 +7,7 @@ using NUnit.Framework;
 using Streaming.Api.Controllers;
 using Streaming.Application.Commands;
 using Streaming.Application.DTO.Video;
+using Streaming.Application.Interfaces.Repositories;
 using Streaming.Application.Interfaces.Services;
 using Streaming.Application.Interfaces.Settings;
 using Streaming.Application.Mappings;
@@ -65,7 +66,7 @@ namespace Streaming.Tests
 
             builder.Register(x => new VideoQueries(new VideoMappings(
                 x.Resolve<IThumbnailService>()),
-                x.Resolve<IMongoCollection<Video>>(),
+                x.Resolve<IVideoRepository>(),
                 x.Resolve<IDirectoriesSettings>(),
                 x.Resolve<IVideoBlobService>()))
                 .As<IVideoQueries>();

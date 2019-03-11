@@ -1,5 +1,6 @@
 ﻿using Autofac;
 using MongoDB.Driver;
+using MongoDB.Driver.GridFS;
 using Streaming.Application.Interfaces.Repositories;
 using Streaming.Domain.Models;
 
