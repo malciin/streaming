@@ -21,12 +21,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Security.Claims;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Streaming.Tests
 {
-    public class VideoTests
+    public class VideoApiTests
     {
         public ContainerBuilder GetBaseMockedContainerBuilder()
         {
@@ -90,7 +89,7 @@ namespace Streaming.Tests
         }
 
         [Test]
-        public void Adding_New_Video()
+        public void Is_Adding_New_Video_Works()
         {
             var videos = new List<Video>();
             var container = GetBaseMockedContainerBuilder();
@@ -135,6 +134,51 @@ namespace Streaming.Tests
             Assert.IsNull(videos[0].FinishedProcessingDate);
             Assert.IsNull(videos[0].Length);
             Assert.IsTrue(DateTime.UtcNow.Subtract(videos.First().CreatedDate).TotalSeconds < 10);  // check if the correct date is setted
+        }
+
+        [Test]
+        public void Query_Video_Works()
+        {
+            var videos = new List<Video>
+            {
+                new Video
+                {
+                    VideoId = Guid.NewGuid(),
+                    Title = "Vid title 1",
+                    CreatedDate = DateTime.UtcNow,
+                    FinishedProcessingDate = DateTime.UtcNow,
+                    Length = TimeSpan.FromSeconds(1)
+                },
+                new Video
+                {
+                    VideoId = Guid.NewGuid(),
+                    Title = "Vid title 2",
+                    CreatedDate = DateTime.UtcNow,
+                    FinishedProcessingDate = DateTime.UtcNow,
+                    Length = TimeSpan.FromSeconds(1)
+                },
+            };
+            var container = GetBaseMockedContainerBuilder();
+
+            var videoRepository = new Mock<IVideoRepository>();
+            videoRepository.Setup(x => x.SearchAsync(It.IsAny<VideoSearchDTO>())).Returns((VideoSearchDTO search) =>
+            {
+                return Task.FromResult(videos.Skip(search.Offset).Take(search.HowMuch));
+            });
+
+            container.Register(x => videoRepository.Object).AsImplementedInterfaces();
+            var componentContext = container.Build();
+
+            var videoController = componentContext.Resolve<VideoController>();
+            var searchResult = videoController.SearchAsync(new VideoSearchDTO
+            {
+                HowMuch = 10,
+                Offset = 0
+            }).GetAwaiter().GetResult().ToList();
+
+            Assert.AreEqual(2, searchResult.Count());
+            Assert.AreEqual("Vid title 1", searchResult[0].Title);
+            Assert.AreEqual("Vid title 2", searchResult[1].Title);
         }
     }
 }

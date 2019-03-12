@@ -18,17 +18,17 @@ namespace Streaming.Application.Query
     public class VideoQueries : IVideoQueries
     {
         private readonly VideoMappings mapper;
-        private readonly IVideoRepository collection;
+        private readonly IVideoRepository videoRepo;
 		private readonly IDirectoriesSettings directoriesSettings;
 		private readonly IVideoBlobService videoBlobService;
 
         public VideoQueries(VideoMappings mapper, 
-			IVideoRepository collection,
+			IVideoRepository videoRepo,
 			IDirectoriesSettings directoriesSettings,
             IVideoBlobService videoBlobService)
         {
             this.mapper = mapper;
-            this.collection = collection;
+            this.videoRepo = videoRepo;
 			this.directoriesSettings = directoriesSettings;
 			this.videoBlobService = videoBlobService;
         }
@@ -36,12 +36,12 @@ namespace Streaming.Application.Query
         public async Task<VideoMetadataDTO> GetBasicVideoMetadataAsync(Guid VideoId)
         {
             var searchFilter = Builders<Video>.Filter.Eq(x => x.VideoId, VideoId);
-            return mapper.MapVideoMetadataDTO(await collection.GetAsync(VideoId));
+            return mapper.MapVideoMetadataDTO(await videoRepo.GetAsync(VideoId));
         }
 
 		public async Task<string> GetVideoManifestAsync(Guid VideoId)
 		{
-            var rawManifest = (await collection.GetAsync(VideoId)).VideoManifestHLS;
+            var rawManifest = (await videoRepo.GetAsync(VideoId)).VideoManifestHLS;
 
             var pattern = VideoManifest.EndpointPlaceholder.Replace("[", "\\[");
             var match = Regex.Match(rawManifest, pattern);
@@ -62,7 +62,7 @@ namespace Streaming.Application.Query
 
 		public async Task<IEnumerable<VideoMetadataDTO>> SearchAsync(VideoSearchDTO Search)
 		{
-			return (await collection.SearchAsync(Search))
+			return (await videoRepo.SearchAsync(Search))
 				.Select(x => mapper.MapVideoMetadataDTO(x));
 		}
 	}

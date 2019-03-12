@@ -1,4 +1,5 @@
-﻿using Streaming.Application.Interfaces.Services;
+﻿using Streaming.Application.Exceptions;
+using Streaming.Application.Interfaces.Services;
 using Streaming.Application.Interfaces.Settings;
 using System;
 using System.Linq;
@@ -30,9 +31,10 @@ namespace Streaming.Infrastructure.Services
 
             var message = signedMessage.Take(messageLengthBytes).ToArray();
             var hash = hasher.ComputeHash(message);
-            if (!signedMessage.Skip(messageLengthBytes).ToArray().SequenceEqual(hash))
+            var givenHash = signedMessage.Skip(messageLengthBytes).ToArray();
+            if (!givenHash.SequenceEqual(hash))
             {
-                throw new ArgumentException("Message malformed");
+                throw new MessageWrongSignatureException(Convert.ToBase64String(hash), Convert.ToBase64String(givenHash));
             }
 
             return message;
