@@ -1,34 +1,31 @@
-﻿using MongoDB.Driver;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Streaming.Infrastructure.MongoDb.Repositories
 {
 	public abstract class AbstractSessionMongoDbRepository
 	{
-		private readonly IMongoClient client;
-		private IClientSessionHandle handle;
+        private List<Func<Task>> asyncCommits { get; }
 
-		protected async ValueTask<IClientSessionHandle> getCurrentSessionHandlerAsync()
-		{
-			if (handle == null)
-			{
-				handle = await client.StartSessionAsync();
-			}
-			return handle;
-		}
+        public AbstractSessionMongoDbRepository()
+        {
+            this.asyncCommits = new List<Func<Task>>();
+        }
 
-		public AbstractSessionMongoDbRepository(IMongoClient client)
-		{
-			this.client = client;
-		}
+        protected void addToCommit(Func<Task> commit)
+        {
+            asyncCommits.Add(commit);
+        }
 
+        // Mocked transactions, because of using mongoDb that have transactions available only in replica set
+        // This is more for compatibility, rather than for providing database stability
 		public async Task CommitAsync()
 		{
-			if (handle == null)
-			{
-				throw new MongoException("Session is not started...");
-			}
-			await handle.CommitTransactionAsync();
+            foreach(var task in asyncCommits)
+            {
+                await task();
+            }
 		}
 	}
 }
