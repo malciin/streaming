@@ -32,7 +32,7 @@ namespace Streaming.Api.Monitor
         {
 
             builder.AppendLine($"Request info:");
-            if (httpContext?.User?.Identity != null && httpContext.User.Identity.IsAuthenticated)
+            if (httpContext.User.Identity?.IsAuthenticated == true)
             {
                 builder.AppendLine($"\t User: {httpContext.User.Identity.Name}");
             }

@@ -23,49 +23,52 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Services\ProcessVideoService\Samples\LICENSE.md">
+    <None Update="_Data\VideoSamples\LICENSE.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Services\ProcessVideoService\Samples\sample.3gp">
+    <None Update="_Data\VideoSamples\Not_Video_File.dat">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Services\ProcessVideoService\Samples\sample.avi">
+    <None Update="_Data\VideoSamples\sample.3gp">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Services\ProcessVideoService\Samples\sample.flv">
+    <None Update="_Data\VideoSamples\sample.avi">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Services\ProcessVideoService\Samples\sample.m4v">
+    <None Update="_Data\VideoSamples\sample.flv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Services\ProcessVideoService\Samples\sample.mkv">
+    <None Update="_Data\VideoSamples\sample.m4v">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Services\ProcessVideoService\Samples\sample.mov">
+    <None Update="_Data\VideoSamples\sample.mkv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Services\ProcessVideoService\Samples\sample.mp4">
+    <None Update="_Data\VideoSamples\sample.mov">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Services\ProcessVideoService\Samples\sample.mpeg">
+    <None Update="_Data\VideoSamples\sample.mp4">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Services\ProcessVideoService\Samples\sample.mpg">
+    <None Update="_Data\VideoSamples\sample.mpeg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Services\ProcessVideoService\Samples\sample.rmvb">
+    <None Update="_Data\VideoSamples\sample.mpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Services\ProcessVideoService\Samples\sample.swf">
+    <None Update="_Data\VideoSamples\sample.rmvb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Services\ProcessVideoService\Samples\sample.vob">
+    <None Update="_Data\VideoSamples\sample.swf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Services\ProcessVideoService\Samples\sample.webm">
+    <None Update="_Data\VideoSamples\sample.vob">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Services\ProcessVideoService\Samples\sample.wmv">
+    <None Update="_Data\VideoSamples\sample.webm">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="_Data\VideoSamples\sample.wmv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

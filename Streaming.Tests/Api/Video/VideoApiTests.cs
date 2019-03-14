@@ -10,6 +10,7 @@ using Streaming.Application.DTO.Video;
 using Streaming.Application.Interfaces.Repositories;
 using Streaming.Application.Interfaces.Services;
 using Streaming.Application.Interfaces.Settings;
+using Streaming.Application.Interfaces.Strategies;
 using Streaming.Application.Mappings;
 using Streaming.Application.Models;
 using Streaming.Application.Query;
@@ -30,7 +31,6 @@ namespace Streaming.Tests
         public ContainerBuilder GetBaseMockedContainerBuilder()
         {
             var builder = new ContainerBuilder();
-            //builder.RegisterModule<Infrastructure.IoC.CommandModule>();
 
             var secretServerKey = new Mock<ISecretServerKey>();
             secretServerKey.Setup(x => x.SecretServerKey).Returns("test");
@@ -44,6 +44,7 @@ namespace Streaming.Tests
             builder.RegisterAssemblyTypes(assembly)
                    .AsClosedTypesOf(typeof(ICommandHandler<>))
                    .InstancePerLifetimeScope();
+
 
             var commandBus = new Mock<ICommandBus>();
             commandBus.Setup(x => x.Push(It.IsAny<ICommand>())).Callback(() => { });
@@ -83,6 +84,8 @@ namespace Streaming.Tests
                 return controller;
             });
 
+            builder.Register<IPathStrategy>(ctx => new Mock<IPathStrategy>().Object);
+
             return builder;
         }
 
@@ -104,6 +107,22 @@ namespace Streaming.Tests
                 return Task.FromResult(0);
             });
             container.Register(x => videoRepository.Object).AsImplementedInterfaces();
+
+            var videoFileInfoService = new Mock<IVideoFileInfoService>();
+            videoFileInfoService.Setup(x => x.GetDetailsAsync(It.IsAny<string>())).Returns((string path) =>
+            {
+                var details = new VideoFileDetailsDTO();
+                details.Video.Codec = "codec";
+                return Task.FromResult(details);
+            });
+            container.Register(x => videoFileInfoService.Object).AsImplementedInterfaces();
+
+            var videoProcessingService = new Mock<IProcessVideoService>();
+            videoProcessingService.Setup(x => x.SupportedVideoTypes()).Returns(new List<(string Extension, string Codec)>
+            {
+                (".mp4", "codec")
+            });
+            container.Register(x => videoProcessingService.Object).AsImplementedInterfaces();
 
             var componentContext = container.Build();
 
