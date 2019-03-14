@@ -24,8 +24,8 @@ namespace Streaming.Application.Strategies
         public string VideoProcessedDirectoryPath(Guid VideoId)
             => String.Format($"{dirSettings.LocalStorageDirectory}{{0}}{VideoId}{{0}}", Path.DirectorySeparatorChar);
 
-        public string VideoProcessedFilePath(Guid VideoId, int PartNumber)
-            => $"{VideoProcessedDirectoryPath(VideoId)}{fileNameStrategy.GetProcessedVideoFileName(VideoId, PartNumber)}";
+        public string VideoSplittedFilePath(Guid VideoId, int PartNumber)
+            => $"{VideoProcessedDirectoryPath(VideoId)}{fileNameStrategy.GetSplittedVideoFileName(VideoId, PartNumber)}";
 
         public string VideoProcessingDirectoryPath(Guid VideoId)
             => String.Format($"{dirSettings.ProcessingDirectory}{{0}}{VideoId}_Dir{{0}}", Path.DirectorySeparatorChar);
@@ -35,5 +35,8 @@ namespace Streaming.Application.Strategies
 
         public string VideoThumbnailsDirectoryPath(Guid VideoId)
             => String.Format($"{VideoProcessingDirectoryPath(VideoId)}Thumbnails{{0}}", Path.DirectorySeparatorChar);
+
+        public string VideoConvertedToMp4FilePath(Guid VideoId)
+            => $"{VideoProcessedDirectoryPath(VideoId)}{fileNameStrategy.GetProcessedVideoFileName(VideoId)}";
     }
 }

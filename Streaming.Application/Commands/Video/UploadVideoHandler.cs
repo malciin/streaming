@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Streaming.Application.Interfaces.Repositories;
 using Streaming.Application.Interfaces.Services;
 using Streaming.Application.Interfaces.Settings;
+using Streaming.Application.Interfaces.Strategies;
 
 namespace Streaming.Application.Commands.Video
 {
@@ -12,17 +14,24 @@ namespace Streaming.Application.Commands.Video
 		private readonly ICommandBus commandBus;
         private readonly IMessageSignerService messageSigner;
         private readonly IVideoRepository videoRepo;
-		private readonly IDirectoriesSettings directoriesSettings;
+        private readonly IPathStrategy pathStrategy;
+        private readonly IVideoFileInfoService videoFileInfoService;
+        private readonly IProcessVideoService processVideoService;
 
 		public UploadVideoHandler(IVideoRepository videoRepo,
 			IDirectoriesSettings directoriesSettings,
             ICommandBus commandBus,
-            IMessageSignerService messageSigner)
+            IMessageSignerService messageSigner,
+            IPathStrategy pathStrategy,
+            IVideoFileInfoService videoFileInfoService,
+            IProcessVideoService processVideoService)
 		{
 			this.videoRepo = videoRepo;
-            this.directoriesSettings = directoriesSettings;
             this.commandBus = commandBus;
             this.messageSigner = messageSigner;
+            this.pathStrategy = pathStrategy;
+            this.processVideoService = processVideoService;
+            this.videoFileInfoService = videoFileInfoService;
 		}
 
         public Guid getVideoIdFromUploadToken(string uploadToken)
@@ -34,12 +43,21 @@ namespace Streaming.Application.Commands.Video
 
         public async Task HandleAsync(Commands.Video.UploadVideoCommand Command)
 		{
+            var videoId = getVideoIdFromUploadToken(Command.UploadToken);
+            var inputFilePath = pathStrategy.VideoProcessingFilePath(videoId);
+
+            var videoFileInfo = await videoFileInfoService.GetDetailsAsync(inputFilePath);
+            if (!processVideoService.SupportedVideoTypes().Select(x => x.Codec).Contains(videoFileInfo.Video.Codec))
+            {
+                throw new NotSupportedException("Video file format not supported!");
+            }
+
 			var video = new Domain.Models.Video
             {
 				CreatedDate = DateTime.Now,
 				Title = Command.Title,
 				Description = Command.Description,
-				VideoId = getVideoIdFromUploadToken(Command.UploadToken),
+				VideoId = videoId,
                 Owner = new Domain.Models.UserDetails
                 {
                     Identifier = Command.User.FindFirst(ClaimTypes.NameIdentifier).Value,
@@ -53,7 +71,9 @@ namespace Streaming.Application.Commands.Video
 
             commandBus.Push(new Commands.Video.ProcessVideoCommand
 			{
-				VideoId = video.VideoId
+				VideoId = video.VideoId,
+                InputFilePath = inputFilePath,
+                InputFileInfo = videoFileInfo
             });
 		}
 	}

@@ -20,7 +20,7 @@ namespace Streaming.Infrastructure.Services
 
         public Task<Stream> GetVideoAsync(Guid VideoId, int PartNumber)
         {
-            return Task.FromResult(File.OpenRead(pathStrategy.VideoProcessedFilePath(VideoId, PartNumber)) as Stream);
+            return Task.FromResult(File.OpenRead(pathStrategy.VideoSplittedFilePath(VideoId, PartNumber)) as Stream);
         }
 
         public string GetVideoUrl(Guid VideoId, int PartNumber)
@@ -32,7 +32,7 @@ namespace Streaming.Infrastructure.Services
         public async Task UploadAsync(Guid VideoId, int PartNumber, Stream Stream)
         {
             Directory.CreateDirectory(pathStrategy.VideoProcessedDirectoryPath(VideoId));
-            using (var writeStream = File.OpenWrite(pathStrategy.VideoProcessedFilePath(VideoId, PartNumber)))
+            using (var writeStream = File.OpenWrite(pathStrategy.VideoSplittedFilePath(VideoId, PartNumber)))
             {
                 await Stream.CopyToAsync(writeStream);
             }

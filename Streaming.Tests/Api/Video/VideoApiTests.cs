@@ -25,7 +25,7 @@ using System.Threading.Tasks;
 
 namespace Streaming.Tests
 {
-    public class VideoApiTests
+    class VideoApiTests
     {
         public ContainerBuilder GetBaseMockedContainerBuilder()
         {
@@ -63,8 +63,11 @@ namespace Streaming.Tests
             builder.Register(x => new SHA256MessageSignerService(x.Resolve<ISecretServerKey>()))
                 .As<IMessageSignerService>();
 
+            builder.RegisterType<VideoMappings>().SingleInstance();
+            builder.RegisterType<VideoQueries>().As<IVideoQueries>();
             builder.Register(x => new VideoQueries(new VideoMappings(
                 x.Resolve<IThumbnailService>()),
+                null,
                 x.Resolve<IVideoRepository>(),
                 x.Resolve<IDirectoriesSettings>(),
                 x.Resolve<IVideoBlobService>()))
@@ -85,7 +88,7 @@ namespace Streaming.Tests
 
         [SetUp]
         public void Setup()
-        {            
+        {
         }
 
         [Test]

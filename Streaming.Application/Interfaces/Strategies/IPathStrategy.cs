@@ -9,8 +9,9 @@ namespace Streaming.Application.Interfaces.Strategies
         string VideoProcessedDirectoryPath(Guid VideoId);
         string VideoThumbnailsDirectoryPath(Guid VideoId);
 
-        string VideoProcessedFilePath(Guid VideoId, int PartNumber);
+        string VideoSplittedFilePath(Guid VideoId, int PartNumber);
         string VideoProcessingFilePath(Guid VideoId);
+        string VideoConvertedToMp4FilePath(Guid VideoId);
         string VideoOverviewThumbnailPath(Guid VideoId);
     }
 }

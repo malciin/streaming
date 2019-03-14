@@ -8,6 +8,7 @@ namespace Streaming.Application.Query
 {
     public interface IVideoQueries
     {
+        IEnumerable<(string Extension, string Codec)> SupportedVideoTypes();
         Task<VideoMetadataDTO> GetBasicVideoMetadataAsync(Guid VideoId);
 		Task<IEnumerable<VideoMetadataDTO>> SearchAsync(VideoSearchDTO Search);
 		Task<string> GetVideoManifestAsync(Guid VideoId);

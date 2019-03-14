@@ -12,6 +12,7 @@ namespace Streaming.Infrastructure.IoC
 
             builder.RegisterType<FFmpegProcessVideoService>()
                    .As<IProcessVideoService>()
+                   .As<IVideoFileInfoService>()
                    .SingleInstance();
 
             builder.RegisterType<LocalStorageVideoBlobService>()

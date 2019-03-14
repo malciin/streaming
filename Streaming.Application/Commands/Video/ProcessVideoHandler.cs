@@ -19,6 +19,7 @@ namespace Streaming.Application.Commands.Video
 		private readonly IVideoRepository videoRepo;
 		private readonly IVideoBlobService videoBlobService;
         private readonly IProcessVideoService processVideoService;
+        private readonly IVideoFileInfoService videoFileInfo;
         private readonly IThumbnailService thumbnailService;
         private readonly IPathStrategy pathStrategy;
         private readonly IFileNameStrategy fileNameStrategy;
@@ -36,6 +37,7 @@ namespace Streaming.Application.Commands.Video
             IVideoRepository videoRepo,
 			IVideoBlobService videoBlobService,
             IProcessVideoService processVideoService,
+            IVideoFileInfoService videoFileInfo,
             IThumbnailService thumbnailService,
             IPathStrategy pathStrategy,
             IFileNameStrategy fileNameStrategy)
@@ -46,12 +48,14 @@ namespace Streaming.Application.Commands.Video
             this.thumbnailService = thumbnailService;
             this.pathStrategy = pathStrategy;
             this.fileNameStrategy = fileNameStrategy;
+            this.videoFileInfo = videoFileInfo;
         }
 
         private void setupProcessingEnvironment(ProcessVideoCommand command)
         {
             processingDirectory = Directory.CreateDirectory(pathStrategy.VideoProcessingDirectoryPath(command.VideoId));
             thumbnailsDirectory = Directory.CreateDirectory(pathStrategy.VideoThumbnailsDirectoryPath(command.VideoId));
+            Directory.CreateDirectory(pathStrategy.VideoProcessedDirectoryPath(command.VideoId));
         }
 
         private async Task<VideoManifest> createManifest(Guid videoId)
@@ -61,7 +65,7 @@ namespace Streaming.Application.Commands.Video
 
             foreach(var file in splittedFiles)
             {
-                var length = await processVideoService.GetVideoLengthAsync(file.FullName);
+                var length = await videoFileInfo.GetVideoLengthAsync(file.FullName);
                 manifest.AddPart(videoId, length);
             }
             videoState |= VideoState.ManifestGenerated;
@@ -105,11 +109,14 @@ namespace Streaming.Application.Commands.Video
 
             setupProcessingEnvironment(Command);
 
-            var videoPath = pathStrategy.VideoProcessingFilePath(Command.VideoId);
-            var videoLength = await processVideoService.GetVideoLengthAsync(videoPath);
-            await processVideoService.ProcessVideoAsync(videoPath, processingDirectory.FullName);
+            var mp4VideoPath = pathStrategy.VideoConvertedToMp4FilePath(Command.VideoId);
+            await processVideoService.ConvertVideoToMp4(Command.InputFilePath, mp4VideoPath);
+            var videoLength = await videoFileInfo.GetVideoLengthAsync(mp4VideoPath);
+            await processVideoService.SplitMp4FileIntoTSFiles(mp4VideoPath, processingDirectory.FullName);
+
             var manifest = await createManifest(Command.VideoId);
-            await getThumbnails(Command.VideoId, videoPath, videoLength);
+
+            await getThumbnails(Command.VideoId, mp4VideoPath, videoLength);
             await uploadVideoParts(Command.VideoId);
             await uploadVideoThumbnails(Command.VideoId);
 

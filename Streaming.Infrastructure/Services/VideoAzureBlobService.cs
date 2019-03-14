@@ -19,17 +19,17 @@ namespace Streaming.Infrastructure.Services
 
 		public async Task<Stream> GetVideoAsync(Guid VideoId, int PartNumber)
 		{
-			return await blobClient.GetFileAsync(blobContainerName, fileNameStrategy.GetProcessedVideoFileName(VideoId, PartNumber));
+			return await blobClient.GetFileAsync(blobContainerName, fileNameStrategy.GetSplittedVideoFileName(VideoId, PartNumber));
 		}
 
         public string GetVideoUrl(Guid VideoId, int PartNumber)
         {
-            return blobClient.GetFileLinkSecuredSAS(blobContainerName, fileNameStrategy.GetProcessedVideoFileName(VideoId, PartNumber));
+            return blobClient.GetFileLinkSecuredSAS(blobContainerName, fileNameStrategy.GetSplittedVideoFileName(VideoId, PartNumber));
         }
 
         public async Task UploadAsync(Guid VideoId, int PartNumber, Stream Stream)
 		{
-			await blobClient.UploadFileAsync(blobContainerName, fileNameStrategy.GetProcessedVideoFileName(VideoId, PartNumber), Stream);
+			await blobClient.UploadFileAsync(blobContainerName, fileNameStrategy.GetSplittedVideoFileName(VideoId, PartNumber), Stream);
 		}
 	}
 }

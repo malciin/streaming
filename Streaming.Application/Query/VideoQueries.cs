@@ -21,9 +21,11 @@ namespace Streaming.Application.Query
         private readonly IVideoRepository videoRepo;
 		private readonly IDirectoriesSettings directoriesSettings;
 		private readonly IVideoBlobService videoBlobService;
+        private readonly IProcessVideoService processVideoService;
 
-        public VideoQueries(VideoMappings mapper, 
-			IVideoRepository videoRepo,
+        public VideoQueries(VideoMappings mapper,
+            IProcessVideoService processVideoService,
+            IVideoRepository videoRepo,
 			IDirectoriesSettings directoriesSettings,
             IVideoBlobService videoBlobService)
         {
@@ -31,6 +33,7 @@ namespace Streaming.Application.Query
             this.videoRepo = videoRepo;
 			this.directoriesSettings = directoriesSettings;
 			this.videoBlobService = videoBlobService;
+            this.processVideoService = processVideoService;
         }
 
         public async Task<VideoMetadataDTO> GetBasicVideoMetadataAsync(Guid VideoId)
@@ -65,5 +68,8 @@ namespace Streaming.Application.Query
 			return (await videoRepo.SearchAsync(Search))
 				.Select(x => mapper.MapVideoMetadataDTO(x));
 		}
-	}
+
+        public IEnumerable<(string Extension, string Codec)> SupportedVideoTypes()
+            => processVideoService.SupportedVideoTypes();
+    }
 }
