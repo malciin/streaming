@@ -16,8 +16,8 @@ namespace Streaming.Application.DTO.Video
             public int BitrateKbs { get; set; }
         }
 
-        public VideoDetailsDTO Video { get; private set; }
-        public AudioDetailsDTO Audio { get; private set; }
+        public VideoDetailsDTO Video { get; set; }
+        public AudioDetailsDTO Audio { get; set; }
 
         public TimeSpan Duration { get; set; }
 

@@ -1,37 +1,284 @@
 ﻿using Autofac;
 using NUnit.Framework;
+using Streaming.Application.DTO.Video;
 using Streaming.Application.Exceptions;
 using Streaming.Application.Interfaces.Services;
 using Streaming.Infrastructure.IoC.Extensions;
+using System;
 using System.IO;
+using System.Linq;
 
 namespace Streaming.Tests.Services.VideoFileInfoService
 {
     class VideoFileInfoService
     {
-        private IComponentContext componentContext;
+        private DirectoryInfo videoSamplesPath;
+        private IVideoFileInfoService videoFileInfoService;
 
         [SetUp]
         public void Setup()
         {
             var container = new ContainerBuilder();
             container.UseDefaultModules();
-            componentContext = container.Build();
+            var componentContext = container.Build();
+            videoFileInfoService = componentContext.Resolve<IVideoFileInfoService>();
+            videoSamplesPath = new DirectoryInfo("_Data/VideoSamples");
         }
 
         [Test]
-        public void File_Not_Found_Exception_Should_Be_Thrown_When_File_Not_Exists()
-        {
-            var videoFileInfo = componentContext.Resolve<IVideoFileInfoService>();
-            Assert.ThrowsAsync<FileNotFoundException>(() => videoFileInfo.GetDetailsAsync("Unexisting/Path"));
-            Assert.ThrowsAsync<FileNotFoundException>(() => videoFileInfo.GetVideoLengthAsync("Unexisting/Path"));
+        public void File_Not_Found_Exception_Should_Be_Thrown_When_File_Not_Exists() { 
+            Assert.ThrowsAsync<FileNotFoundException>(() => videoFileInfoService.GetDetailsAsync("Unexisting/Path"));
+            Assert.ThrowsAsync<FileNotFoundException>(() => videoFileInfoService.GetVideoLengthAsync("Unexisting/Path"));
         }
 
         [Test]
         public void Not_Video_File_Exception_Should_Be_Thrown_When_File_Is_Not_Video()
         {
-            var videoFileInfo = componentContext.Resolve<IVideoFileInfoService>();
-            Assert.ThrowsAsync<NotVideoFileException>(() => videoFileInfo.GetDetailsAsync("_Data/VideoSamples/Not_Video_File.dat"));
+            Assert.ThrowsAsync<NotVideoFileException>(() => videoFileInfoService.GetDetailsAsync("_Data/VideoSamples/Not_Video_File.dat"));
         }
+
+        private string getFilePath(string extension) =>
+            videoSamplesPath.GetFiles().Where(x => String.Equals(extension, x.Extension, StringComparison.InvariantCultureIgnoreCase))
+            .First().FullName;
+            
+        private readonly int maxMsVideoDurationError = 250;
+
+        private void testVideoFormatInfo(string sampleExtension, VideoFileDetailsDTO expected)
+        {
+            var result = videoFileInfoService.GetDetailsAsync(getFilePath(sampleExtension)).GetAwaiter().GetResult();
+            var durationFromSpecifiedMethod = videoFileInfoService.GetVideoLengthAsync(getFilePath(sampleExtension)).GetAwaiter().GetResult();
+
+            Assert.True(Math.Abs(durationFromSpecifiedMethod.Subtract(expected.Duration).TotalMilliseconds) <= maxMsVideoDurationError, 
+                $"Wrong duration from duration only method! Expected {expected.Duration.TotalMilliseconds}ms but gets {durationFromSpecifiedMethod.TotalMilliseconds}ms " +
+                $"with max allowed duration error of {maxMsVideoDurationError}ms");
+            Assert.True(Math.Abs(result.Duration.Subtract(expected.Duration).TotalMilliseconds) <= maxMsVideoDurationError, 
+                $"Wrong duration! Expected {expected.Duration.TotalMilliseconds}ms but gets {result.Duration.TotalMilliseconds}ms " + 
+                $"with max allowed duration error of {maxMsVideoDurationError}ms");
+            Assert.AreEqual(expected.Video.Resolution, result.Video.Resolution,
+                $"Wrong resolution! Expected {expected.Video.Resolution.xResolution}x{expected.Video.Resolution.yResolution}" +
+                $" but gets {result.Video.Resolution.xResolution}x{result.Video.Resolution.yResolution}"); 
+            Assert.AreEqual(expected.Video.Codec, result.Video.Codec, $"Wrong codec! Expected {expected.Video.Codec} but gets {result.Video.Codec}");
+        }
+
+        [Test]
+        public void Valid_Video_Info_For_3gp_Format() =>
+            testVideoFormatInfo(".3gp", new VideoFileDetailsDTO
+            {
+                Video = new VideoFileDetailsDTO.VideoDetailsDTO
+                {
+                    Resolution = (352, 288),
+                    BitrateKbs = 493,
+                    Codec = "h263"
+                },
+                Audio = new VideoFileDetailsDTO.AudioDetailsDTO
+                {
+                    Codec = "h263"
+                },
+                Duration = TimeSpan.FromMilliseconds(5_570)
+            });
+
+        [Test]
+        public void Valid_Video_Info_For_Avi_Format() =>
+            testVideoFormatInfo(".avi", new VideoFileDetailsDTO
+            {
+                Video = new VideoFileDetailsDTO.VideoDetailsDTO
+                {
+                    Resolution = (320, 240),
+                    BitrateKbs = 540,
+                    Codec = "mpeg4"
+                },
+                Audio = new VideoFileDetailsDTO.AudioDetailsDTO
+                {
+                    Codec = "mp3"
+                },
+                Duration = TimeSpan.FromMilliseconds(5_700)
+            });
+
+        [Test]
+        public void Valid_Video_Info_For_Flv_Format() =>
+            testVideoFormatInfo(".flv", new VideoFileDetailsDTO
+            {
+                Video = new VideoFileDetailsDTO.VideoDetailsDTO
+                {
+                    Resolution = (320, 240),
+                    BitrateKbs = 436,
+                    Codec = "flv1"
+                },
+                Audio = new VideoFileDetailsDTO.AudioDetailsDTO
+                {
+                    Codec = "mp3"
+                },
+                Duration = TimeSpan.FromMilliseconds(5_700)
+            });
+
+        [Test]
+        public void Valid_Video_Info_For_M4v_Format() =>
+            testVideoFormatInfo(".m4v", new VideoFileDetailsDTO
+            {
+                Video = new VideoFileDetailsDTO.VideoDetailsDTO
+                {
+                    Resolution = (560, 320),
+                    BitrateKbs = 256,
+                    Codec = "h264"
+                },
+                Audio = new VideoFileDetailsDTO.AudioDetailsDTO
+                {
+                    Codec = "aac"
+                },
+                Duration = TimeSpan.FromMilliseconds(5_700)
+            });
+
+        [Test]
+        public void Valid_Video_Info_For_Mkv_Format() =>
+            testVideoFormatInfo(".mkv", new VideoFileDetailsDTO
+            {
+                Video = new VideoFileDetailsDTO.VideoDetailsDTO
+                {
+                    Resolution = (560, 320),
+                    BitrateKbs = 598,
+                    Codec = "h264"
+                },
+                Audio = new VideoFileDetailsDTO.AudioDetailsDTO
+                {
+                    Codec = "aac"
+                },
+                Duration = TimeSpan.FromMilliseconds(5_700)
+            });
+
+        [Test]
+        public void Test_Mov_Format() =>
+            testVideoFormatInfo(".mov", new VideoFileDetailsDTO
+            {
+                Video = new VideoFileDetailsDTO.VideoDetailsDTO
+                {
+                    Resolution = (560, 320),
+                    BitrateKbs = 674,
+                    Codec = "mpeg4"
+                },
+                Audio = new VideoFileDetailsDTO.AudioDetailsDTO
+                {
+                    Codec = "aac"
+                },
+                Duration = TimeSpan.FromMilliseconds(5_700)
+            });
+
+        [Test]
+        public void Valid_Video_Info_For_Mp4_Format() =>
+            testVideoFormatInfo(".mp4", new VideoFileDetailsDTO
+            {
+                Video = new VideoFileDetailsDTO.VideoDetailsDTO
+                {
+                    Resolution = (560, 320),
+                    BitrateKbs = 551,
+                    Codec = "h264"
+                },
+                Audio = new VideoFileDetailsDTO.AudioDetailsDTO
+                {
+                    Codec = "aac"
+                },
+                Duration = TimeSpan.FromMilliseconds(5_700)
+            });
+
+        [Test]
+        public void Valid_Video_Info_For_Mpeg_Format() =>
+            testVideoFormatInfo(".mpeg", new VideoFileDetailsDTO
+            {
+                Video = new VideoFileDetailsDTO.VideoDetailsDTO
+                {
+                    Resolution = (560, 320),
+                    BitrateKbs = 939,
+                    Codec = "mpeg2video"
+                },
+                Audio = new VideoFileDetailsDTO.AudioDetailsDTO
+                {
+                    Codec = "mp2"
+                },
+                Duration = TimeSpan.FromMilliseconds(5_700)
+            });
+
+        [Test]
+        public void Valid_Video_Info_For_Mpg_Format() =>
+            testVideoFormatInfo(".mpg", new VideoFileDetailsDTO
+            {
+                Video = new VideoFileDetailsDTO.VideoDetailsDTO
+                {
+                    Resolution = (352, 240),
+                    BitrateKbs = 970,
+                    Codec = "mpeg1video"
+                },
+                Audio = new VideoFileDetailsDTO.AudioDetailsDTO
+                {
+                    Codec = "mp2"
+                },
+                Duration = TimeSpan.FromMilliseconds(5_700)
+            });
+
+        [Test]
+        public void Valid_Video_Info_For_Rmvb_Format() =>
+            testVideoFormatInfo(".rmvb", new VideoFileDetailsDTO
+            {
+                Video = new VideoFileDetailsDTO.VideoDetailsDTO
+                {
+                    Resolution = (360, 480),
+                    BitrateKbs = 871,
+                    Codec = "rv40"
+                },
+                Audio = new VideoFileDetailsDTO.AudioDetailsDTO
+                {
+                    Codec = "cook"
+                },
+                Duration = TimeSpan.FromMilliseconds(11_150)
+            });
+
+        [Test]
+        public void Valid_Video_Info_For_Vob_Format() =>
+            testVideoFormatInfo(".vob", new VideoFileDetailsDTO
+            {
+                Video = new VideoFileDetailsDTO.VideoDetailsDTO
+                {
+                    Resolution = (560, 320),
+                    BitrateKbs = 884,
+                    Codec = "mpeg2video"
+                },
+                Audio = new VideoFileDetailsDTO.AudioDetailsDTO
+                {
+                    Codec = "mp2"
+                },
+                Duration = TimeSpan.FromMilliseconds(5_700)
+            });
+
+        [Test]
+        public void Valid_Video_Info_For_Webm_Format() =>
+            testVideoFormatInfo(".webm", new VideoFileDetailsDTO
+            {
+                Video = new VideoFileDetailsDTO.VideoDetailsDTO
+                {
+                    Resolution = (640, 360),
+                    BitrateKbs = 256,
+                    Codec = "vp8"
+                },
+                Audio = new VideoFileDetailsDTO.AudioDetailsDTO
+                {
+                    Codec = "vorbis"
+                },
+                Duration = TimeSpan.FromMilliseconds(10_500)
+            });
+
+        [Test]
+        public void Valid_Video_Info_For_Wmv_Format() =>
+            testVideoFormatInfo(".wmv", new VideoFileDetailsDTO
+            {
+                Video = new VideoFileDetailsDTO.VideoDetailsDTO
+                {
+                    Resolution = (320, 240),
+                    BitrateKbs = 793,
+                    Codec = "wmv2"
+                },
+                Audio = new VideoFileDetailsDTO.AudioDetailsDTO
+                {
+                    Codec = "wmav2"
+                },
+                Duration = TimeSpan.FromMilliseconds(5_700)
+            });
     }
 }

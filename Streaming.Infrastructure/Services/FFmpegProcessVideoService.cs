@@ -64,7 +64,7 @@ namespace Streaming.Infrastructure.Services
             videoDetails.Duration = TimeSpan.ParseExact(duration, @"hh\:mm\:ss\.ff", CultureInfo.InvariantCulture);
             videoDetails.Video.BitrateKbs = int.Parse(durationAndBitrateRegex.Groups["bitrate"].Value);
 
-            var videoTypeRegex = Regex.Match(output, @"Stream #\d:\d+.*Video\: (?<codec>[^ ]+).* (?<xResolution>\d+)x(?<yResolution>\d+)");
+            var videoTypeRegex = Regex.Match(output, @"Stream #\d:\d+.*Video\: (?<codec>[^ ,]+).* (?<xResolution>\d+)x(?<yResolution>\d+)");
             videoDetails.Video.Codec = videoTypeRegex.Groups["codec"].Value;
             videoDetails.Video.Resolution = (int.Parse(videoTypeRegex.Groups["xResolution"].Value), int.Parse(videoTypeRegex.Groups["yResolution"].Value));
 

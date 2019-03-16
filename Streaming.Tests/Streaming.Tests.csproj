@@ -59,9 +59,6 @@
     <None Update="_Data\VideoSamples\sample.rmvb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="_Data\VideoSamples\sample.swf">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Update="_Data\VideoSamples\sample.vob">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
