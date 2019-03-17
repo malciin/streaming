@@ -64,11 +64,11 @@ export default class ApiService {
         return jsonData.token;
     }
 
-    async uploadVideo(data) {
+    async uploadVideo(data, progressFunc) {
         await this.waitForAuth();
         var token = await this.getUploadToken();
-
-        var sendPartXmlRequest = function (idToken, uploadToken, bytes, md5Hash) {
+        var sendPartXmlRequest = function (idToken, uploadToken, bytes, md5Hash,
+            soFarTransferedBytes, bytesToTransfer) {
             return new Promise((resolve, reject) => {
                 var formData = new FormData();
                 formData.append("UploadToken", uploadToken);
@@ -85,28 +85,33 @@ export default class ApiService {
                         }
                     }
                 };
+                xhr.onprogress = function(progress) {
+                    progressFunc((soFarTransferedBytes + progress.loaded) / bytesToTransfer * 100)
+                }
                 xhr.open("POST", `${Config.apiPath}/Video/UploadPart`, true);
                 xhr.setRequestHeader('Authorization', `Bearer ${idToken}`);
                 xhr.send(formData);
             });
-        }
+        };
 
-        var sendPart = async function (uploadToken, partBytes) {
+        var sendPart = async function (uploadToken, partBytes,
+            soFarTransferedBytes, bytesToTransfer) {
             var partBytesArray = await AsyncFunctions.blob.readAsArrayBuffer(partBytes);
             var wordArray = crypto.lib.WordArray.create(partBytesArray);
             var md5Hash = crypto.MD5(wordArray).toString(crypto.enc.Base64);
 
             await sendPartXmlRequest(this.authContext.idToken, 
-                uploadToken, partBytes, md5Hash);
+                uploadToken, partBytes, md5Hash, soFarTransferedBytes, bytesToTransfer);
         }.bind(this);
 
-        var singlePartLength = 4000000;
+        var singlePartLength = 1000000;
         for(var i = 0; i<data.video.size; i += singlePartLength) {
             var startByte = i;
             var endByte = startByte + singlePartLength;
             if (endByte > data.video.size)
                 endByte = data.video.size;
-            await sendPart(token, data.video.slice(startByte, endByte));
+            await sendPart(token, data.video.slice(startByte, endByte), startByte, data.video.size);
+            progressFunc(endByte / data.video.size * 100);
         }
 
         return await fetch(`${Config.apiPath}/Video`, {

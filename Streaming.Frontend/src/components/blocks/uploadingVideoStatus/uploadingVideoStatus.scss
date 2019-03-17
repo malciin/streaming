@@ -1,0 +1,49 @@
+@import '../../../shared/global.scss';
+
+.status-box {
+    background-color: darken($background-color, 5px);
+    
+    .main-upload-info {
+        position: relative;
+        z-index: 0;
+        padding: 10px;
+    }
+    .progress {
+        height: 100%;
+        position: absolute;
+        width: 100%;
+        background-color: darken( #06fa12, 30%);
+        top: 0;
+        left: 0;
+        z-index: -1;
+    }
+
+    .upload-realtime-info {
+        padding: 10px;
+        font-family: 'Inconsolata', monospace;
+    }
+
+    .buffer {
+        height: 300px;
+        overflow-y: auto;
+        font-size: 14px;
+        color: darken($text-color, 10%);
+    }
+
+    .status-box-content {
+        z-index: 1;
+    }
+
+    .icon {
+        margin-right: 5px;
+    }
+}
+
+.text-dark-accent {
+    color: darken($text-color, 30%);
+    font-size: 13px;
+}
+
+.consolata-font {
+    font-family: 'Inconsolata', monospace;
+}

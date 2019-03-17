@@ -44,9 +44,6 @@ class FileUploadCard extends React.Component {
                 </div>
                 <div onClick={this.deleteFile} className="icon icon-clickable"><span className="icon-trash"></span></div>       
             </div>
-            <div className="progress">
-                <div className="progress-bar" role="progressbar" style={{width: '0%'}} aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
-            </div>
             </div>
             
         );
