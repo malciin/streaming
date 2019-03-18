@@ -3,7 +3,7 @@ import Navbar from '../../components/navbar/Navbar';
 import { AppContext } from '../../AppContext';
 import UploadVideoForm from '../../components/forms/uploadVideoForm/uploadVideoForm';
 import UploadingVideoStatus from '../../components/blocks/uploadingVideoStatus/uploadingVideoStatus';
-
+import Console from '../../components/blocks/console/console';
 class UploadVideoPage extends React.Component{
     constructor(props) {
         super(props);
@@ -46,10 +46,21 @@ class UploadVideoPage extends React.Component{
 
     render() {
         return (
-            <div className="uploadVideoPage">
+            <div>
                 <Navbar />
+                <div className="container">
                 { !this.state.uploading && <UploadVideoForm submit={this.uploadVideo}/> }
-                { this.state.uploading && <UploadingVideoStatus video={this.videoInfo} progress={this.state.progress} output={this.state.output} /> }
+                { this.state.uploading && 
+                <UploadingVideoStatus video={this.videoInfo} progress={this.state.progress} output={this.state.output} /> }
+                { this.state.uploading &&    
+                    <Console settings = {{
+                        barEnabled: true,
+                        inputEnabled: false
+                    }} model= {{
+                        title: "Progress",
+                        commands: this.state.output
+                    }}/> }
+                </div>
             </div>
         );
     }

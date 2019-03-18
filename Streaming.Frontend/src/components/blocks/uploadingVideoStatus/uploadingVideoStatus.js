@@ -2,24 +2,6 @@ import React from 'react';
 import './uploadingVideoStatus.scss';
 
 export default class UploadingVideoStatus extends React.Component {
-    // componentDidMount() {
-    //     document.addEventListener('keydown', this.preventBackspaceFromNavigatingBack);
-    // }
-
-    // componentWillUnmount() {
-    //     document.removeEventListener('keydown', this.preventBackspaceFromNavigatingBack);
-    // }
-
-    // preventBackspaceFromNavigatingBack(e) {
-    //     if (e.which === 8) {
-    //         e.preventDefault();
-    //     }
-
-    //     var consoleInput = document.getElementById('console-input');
-    //     if (document.activeElement.className == 'console-input') {
-    //         consoleInput.innerText += e.key;
-    //     }
-    // }
 
     printFriendlyBytes(size) {
         size = size/1024/1024;        
@@ -27,8 +9,7 @@ export default class UploadingVideoStatus extends React.Component {
     }
 
     render() {
-        return <div className="container">
-            <div className="status-box">
+        return <div className="status-box">
                 <div className="status-box-content">
                     <div className="flex-box main-upload-info">
                         <div className="progress" style= {{ width: `${this.props.progress}%`}}></div>
@@ -48,17 +29,7 @@ export default class UploadingVideoStatus extends React.Component {
                             </div>
                         </div>
                     </div>
-                    <div className="upload-realtime-info">
-                        Process information:
-                        <div className="buffer">
-                        { this.props.output.map((command, index) => <div key={index}>{command}</div>) }
-                        </div>
-                        {/* <div tabIndex="0" className="console-input">
-                            ~ <span id="console-input"></span>_
-                        </div> */}
-                    </div>
                 </div>
             </div>
-        </div>
     }
 }

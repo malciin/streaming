@@ -1,7 +1,7 @@
 @import '../../../shared/global.scss';
 
 .status-box {
-    background-color: darken($background-color, 5px);
+    background-color: darken($background-color, 5%);
     
     .main-upload-info {
         position: relative;
@@ -16,18 +16,6 @@
         top: 0;
         left: 0;
         z-index: -1;
-    }
-
-    .upload-realtime-info {
-        padding: 10px;
-        font-family: 'Inconsolata', monospace;
-    }
-
-    .buffer {
-        height: 300px;
-        overflow-y: auto;
-        font-size: 14px;
-        color: darken($text-color, 10%);
     }
 
     .status-box-content {

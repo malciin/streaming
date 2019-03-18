@@ -17,6 +17,7 @@
   },
   "Auth0_ManagementApi": {
     "Audience": "https://id0.eu.auth0.com/api/v2/",
-    "ClientId": "o0manqM8zThK5OQV7HUXKKIgitvhwx1r"
+    "ClientId": "o0manqM8zThK5OQV7HUXKKIgitvhwx1r",
+    "ClientSecret":  "Type your super secret auth0 client secret"
   }
 }
