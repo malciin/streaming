@@ -33,11 +33,15 @@ class UploadVideoPage extends React.Component{
         this.setState({
             uploading: true
         });
-        await this.context.streamingApi.uploadVideo(data, progress => this.setState({
-            progress: progress
-        }));
-        this.consoleOutput("Video successfully uploaded...");
-        this.consoleOutput("Video will start processing!");
+        try {
+            await this.context.streamingApi.uploadVideo(data, progress => this.setState({
+                progress: progress
+            }));
+            this.consoleOutput("Video successfully uploaded...");
+            this.consoleOutput("Video will start processing!");
+        } catch (exception) {
+            this.consoleOutput(`Exception: ${exception.message}`);
+        }
     }
 
     render() {

@@ -1,6 +1,6 @@
 import { Config } from "./shared/config";
 import { AsyncFunctions } from "./shared/AsyncFunctions";
-var crypto = require("crypto-js");
+var SparkMD5 = require('spark-md5');
 
 export default class ApiService {
     constructor(props) {
@@ -87,7 +87,6 @@ export default class ApiService {
                 };
                 xhr.upload.addEventListener('progress', (info) => 
                     progressFunc((soFarTransferedBytes + info.loaded) / bytesToTransfer * 100));
-
                 xhr.open("POST", `${Config.apiPath}/Video/UploadPart`, true);
                 xhr.setRequestHeader('Authorization', `Bearer ${idToken}`);
                 xhr.send(formData);
@@ -96,9 +95,10 @@ export default class ApiService {
 
         var sendPart = async function (uploadToken, partBytes,
             soFarTransferedBytes, bytesToTransfer) {
-            var partBytesArray = await AsyncFunctions.blob.readAsArrayBuffer(partBytes);
-            var wordArray = crypto.lib.WordArray.create(partBytesArray);
-            var md5Hash = crypto.MD5(wordArray).toString(crypto.enc.Base64);
+            var partBinaryString = await AsyncFunctions.blob.readAsBinaryString(partBytes);
+            var hasher = new SparkMD5(); 
+            hasher.appendBinary(partBinaryString);
+            var md5Hash = btoa(hasher.end(true));
 
             await sendPartXmlRequest(this.authContext.idToken, 
                 uploadToken, partBytes, md5Hash, soFarTransferedBytes, bytesToTransfer);

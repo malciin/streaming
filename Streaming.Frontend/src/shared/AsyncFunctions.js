@@ -26,6 +26,16 @@ export const AsyncFunctions = {
                     resolve(a.result);
                 }
             })
+        },
+
+        readAsBinaryString(blob) {
+            return new Promise((resolve) => {
+                var a = new FileReader();
+                a.readAsBinaryString(blob);
+                a.onloadend = function() {
+                    resolve(a.result);
+                }
+            })
         }
     }
 }
