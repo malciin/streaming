@@ -14,7 +14,13 @@ class UploadVideoPage extends React.Component{
             output: ["- - - Upload Video Shell 0.22 - - -"]
         };
 
-        this.uploadingVideoState = <UploadingVideoStatus />
+        this.consoleOutput = this.consoleOutput.bind(this);        
+    }
+
+    consoleOutput(line) {
+        this.setState({
+            output: [...this.state.output, line]
+        });
     }
 
     async uploadVideo(data) {
@@ -23,13 +29,15 @@ class UploadVideoPage extends React.Component{
             description: data.videoDescription,
             file: data.video
         }
+        this.consoleOutput("Video uploading...");
         this.setState({
             uploading: true
         });
         await this.context.streamingApi.uploadVideo(data, progress => this.setState({
             progress: progress
         }));
-        
+        this.consoleOutput("Video successfully uploaded...");
+        this.consoleOutput("Video will start processing!");
     }
 
     render() {

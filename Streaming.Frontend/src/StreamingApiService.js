@@ -78,16 +78,16 @@ export default class ApiService {
                 var xhr = new XMLHttpRequest();
                 xhr.onload = function (e) {
                     if (xhr.readyState === 4) {
-                        if (xhr.status === 200) {
-                            resolve(xhr.responseText);
+                        if (xhr.status === 204) {
+                            resolve(xhr.status);
                         } else {
-                            reject(xhr.statusText);
+                            reject(xhr.status);
                         }
                     }
                 };
-                xhr.onprogress = function(progress) {
-                    progressFunc((soFarTransferedBytes + progress.loaded) / bytesToTransfer * 100)
-                }
+                xhr.upload.addEventListener('progress', (info) => 
+                    progressFunc((soFarTransferedBytes + info.loaded) / bytesToTransfer * 100));
+
                 xhr.open("POST", `${Config.apiPath}/Video/UploadPart`, true);
                 xhr.setRequestHeader('Authorization', `Bearer ${idToken}`);
                 xhr.send(formData);
@@ -104,7 +104,7 @@ export default class ApiService {
                 uploadToken, partBytes, md5Hash, soFarTransferedBytes, bytesToTransfer);
         }.bind(this);
 
-        var singlePartLength = 1000000;
+        var singlePartLength = 5000000;
         for(var i = 0; i<data.video.size; i += singlePartLength) {
             var startByte = i;
             var endByte = startByte + singlePartLength;

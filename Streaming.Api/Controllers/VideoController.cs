@@ -37,7 +37,7 @@ namespace Streaming.Api.Controllers
                 Description = uploadVideo.Description,
                 User = HttpContext.User
             });
-            return Ok();
+            return NoContent();
         }
 
         [HttpGet("UploadToken")]
@@ -62,7 +62,7 @@ namespace Streaming.Api.Controllers
                 UploadToken = videoPart.UploadToken,
                 PartBytes = videoPart.PartBytes
             });
-            return Ok();
+            return NoContent();
         }
 
         [HttpGet("{Id}")]
@@ -98,7 +98,7 @@ namespace Streaming.Api.Controllers
             {
                 VideoId = Id
             });
-            return Ok();
+            return NoContent();
         }
 
         [HttpPut]
@@ -112,7 +112,7 @@ namespace Streaming.Api.Controllers
                 NewDescription = update.Description,
                 User = User
             });
-            return Ok();
+            return NoContent();
         }
     }
 }
