@@ -5,22 +5,12 @@ var SparkMD5 = require('spark-md5');
 export default class ApiService {
     constructor(props) {
         this.authContext = props.auth;
-        this.waitForAuth = this.waitForAuth.bind(this);
         this.getJsonRequestHeaders = this.getJsonRequestHeaders.bind(this);
 
         this.getVideos = this.getVideos.bind(this);
         this.getVideo = this.getVideo.bind(this);
         this.uploadVideo = this.uploadVideo.bind(this);
         this.deleteVideo = this.deleteVideo.bind(this);
-    }
-
-    // TODO: Propably not the correct way for waiting to silent authentication
-    // Waiting for authentication
-    async waitForAuth() {
-        while (this.authContext.pendingSilentLogin)
-        {
-            await AsyncFunctions.timeout(10);
-        }
     }
 
     getJsonRequestHeaders() {
@@ -56,7 +46,7 @@ export default class ApiService {
     }
 
     async getUploadToken() {
-        await this.waitForAuth();
+        await this.authContext.waitForAuth();
         const resp = await fetch(`${Config.apiPath}/Video/UploadToken`, {
             headers: this.getJsonRequestHeaders()
         });
@@ -65,7 +55,7 @@ export default class ApiService {
     }
 
     async uploadVideo(data, progressFunc) {
-        await this.waitForAuth();
+        await this.authContext.waitForAuth();
         var token = await this.getUploadToken();
         var sendPartXmlRequest = function (idToken, uploadToken, bytes, md5Hash,
             soFarTransferedBytes, bytesToTransfer) {
@@ -126,7 +116,7 @@ export default class ApiService {
     }
 
     async deleteVideo(videoId) {
-        await this.waitForAuth();
+        await this.authContext.waitForAuth();
         return await fetch(`${Config.apiPath}/Video/${videoId}`, {
             method: 'DELETE',
             headers: this.getJsonRequestHeaders()

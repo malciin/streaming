@@ -19,6 +19,16 @@ export default class Auth {
         this.getUserInfo = this.getUserInfo.bind(this);
         this.isAuthenticated = this.isAuthenticated.bind(this);
         this.haveClaim = this.haveClaim.bind(this);
+        this.waitForAuth = this.waitForAuth.bind(this);
+    }
+
+    // TODO: Propably not the correct way for waiting to silent authentication
+    // Waiting for authentication
+    async waitForAuth() {
+        while (this.pendingSilentLogin)
+        {
+            await AsyncFunctions.timeout(10);
+        }
     }
     
     login() {
