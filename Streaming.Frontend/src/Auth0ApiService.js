@@ -10,6 +10,7 @@ export default class Auth0ApiService {
         this.waitForAuth = this.waitForAuth.bind(this);
 
         this.getUsers = this.getUsers.bind(this);
+        this.updateClaims = this.updateClaims.bind(this);
     }
 
     // TODO: Propably not the correct way for waiting to silent authentication
@@ -30,5 +31,22 @@ export default class Auth0ApiService {
                 'Authorization': `Bearer ${this.authContext.managementApiIdToken}`
             }});
         return await response.json();
+    }
+
+    async updateClaims(updateClaimsObject) {
+        await this.waitForAuth();
+        const response = await fetch(`${this.api}users/${updateClaimsObject.userId}`, {
+            method: 'PATCH',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${this.authContext.managementApiIdToken}`
+            },
+            body: JSON.stringify({
+                app_metadata: {
+                    claims: updateClaimsObject.requestedClaims
+                }
+            })
+        });
     }
 }

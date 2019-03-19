@@ -40,7 +40,7 @@ namespace Streaming.Tests
         }
 
         [Test]
-        public void Wrong_Message_Sign_Part_Should_Throw_()
+        public void Wrong_Message_Sign_Part_Should_Throw_MessageWrongSignatureException()
         {
             var messageSingerService = componentContext.Resolve<IMessageSignerService>();
             var msgToSign = new byte[]

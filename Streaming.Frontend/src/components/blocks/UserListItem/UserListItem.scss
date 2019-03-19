@@ -1,35 +1,86 @@
-.user-list-card-container {
-    display: flex;
+@import '../../../shared/global.scss';
 
-    .gravatar-container {
-        width: 50px;
-        img {
-            width: 100%;
+.user-list-card {
+
+    .main-user-info {
+        display: flex;
+        .gravatar {
+            width: 50px;
+            img {
+                width: 100%;
+            }
+            margin-right: 10px;
         }
-        margin-right: 10px;
+    
+        .user-metadata {
+        }
     }
-
-    .user-metadata {
-
-    }
+    
 
     .claims {
-        margin-left: 10px;
-
         .claim {
             background-color: red;
             padding: 5px;
             border-radius: 10px;
             margin-right: 5px;
             margin-left: 5px;
+            display: inline-block;
 
             .delete {
                 cursor: pointer;
             }
         }
 
-        .addClaim {
+        .add-claim-field {
+            width: 200px;
+            background-color: lighten($accent-color, 10%);
+        }
+
+        .add-claim-button {
+            text-align: center;
             cursor: pointer;
         }
+
+        .add-claim-input {
+            .add-claim-input-container {
+                display: flex;
+            }
+            
+            input {
+                width: 100%;
+                color: white;
+                border: 0px;
+                display: inline-block;
+                padding: 0;
+                margin: 0;
+                background-color: lighten($accent-color, 10%);
+            }
+
+            .add-claim {
+                cursor: pointer;
+            }
+        }
+
+        .add-claim-loader {
+            text-align: center;
+            background-image: repeating-linear-gradient(
+                -45deg,
+                lighten($accent-color, 10%),
+                lighten($accent-color, 10%) 11px,
+                lighten($accent-color, 30%) 10px,
+                lighten($accent-color, 30%) 20px /* determines size */
+            );
+            background-size: 28px 28px;
+            animation: background-loader-move 1.0s linear infinite;
+        }
+    }
+}
+
+@keyframes background-loader-move {
+    0% {
+        background-position: 0 0;
+    }
+    100% {
+        background-position: 28px 0;
     }
 }
