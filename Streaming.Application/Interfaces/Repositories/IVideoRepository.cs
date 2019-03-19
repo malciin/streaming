@@ -1,4 +1,4 @@
-﻿using Streaming.Application.DTO.Video;
+﻿using Streaming.Application.Models.DTO.Video;
 using Streaming.Application.Models.Repository.Video;
 using Streaming.Domain.Models;
 using System;

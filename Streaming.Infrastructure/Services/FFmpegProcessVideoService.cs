@@ -1,6 +1,6 @@
-﻿using Streaming.Application.DTO.Video;
-using Streaming.Application.Exceptions;
+﻿using Streaming.Application.Exceptions;
 using Streaming.Application.Interfaces.Services;
+using Streaming.Application.Models.DTO.Video;
 using Streaming.Common.Extensions;
 using System;
 using System.Collections.Generic;

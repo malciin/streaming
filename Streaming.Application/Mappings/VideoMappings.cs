@@ -1,5 +1,5 @@
-﻿using Streaming.Application.DTO.Video;
-using Streaming.Application.Interfaces.Services;
+﻿using Streaming.Application.Interfaces.Services;
+using Streaming.Application.Models.DTO.Video;
 using Streaming.Domain.Enums;
 using Streaming.Domain.Models;
 using System;

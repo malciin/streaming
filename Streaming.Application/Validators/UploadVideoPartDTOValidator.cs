@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using Streaming.Application.DTO.Video;
+using Streaming.Application.Models.DTO.Video;
 using Streaming.Common.Extensions;
 
 namespace Streaming.Application.Validators

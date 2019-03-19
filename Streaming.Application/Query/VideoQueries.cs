@@ -1,9 +1,9 @@
 ﻿using MongoDB.Driver;
-using Streaming.Application.DTO.Video;
 using Streaming.Application.Interfaces.Repositories;
 using Streaming.Application.Interfaces.Services;
 using Streaming.Application.Interfaces.Settings;
 using Streaming.Application.Mappings;
+using Streaming.Application.Models.DTO.Video;
 using Streaming.Common.Extensions;
 using Streaming.Domain.Models;
 using System;

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Streaming.Application.DTO.Video
+namespace Streaming.Application.Models.DTO.Video
 {
     public class UpdateVideoDTO
     {

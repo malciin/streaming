@@ -1,7 +1,7 @@
 ﻿using Streaming.Domain.Models;
 using System;
 
-namespace Streaming.Application.DTO.Video
+namespace Streaming.Application.Models.DTO.Video
 {
     public class VideoMetadataDTO
     {

@@ -7,9 +7,9 @@ using Streaming.Api.Attributes;
 using Streaming.Application.Commands;
 using Streaming.Application.Commands.Video;
 using Streaming.Application.DTO;
-using Streaming.Application.DTO.Video;
 using Streaming.Application.Interfaces.Services;
 using Streaming.Application.Models;
+using Streaming.Application.Models.DTO.Video;
 using Streaming.Application.Query;
 
 namespace Streaming.Api.Controllers

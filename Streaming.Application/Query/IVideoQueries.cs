@@ -1,4 +1,4 @@
-﻿using Streaming.Application.DTO.Video;
+﻿using Streaming.Application.Models.DTO.Video;
 using System;
 using System.Collections.Generic;
 using System.IO;

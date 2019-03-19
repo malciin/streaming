@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using MongoDB.Driver;
-using Streaming.Application.DTO.Video;
 using Streaming.Application.Interfaces.Repositories;
+using Streaming.Application.Models.DTO.Video;
 using Streaming.Application.Models.Repository.Video;
 using Streaming.Domain.Enums;
 using Streaming.Domain.Models;

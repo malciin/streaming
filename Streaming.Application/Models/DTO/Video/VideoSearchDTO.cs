@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Streaming.Application.DTO.Video
+namespace Streaming.Application.Models.DTO.Video
 {
     public class VideoSearchDTO
     {

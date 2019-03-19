@@ -1,4 +1,4 @@
-﻿namespace Streaming.Application.DTO.Video
+﻿namespace Streaming.Application.Models.DTO.Video
 {
     public class UploadVideoDTO
     {
