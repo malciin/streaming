@@ -10,6 +10,7 @@ import Callback from './pages/callback/Callback';
 import history from './History';
 import AdminPage from './pages/adminPage/AdminPage';
 import EditVideoPage from './pages/editVideoPage/EditVideoPage';
+import SignalRPage from './pages/signalRPage/signalRPage';
 
 class App extends Component {
 
@@ -27,6 +28,7 @@ class App extends Component {
           <Route exact path="/Vid/:id" component={VideoPage} />
           <Route exact path="/Edit/:id" component={EditVideoPage} />
           <Route exact path="/Admin" component={AdminPage} />
+          <Route exact path="/SignalR" component={SignalRPage} />
           <Route path="/sign-in" render={(props) => {
             this.context.auth.loginCallback(props);
             return <Callback />

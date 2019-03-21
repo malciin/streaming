@@ -1,10 +1,14 @@
 ﻿using System;
+using System.Linq;
+using System.Reflection;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Streaming.Api.Middlewares;
@@ -31,9 +35,9 @@ namespace Streaming.Api
         {
             services.AddCors(options =>
             {
-                options.AddPolicy("AllowAll", x =>
+                options.AddPolicy("AllowLocalhost", x =>
                 {
-                    x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+                    x.WithOrigins("http://localhost:3000").AllowAnyMethod().AllowAnyHeader().AllowCredentials();
                 });
             });
 
@@ -44,6 +48,8 @@ namespace Streaming.Api
                 x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             }).AddAuth0JwtToken(authenticationDomain: configuration["Jwt:Issuer"]);
+
+            services.AddSignalR();
 
             services.AddMvc().AddFluentValidation(x =>
             {
@@ -66,8 +72,28 @@ namespace Streaming.Api
                 app.UseMiddleware<ExceptionHandlingMiddleware>();
             }
 
-            app.UseCors("AllowAll");
+            app.UseCors("AllowLocalhost");
             app.UseAuthentication();
+            app.UseSignalR(config =>
+            {
+                var hubRoutes = Assembly.GetExecutingAssembly().GetTypes().Where(x => typeof(Microsoft.AspNetCore.SignalR.Hub).IsAssignableFrom(x))
+                    .Select(x => new {
+                        Hub = x,
+                        HubRoute = x.GetCustomAttribute<RouteAttribute>().Template
+                    });
+
+                foreach (var hubRoute in hubRoutes)
+                {
+                    var genericMethod = config.GetType().GetMethod("MapHub", new Type[] { typeof(PathString) });
+                    var genericMethodInvokable = genericMethod.MakeGenericMethod(hubRoute.Hub);
+                    var route = hubRoute.HubRoute;
+                    if (route[0] != '/')
+                        route = '/' + route;
+
+                    genericMethodInvokable.Invoke(config, new object[] {
+                        new PathString(route) });
+                }
+            });
             app.UseMvc();
         }
     }
