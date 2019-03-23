@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -35,7 +36,12 @@ namespace Streaming.Api.Controllers
                 UploadToken = uploadVideo.UploadToken,
                 Title = uploadVideo.Title,
                 Description = uploadVideo.Description,
-                User = HttpContext.User
+                User = new UserDetailsDTO
+                {
+                    UserId = User.FindFirst(ClaimTypes.NameIdentifier).Value,
+                    Email = User.FindFirst(ClaimTypes.Email).Value,
+                    Nickname = User.FindFirst(x => x.Type == "nickname")?.Value
+                }
             });
             return NoContent();
         }

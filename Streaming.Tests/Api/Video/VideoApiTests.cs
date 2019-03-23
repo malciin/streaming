@@ -148,7 +148,7 @@ namespace Streaming.Tests
             Assert.AreEqual("Title", videos[0].Title);
             Assert.AreEqual("Description", videos[0].Description);
             Assert.AreEqual((VideoState)0, videos[0].State);
-            Assert.AreEqual("testUser", videos[0].Owner.Identifier);
+            Assert.AreEqual("testUser", videos[0].Owner.UserId);
             Assert.AreEqual("testEmail@email.co", videos[0].Owner.Email);
 
             Assert.IsNull(videos[0].ProcessingInfo);

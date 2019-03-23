@@ -57,7 +57,7 @@ namespace Streaming.Infrastructure.MongoDb.Repositories
             if (!String.IsNullOrEmpty(updateVideoInfo.UpdateByUserIdentifier))
             {
                 filters.Add(Builders<Domain.Models.Video>.Filter
-                    .Eq(x => x.Owner.Identifier, updateVideoInfo.UpdateByUserIdentifier));
+                    .Eq(x => x.Owner.UserId, updateVideoInfo.UpdateByUserIdentifier));
             }
 
             var updateDefinition = Builders<Domain.Models.Video>.Update

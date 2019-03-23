@@ -1,6 +1,6 @@
-﻿namespace Streaming.Domain.Models
+﻿namespace Streaming.Application.Models.DTO.Video
 {
-    public class UserDetails
+    public class UserDetailsDTO
     {
         public string UserId { get; set; }
         public string Nickname { get; set; }

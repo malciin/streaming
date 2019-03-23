@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using Streaming.Application.Interfaces.Repositories;
 using Streaming.Application.Interfaces.Services;
@@ -9,7 +8,7 @@ using Streaming.Application.Interfaces.Strategies;
 
 namespace Streaming.Application.Commands.Video
 {
-	public class UploadVideoHandler : ICommandHandler<Commands.Video.UploadVideoCommand>
+	public class UploadVideoHandler : ICommandHandler<UploadVideoCommand>
 	{
 		private readonly ICommandBus commandBus;
         private readonly IMessageSignerService messageSigner;
@@ -41,7 +40,7 @@ namespace Streaming.Application.Commands.Video
             return new Guid(message);
         }
 
-        public async Task HandleAsync(Commands.Video.UploadVideoCommand Command)
+        public async Task HandleAsync(UploadVideoCommand Command)
 		{
             var videoId = getVideoIdFromUploadToken(Command.UploadToken);
             var inputFilePath = pathStrategy.VideoProcessingFilePath(videoId);
@@ -60,17 +59,17 @@ namespace Streaming.Application.Commands.Video
 				VideoId = videoId,
                 Owner = new Domain.Models.UserDetails
                 {
-                    Identifier = Command.User.FindFirst(ClaimTypes.NameIdentifier).Value,
-                    Email = Command.User.FindFirst(ClaimTypes.Email).Value,
-                    Nickname = Command.User.FindFirst(x => x.Type == "nickname")?.Value
+                    UserId = Command.User.UserId,
+                    Email = Command.User.Email,
+                    Nickname = Command.User.Nickname
                 }
 			};
 
 			await videoRepo.AddAsync(video);
             await videoRepo.CommitAsync();
 
-            commandBus.Push(new Commands.Video.ProcessVideoCommand
-			{
+            commandBus.Push(new ProcessVideoCommand
+            {
 				VideoId = video.VideoId,
                 InputFilePath = inputFilePath,
                 InputFileInfo = videoFileInfo

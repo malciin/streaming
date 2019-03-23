@@ -1,6 +1,7 @@
 ﻿using Streaming.Application.Interfaces.Repositories;
 using Streaming.Application.Interfaces.Services;
 using Streaming.Application.Interfaces.Strategies;
+using Streaming.Application.Models;
 using Streaming.Application.Models.Repository.Video;
 using Streaming.Domain.Enums;
 using Streaming.Domain.Models;
@@ -51,6 +52,40 @@ namespace Streaming.Application.Commands.Video
             this.videoFileInfo = videoFileInfo;
         }
 
+        public async Task HandleAsync(ProcessVideoCommand Command)
+        {
+            var timer = Stopwatch.StartNew();
+
+            setupProcessingEnvironment(Command);
+
+            var mp4VideoPath = pathStrategy.VideoConvertedToMp4FilePath(Command.VideoId);
+            await processVideoService.ConvertVideoToMp4(Command.InputFilePath, mp4VideoPath);
+            var videoLength = await videoFileInfo.GetVideoLengthAsync(mp4VideoPath);
+            await processVideoService.SplitMp4FileIntoTSFiles(mp4VideoPath, processingDirectory.FullName);
+
+            var manifest = await createManifest(Command.VideoId);
+
+            await getThumbnails(Command.VideoId, mp4VideoPath, videoLength);
+            await uploadVideoParts(Command.VideoId);
+            await uploadVideoThumbnails(Command.VideoId);
+
+            timer.Stop();
+
+            processingDirectory.Delete(recursive: true);
+            videoState |= VideoState.Processed;
+
+            await videoRepo.UpdateAsync(new UpdateVideoAfterProcessing
+            {
+                FinishedProcessingDate = DateTime.UtcNow,
+                ProcessingInfo = $"Sucessfully processed after {timer.Elapsed.TotalMilliseconds}ms",
+                VideoState = videoState,
+                VideoId = Command.VideoId,
+                VideoLength = videoLength,
+                VideoManifestHLS = manifest.ToString()
+            });
+            await videoRepo.CommitAsync();
+        }
+
         private void setupProcessingEnvironment(ProcessVideoCommand command)
         {
             processingDirectory = Directory.CreateDirectory(pathStrategy.VideoProcessingDirectoryPath(command.VideoId));
@@ -87,10 +122,10 @@ namespace Streaming.Application.Commands.Video
         private async Task getThumbnails(Guid videoId, string videoPath, TimeSpan videoLength)
         {
             await processVideoService.TakeVideoScreenshot(
-                videoPath, pathStrategy.VideoOverviewThumbnailPath(videoId), 
+                videoPath, pathStrategy.VideoOverviewThumbnailPath(videoId),
                 new TimeSpan(videoLength.Ticks / 2));
 
-            await processVideoService.GenerateVideoOverviewScreenshots(videoPath, 
+            await processVideoService.GenerateVideoOverviewScreenshots(videoPath,
                 thumbnailsDirectory.FullName, new TimeSpan(videoLength.Ticks / 30));
             videoState |= VideoState.MainThumbnailGenerated;
         }
@@ -102,39 +137,5 @@ namespace Streaming.Application.Commands.Video
                 await thumbnailService.UploadAsync(videoId, fileStream);
             }
         }
-
-        public async Task HandleAsync(ProcessVideoCommand Command)
-        {
-            var timer = Stopwatch.StartNew();
-
-            setupProcessingEnvironment(Command);
-
-            var mp4VideoPath = pathStrategy.VideoConvertedToMp4FilePath(Command.VideoId);
-            await processVideoService.ConvertVideoToMp4(Command.InputFilePath, mp4VideoPath);
-            var videoLength = await videoFileInfo.GetVideoLengthAsync(mp4VideoPath);
-            await processVideoService.SplitMp4FileIntoTSFiles(mp4VideoPath, processingDirectory.FullName);
-
-            var manifest = await createManifest(Command.VideoId);
-
-            await getThumbnails(Command.VideoId, mp4VideoPath, videoLength);
-            await uploadVideoParts(Command.VideoId);
-            await uploadVideoThumbnails(Command.VideoId);
-
-            timer.Stop();
-
-            processingDirectory.Delete(recursive: true);
-            videoState |= VideoState.Processed;
-
-            await videoRepo.UpdateAsync(new UpdateVideoAfterProcessing
-            {
-                FinishedProcessingDate = DateTime.UtcNow,
-                ProcessingInfo = $"Sucessfully processed after {timer.Elapsed.TotalMilliseconds}ms",
-                VideoState = videoState,
-                VideoId = Command.VideoId,
-                VideoLength = videoLength,
-                VideoManifestHLS = manifest.ToString()
-            });
-            await videoRepo.CommitAsync();
-        }        
     }
 }

@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+﻿using Streaming.Application.Models.DTO.Video;
 
 namespace Streaming.Application.Commands.Video
 {
@@ -7,6 +7,6 @@ namespace Streaming.Application.Commands.Video
         public string UploadToken { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
-        public ClaimsPrincipal User { get; set; }
+        public UserDetailsDTO User { get; set; }
     }
 }
