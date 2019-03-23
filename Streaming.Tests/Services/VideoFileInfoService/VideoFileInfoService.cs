@@ -1,8 +1,8 @@
 ﻿using Autofac;
 using NUnit.Framework;
-using Streaming.Application.DTO.Video;
 using Streaming.Application.Exceptions;
 using Streaming.Application.Interfaces.Services;
+using Streaming.Application.Models.DTO.Video;
 using Streaming.Infrastructure.IoC.Extensions;
 using System;
 using System.IO;

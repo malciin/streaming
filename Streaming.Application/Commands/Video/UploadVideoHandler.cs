@@ -72,7 +72,8 @@ namespace Streaming.Application.Commands.Video
             {
 				VideoId = video.VideoId,
                 InputFilePath = inputFilePath,
-                InputFileInfo = videoFileInfo
+                InputFileInfo = videoFileInfo,
+                UserId = Command.User.UserId
             });
 		}
 	}

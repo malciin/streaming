@@ -54,7 +54,7 @@ namespace Streaming.Application.Commands
 				if (!running)
 				{
 					running = true;
-                    worker = WorkerTask();
+                    worker = Task.Factory.StartNew(WorkerTask, TaskCreationOptions.LongRunning);
 				}
 			}
 		}

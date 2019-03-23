@@ -2,12 +2,19 @@
 using Streaming.Common.Helpers;
 using System;
 using System.Diagnostics;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Streaming.Common.Extensions
 {
     public static class BashExtensions
     {
+        public enum DefaultOutput
+        {
+            StandardOutput,
+            ErrorOutput
+        }
+
         public static Process StartBashExecution(this string Command)
         {
             ProcessStartInfo psi = new ProcessStartInfo();
@@ -26,20 +33,36 @@ namespace Streaming.Common.Extensions
             return process;
         }
 
-        public static async Task<string> ExecuteBashAsync(this string Command)
+        /// <summary>
+        /// Execute command and returns command output
+        /// </summary>
+        /// <param name="Command">Command string</param>
+        /// <param name="defaultOutput">Default output for read</param>
+        /// <param name="commandLineOutputCallback">Callback that is called for every output line readed</param>
+        /// <returns></returns>
+        public static async Task<string> ExecuteBashAsync(this string Command, DefaultOutput defaultOutput = DefaultOutput.StandardOutput, Action<string> commandLineOutputCallback = null)
         {
             string errorOutput = "";
+            var strBuilder = new StringBuilder();
             try
             {
                 using (var process = Command.StartBashExecution())
                 {
-                    errorOutput = await process.StandardError.ReadToEndAsync();
-
-                    string output = await process.StandardOutput.ReadToEndAsync();
+                    var defaultStream = defaultOutput == DefaultOutput.StandardOutput ? process.StandardOutput : process.StandardError;
+                    while(!defaultStream.EndOfStream)
+                    {
+                        var line = await defaultStream.ReadLineAsync();
+                        strBuilder.AppendLine(line);
+                        commandLineOutputCallback?.Invoke(line);
+                    }
+                    if (defaultOutput == DefaultOutput.StandardOutput && !process.StandardError.EndOfStream)
+                    {
+                        errorOutput += await process.StandardError.ReadToEndAsync();
+                    }
                     process.WaitForExit();
                     if (process.ExitCode != 0)
-                        throw new CommandException(Command, errorOutput);
-                    return output;
+                        throw new CommandException(Command, defaultOutput == DefaultOutput.StandardOutput ? errorOutput : strBuilder.ToString());
+                    return strBuilder.ToString();
                 }
             }
             catch(Exception ex)

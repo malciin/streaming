@@ -3,7 +3,7 @@ using Streaming.Application.Commands;
 
 namespace Streaming.Api.Controllers
 {
-    public class _ApiControllerBase : ControllerBase
+    public abstract class _ApiControllerBase : ControllerBase
     {
         protected readonly ICommandDispatcher CommandDispatcher;
         protected _ApiControllerBase (ICommandDispatcher CommandDispatcher)

@@ -1,23 +1,23 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
+using Streaming.Application.Models;
 
-namespace Streaming.Api.SignalR.Hubs
+namespace Streaming.Application.SignalR.Hubs
 {
-    public class _BaseHub : Hub
+    public abstract class _BaseHub : Hub
     {
-        public _BaseHub()
-        {
-            
-        }
+        protected static readonly HubConnectionsInformation Informations = new HubConnectionsInformation();
 
         public override Task OnConnectedAsync()
         {
+            Informations.Push(Context);
             return base.OnConnectedAsync();
         }
 
         public override Task OnDisconnectedAsync(Exception exception)
         {
+            Informations.Pop(Context);
             return base.OnDisconnectedAsync(exception);
         }
     }

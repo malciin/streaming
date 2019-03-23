@@ -13,6 +13,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Streaming.Api.Middlewares;
 using Streaming.Api.Monitor;
+using Streaming.Application.SignalR.Hubs;
 using Streaming.Auth0;
 using Streaming.Infrastructure.IoC.Extensions;
 using Streaming.Infrastructure.MongoDb.Extensions;
@@ -76,23 +77,7 @@ namespace Streaming.Api
             app.UseAuthentication();
             app.UseSignalR(config =>
             {
-                var hubRoutes = Assembly.GetExecutingAssembly().GetTypes().Where(x => typeof(Microsoft.AspNetCore.SignalR.Hub).IsAssignableFrom(x))
-                    .Select(x => new {
-                        Hub = x,
-                        HubRoute = x.GetCustomAttribute<RouteAttribute>().Template
-                    });
-
-                foreach (var hubRoute in hubRoutes)
-                {
-                    var genericMethod = config.GetType().GetMethod("MapHub", new Type[] { typeof(PathString) });
-                    var genericMethodInvokable = genericMethod.MakeGenericMethod(hubRoute.Hub);
-                    var route = hubRoute.HubRoute;
-                    if (route[0] != '/')
-                        route = '/' + route;
-
-                    genericMethodInvokable.Invoke(config, new object[] {
-                        new PathString(route) });
-                }
+                config.MapHub<FFmpegProcessingHub>("/hub/processingInfo");
             });
             app.UseMvc();
         }

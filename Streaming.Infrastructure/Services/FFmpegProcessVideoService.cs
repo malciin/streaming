@@ -30,7 +30,7 @@ namespace Streaming.Infrastructure.Services
             throwIfFileNotExists(videoPath);
             double interval = 1 / screenshotInterval.TotalSeconds;
             var command = $"ffmpeg -i '{videoPath}' -filter:v scale=\"140:-1\",fps={interval} '{screenshotOutputDirectory}out%d.jpg'";
-            return command.ExecuteBashAsync();
+            return command.ExecuteBashAsync(BashExtensions.DefaultOutput.ErrorOutput);
         }
 
         public Task TakeVideoScreenshot(string videoPath, string screenshotOutputPath, TimeSpan timeSpan)
@@ -38,21 +38,21 @@ namespace Streaming.Infrastructure.Services
             throwIfFileNotExists(videoPath);
             var lengthString = $"{timeSpan.Hours}:{timeSpan.Minutes}:{timeSpan.Seconds}";
             var command = $"ffmpeg -ss {lengthString} -i '{videoPath}' -vframes 1 -q:v 2 '{screenshotOutputPath}'";
-            return command.ExecuteBashAsync();
+            return command.ExecuteBashAsync(BashExtensions.DefaultOutput.ErrorOutput);
         }
 
-        public Task ConvertVideoToMp4(string videoPath, string outputVideoFile)
+        public Task ConvertVideoToMp4(string videoPath, string outputVideoFile, Action<string> commandLineOutputCallback = null)
         {
             throwIfFileNotExists(videoPath);
             var convertMp4Command = $"ffmpeg -i '{videoPath}' -f mp4 -vcodec libx264 -acodec aac '{outputVideoFile}'";
-            return convertMp4Command.ExecuteBashAsync();
+            return convertMp4Command.ExecuteBashAsync(BashExtensions.DefaultOutput.ErrorOutput, commandLineOutputCallback);
         }
 
         public Task SplitMp4FileIntoTSFiles(string mp4VideoFilePath, string outputTsFilesDirectory)
         {
             throwIfFileNotExists(mp4VideoFilePath);
             var splitCommand = $"ffmpeg -i '{mp4VideoFilePath}' -c copy -map 0 -segment_time 5 -f segment '{outputTsFilesDirectory}%03d.ts'";
-            return splitCommand.ExecuteBashAsync();
+            return splitCommand.ExecuteBashAsync(BashExtensions.DefaultOutput.ErrorOutput);
         }
 
         private VideoFileDetailsDTO getVideoDetailsFromOutputString(string output)
@@ -80,7 +80,7 @@ namespace Streaming.Infrastructure.Services
             using (var process = $"ffmpeg -i '{videoPath}'".StartBashExecution())
             {
                 // We manually create process and read from StandardError, because ffmpeg returns
-                // an error when we don't specify the output file
+                // an error and '-1' error code when we don't specify the output file
                 var output = await process.StandardError.ReadToEndAsync();
 
                 try
