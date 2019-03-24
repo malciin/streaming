@@ -46,7 +46,7 @@ namespace Streaming.Application.Commands.Video
             var inputFilePath = pathStrategy.VideoProcessingFilePath(videoId);
 
             var videoFileInfo = await videoFileInfoService.GetDetailsAsync(inputFilePath);
-            if (!processVideoService.SupportedVideoTypes().Codec.Contains(videoFileInfo.Video.Codec))
+            if (!processVideoService.SupportedVideoCodecs().Contains(videoFileInfo.Video.Codec))
             {
                 throw new NotSupportedException("Video file format not supported!");
             }

@@ -117,12 +117,9 @@ namespace Streaming.Tests
             });
             container.Register(x => videoFileInfoService.Object).AsImplementedInterfaces();
             var videoProcessingService = new Mock<IProcessVideoService>();
-            videoProcessingService.Setup(x => x.SupportedVideoTypes()).Returns((
-                new List<string>
-                { ".mp4" }, 
-                new List<VideoCodec>
-                { VideoCodec.h264 }
-            ));
+            videoProcessingService.Setup(x => x.SupportedVideoCodecs()).Returns(new List<VideoCodec> {
+                VideoCodec.h264
+            });
             container.Register(x => videoProcessingService.Object).AsImplementedInterfaces();
 
             var componentContext = container.Build();

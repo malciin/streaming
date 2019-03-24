@@ -5,7 +5,7 @@ using System.Reflection;
 
 namespace Streaming.Infrastructure.IoC
 {
-    class SettingsModule : Autofac.Module
+    public class SettingsModule : Autofac.Module
     {
         protected override void Load(ContainerBuilder builder)
         {

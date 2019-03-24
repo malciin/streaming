@@ -95,14 +95,11 @@ namespace Streaming.Infrastructure.Services
             }
         }
 
-        (IEnumerable<string> Extension, IEnumerable<VideoCodec> Codec) IProcessVideoService.SupportedVideoTypes()
-            => (new List<string>
-            {
-                ".mp4"
-            }, new List<VideoCodec>
+        IEnumerable<VideoCodec> IProcessVideoService.SupportedVideoCodecs()
+            => new List<VideoCodec>
             {
                 VideoCodec.h264
-            });
+            };
 
         private void throwIfFileNotExists(string path)
         {
