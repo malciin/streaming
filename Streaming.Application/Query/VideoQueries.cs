@@ -68,8 +68,5 @@ namespace Streaming.Application.Query
 			return (await videoRepo.SearchAsync(Search))
 				.Select(x => mapper.MapVideoMetadataDTO(x));
 		}
-
-        public IEnumerable<(string Extension, string Codec)> SupportedVideoTypes()
-            => processVideoService.SupportedVideoTypes();
     }
 }

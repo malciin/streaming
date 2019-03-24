@@ -3,6 +3,7 @@ using NUnit.Framework;
 using Streaming.Application.Exceptions;
 using Streaming.Application.Interfaces.Services;
 using Streaming.Application.Models.DTO.Video;
+using Streaming.Application.Models.Enum;
 using Streaming.Infrastructure.IoC.Extensions;
 using System;
 using System.IO;
@@ -68,11 +69,11 @@ namespace Streaming.Tests.Services.VideoFileInfoService
                 {
                     Resolution = (352, 288),
                     BitrateKbs = 493,
-                    Codec = "h263"
+                    Codec = VideoCodec.h263
                 },
                 Audio = new VideoFileDetailsDTO.AudioDetailsDTO
                 {
-                    Codec = "h263"
+                    Codec = AudioCodec.amr_nb
                 },
                 Duration = TimeSpan.FromMilliseconds(5_570)
             });
@@ -85,11 +86,11 @@ namespace Streaming.Tests.Services.VideoFileInfoService
                 {
                     Resolution = (320, 240),
                     BitrateKbs = 540,
-                    Codec = "mpeg4"
+                    Codec = VideoCodec.mpeg4
                 },
                 Audio = new VideoFileDetailsDTO.AudioDetailsDTO
                 {
-                    Codec = "mp3"
+                    Codec = AudioCodec.mp3
                 },
                 Duration = TimeSpan.FromMilliseconds(5_700)
             });
@@ -102,11 +103,11 @@ namespace Streaming.Tests.Services.VideoFileInfoService
                 {
                     Resolution = (320, 240),
                     BitrateKbs = 436,
-                    Codec = "flv1"
+                    Codec = VideoCodec.flv1
                 },
                 Audio = new VideoFileDetailsDTO.AudioDetailsDTO
                 {
-                    Codec = "mp3"
+                    Codec = AudioCodec.mp3
                 },
                 Duration = TimeSpan.FromMilliseconds(5_700)
             });
@@ -119,11 +120,11 @@ namespace Streaming.Tests.Services.VideoFileInfoService
                 {
                     Resolution = (560, 320),
                     BitrateKbs = 256,
-                    Codec = "h264"
+                    Codec = VideoCodec.h264
                 },
                 Audio = new VideoFileDetailsDTO.AudioDetailsDTO
                 {
-                    Codec = "aac"
+                    Codec = AudioCodec.aac
                 },
                 Duration = TimeSpan.FromMilliseconds(5_700)
             });
@@ -136,11 +137,11 @@ namespace Streaming.Tests.Services.VideoFileInfoService
                 {
                     Resolution = (560, 320),
                     BitrateKbs = 598,
-                    Codec = "h264"
+                    Codec = VideoCodec.h264
                 },
                 Audio = new VideoFileDetailsDTO.AudioDetailsDTO
                 {
-                    Codec = "aac"
+                    Codec = AudioCodec.aac
                 },
                 Duration = TimeSpan.FromMilliseconds(5_700)
             });
@@ -153,11 +154,11 @@ namespace Streaming.Tests.Services.VideoFileInfoService
                 {
                     Resolution = (560, 320),
                     BitrateKbs = 674,
-                    Codec = "mpeg4"
+                    Codec = VideoCodec.mpeg4
                 },
                 Audio = new VideoFileDetailsDTO.AudioDetailsDTO
                 {
-                    Codec = "aac"
+                    Codec = AudioCodec.aac
                 },
                 Duration = TimeSpan.FromMilliseconds(5_700)
             });
@@ -170,11 +171,11 @@ namespace Streaming.Tests.Services.VideoFileInfoService
                 {
                     Resolution = (560, 320),
                     BitrateKbs = 551,
-                    Codec = "h264"
+                    Codec = VideoCodec.h264
                 },
                 Audio = new VideoFileDetailsDTO.AudioDetailsDTO
                 {
-                    Codec = "aac"
+                    Codec = AudioCodec.aac
                 },
                 Duration = TimeSpan.FromMilliseconds(5_700)
             });
@@ -187,11 +188,11 @@ namespace Streaming.Tests.Services.VideoFileInfoService
                 {
                     Resolution = (560, 320),
                     BitrateKbs = 939,
-                    Codec = "mpeg2video"
+                    Codec = VideoCodec.mpeg2video
                 },
                 Audio = new VideoFileDetailsDTO.AudioDetailsDTO
                 {
-                    Codec = "mp2"
+                    Codec = AudioCodec.mp2
                 },
                 Duration = TimeSpan.FromMilliseconds(5_700)
             });
@@ -204,11 +205,11 @@ namespace Streaming.Tests.Services.VideoFileInfoService
                 {
                     Resolution = (352, 240),
                     BitrateKbs = 970,
-                    Codec = "mpeg1video"
+                    Codec = VideoCodec.mpeg1video
                 },
                 Audio = new VideoFileDetailsDTO.AudioDetailsDTO
                 {
-                    Codec = "mp2"
+                    Codec = AudioCodec.mp2
                 },
                 Duration = TimeSpan.FromMilliseconds(5_700)
             });
@@ -221,11 +222,11 @@ namespace Streaming.Tests.Services.VideoFileInfoService
                 {
                     Resolution = (360, 480),
                     BitrateKbs = 871,
-                    Codec = "rv40"
+                    Codec = VideoCodec.rv40
                 },
                 Audio = new VideoFileDetailsDTO.AudioDetailsDTO
                 {
-                    Codec = "cook"
+                    Codec = AudioCodec.cook
                 },
                 Duration = TimeSpan.FromMilliseconds(11_150)
             });
@@ -238,11 +239,11 @@ namespace Streaming.Tests.Services.VideoFileInfoService
                 {
                     Resolution = (560, 320),
                     BitrateKbs = 884,
-                    Codec = "mpeg2video"
+                    Codec = VideoCodec.mpeg2video
                 },
                 Audio = new VideoFileDetailsDTO.AudioDetailsDTO
                 {
-                    Codec = "mp2"
+                    Codec = AudioCodec.mp2
                 },
                 Duration = TimeSpan.FromMilliseconds(5_700)
             });
@@ -255,11 +256,11 @@ namespace Streaming.Tests.Services.VideoFileInfoService
                 {
                     Resolution = (640, 360),
                     BitrateKbs = 256,
-                    Codec = "vp8"
+                    Codec = VideoCodec.vp8
                 },
                 Audio = new VideoFileDetailsDTO.AudioDetailsDTO
                 {
-                    Codec = "vorbis"
+                    Codec = AudioCodec.vorbis
                 },
                 Duration = TimeSpan.FromMilliseconds(10_500)
             });
@@ -272,11 +273,11 @@ namespace Streaming.Tests.Services.VideoFileInfoService
                 {
                     Resolution = (320, 240),
                     BitrateKbs = 793,
-                    Codec = "wmv2"
+                    Codec = VideoCodec.wmv2
                 },
                 Audio = new VideoFileDetailsDTO.AudioDetailsDTO
                 {
-                    Codec = "wmav2"
+                    Codec = AudioCodec.wmav2
                 },
                 Duration = TimeSpan.FromMilliseconds(5_700)
             });

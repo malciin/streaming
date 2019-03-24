@@ -1,6 +1,7 @@
 ﻿using Streaming.Application.Exceptions;
 using Streaming.Application.Interfaces.Services;
 using Streaming.Application.Models.DTO.Video;
+using Streaming.Application.Models.Enum;
 using Streaming.Common.Extensions;
 using System;
 using System.Collections.Generic;
@@ -65,11 +66,11 @@ namespace Streaming.Infrastructure.Services
             videoDetails.Video.BitrateKbs = int.Parse(durationAndBitrateRegex.Groups["bitrate"].Value);
 
             var videoTypeRegex = Regex.Match(output, @"Stream #\d:\d+.*Video\: (?<codec>[^ ,]+).* (?<xResolution>\d+)x(?<yResolution>\d+)");
-            videoDetails.Video.Codec = videoTypeRegex.Groups["codec"].Value;
+            videoDetails.Video.Codec = (VideoCodec)Enum.Parse(typeof(VideoCodec), videoTypeRegex.Groups["codec"].Value);
             videoDetails.Video.Resolution = (int.Parse(videoTypeRegex.Groups["xResolution"].Value), int.Parse(videoTypeRegex.Groups["yResolution"].Value));
 
-            var audioTypeRegex = Regex.Match(output, @"Stream #\d:\d+.*Video\: (?<codec>[^ ]+)");
-            videoDetails.Audio.Codec = audioTypeRegex.Groups["codec"].Value;
+            var audioTypeRegex = Regex.Match(output, @"Stream #\d:\d+.*Audio\: (?<codec>[^ ,]+)");
+            videoDetails.Audio.Codec = (AudioCodec)Enum.Parse(typeof(AudioCodec), audioTypeRegex.Groups["codec"].Value);
 
             return videoDetails;
         }
@@ -94,13 +95,14 @@ namespace Streaming.Infrastructure.Services
             }
         }
 
-        public IEnumerable<(string Extension, string Codec)> SupportedVideoTypes()
-            => new List<(string Extension, string Codec)>
+        (IEnumerable<string> Extension, IEnumerable<VideoCodec> Codec) IProcessVideoService.SupportedVideoTypes()
+            => (new List<string>
             {
-                (".mp4", "h264"),
-                (".avi", "mpeg4"),
-                (".swf", "flv1")
-            };
+                ".mp4"
+            }, new List<VideoCodec>
+            {
+                VideoCodec.h264
+            });
 
         private void throwIfFileNotExists(string path)
         {

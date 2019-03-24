@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Streaming.Application.Models.Enum;
+using System;
 
 namespace Streaming.Application.Models.DTO.Video
 {
@@ -6,12 +7,12 @@ namespace Streaming.Application.Models.DTO.Video
     {
         public class AudioDetailsDTO
         {
-            public string Codec { get; set; }
+            public AudioCodec Codec { get; set; }
         }
 
         public class VideoDetailsDTO
         {
-            public string Codec { get; set; }
+            public VideoCodec Codec { get; set; }
             public (int xResolution, int yResolution) Resolution { get; set; }
             public int BitrateKbs { get; set; }
         }

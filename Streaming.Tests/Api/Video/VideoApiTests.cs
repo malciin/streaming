@@ -13,6 +13,7 @@ using Streaming.Application.Interfaces.Strategies;
 using Streaming.Application.Mappings;
 using Streaming.Application.Models;
 using Streaming.Application.Models.DTO.Video;
+using Streaming.Application.Models.Enum;
 using Streaming.Application.Query;
 using Streaming.Domain.Enums;
 using Streaming.Domain.Models;
@@ -44,7 +45,6 @@ namespace Streaming.Tests
             builder.RegisterAssemblyTypes(assembly)
                    .AsClosedTypesOf(typeof(ICommandHandler<>))
                    .InstancePerLifetimeScope();
-
 
             var commandBus = new Mock<ICommandBus>();
             commandBus.Setup(x => x.Push(It.IsAny<ICommand>())).Callback(() => { });
@@ -112,16 +112,17 @@ namespace Streaming.Tests
             videoFileInfoService.Setup(x => x.GetDetailsAsync(It.IsAny<string>())).Returns((string path) =>
             {
                 var details = new VideoFileDetailsDTO();
-                details.Video.Codec = "codec";
+                details.Video.Codec = Application.Models.Enum.VideoCodec.h264;
                 return Task.FromResult(details);
             });
             container.Register(x => videoFileInfoService.Object).AsImplementedInterfaces();
-
             var videoProcessingService = new Mock<IProcessVideoService>();
-            videoProcessingService.Setup(x => x.SupportedVideoTypes()).Returns(new List<(string Extension, string Codec)>
-            {
-                (".mp4", "codec")
-            });
+            videoProcessingService.Setup(x => x.SupportedVideoTypes()).Returns((
+                new List<string>
+                { ".mp4" }, 
+                new List<VideoCodec>
+                { VideoCodec.h264 }
+            ));
             container.Register(x => videoProcessingService.Object).AsImplementedInterfaces();
 
             var componentContext = container.Build();
@@ -157,6 +158,8 @@ namespace Streaming.Tests
             Assert.IsNull(videos[0].Length);
             Assert.IsTrue(DateTime.UtcNow.Subtract(videos.First().CreatedDate).TotalSeconds < 10);  // check if the correct date is setted
         }
+
+
 
         [Test]
         public void Query_Video_Works()
