@@ -13,7 +13,7 @@ namespace Streaming.Tests.Extensions
         /// <param name="builder"></param>
         /// <param name="types"></param>
         /// <returns></returns>
-        public static ContainerBuilder RegisterUnusedServices(this ContainerBuilder builder, params Type[] types)
+        public static ContainerBuilder RegisterUnused(this ContainerBuilder builder, params Type[] types)
         {
             foreach(var type in types)
             {

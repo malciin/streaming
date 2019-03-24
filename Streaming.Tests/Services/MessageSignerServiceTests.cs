@@ -7,7 +7,7 @@ using Streaming.Application.Interfaces.Settings;
 using Streaming.Infrastructure.IoC.Extensions;
 using System;
 
-namespace Streaming.Tests
+namespace Streaming.Tests.Services
 {
     public class MessageSignerService
     {

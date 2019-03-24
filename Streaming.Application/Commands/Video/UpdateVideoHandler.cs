@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Streaming.Application.Interfaces.Repositories;
 using Streaming.Application.Models;
 using Streaming.Application.Models.Repository.Video;
-using Streaming.Common.Extensions;
+using Streaming.Application.Extensions;
 
 namespace Streaming.Application.Commands.Video
 {

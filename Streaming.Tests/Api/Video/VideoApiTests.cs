@@ -1,25 +1,25 @@
 using Autofac;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using MongoDB.Driver;
 using Moq;
 using NUnit.Framework;
+using Streaming.Api.Attributes;
 using Streaming.Api.Controllers;
 using Streaming.Application.Commands;
+using Streaming.Application.Commands.Video;
+using Streaming.Application.DTO;
 using Streaming.Application.Interfaces.Repositories;
 using Streaming.Application.Interfaces.Services;
-using Streaming.Application.Interfaces.Settings;
-using Streaming.Application.Interfaces.Strategies;
-using Streaming.Application.Mappings;
 using Streaming.Application.Models;
 using Streaming.Application.Models.DTO.Video;
-using Streaming.Application.Models.Enum;
 using Streaming.Application.Query;
-using Streaming.Domain.Enums;
 using Streaming.Domain.Models;
-using Streaming.Infrastructure.Services;
+using Streaming.Tests.Extensions;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
 using System.Security.Claims;
@@ -29,108 +29,98 @@ namespace Streaming.Tests
 {
     class VideoApiTests
     {
-        public ContainerBuilder GetBaseMockedContainerBuilder()
+        private ContainerBuilder containerBuilder;
+        private Mock<ICommandDispatcher> commandDispatcherMock;
+        private Mock<IVideoQueries> videoQueriesMock;
+
+        private IContainer _container;
+        private IContainer container
         {
-            var builder = new ContainerBuilder();
-
-            var secretServerKey = new Mock<ISecretServerKey>();
-            secretServerKey.Setup(x => x.SecretServerKey).Returns("test");
-            builder.Register(x => secretServerKey.Object).AsImplementedInterfaces();
-
-            var assembly = typeof(CommandDispatcher).GetTypeInfo().Assembly;
-            builder.RegisterType<CommandDispatcher>()
-                   .As<ICommandDispatcher>()
-                   .InstancePerLifetimeScope();
-
-            builder.RegisterAssemblyTypes(assembly)
-                   .AsClosedTypesOf(typeof(ICommandHandler<>))
-                   .InstancePerLifetimeScope();
-
-            var commandBus = new Mock<ICommandBus>();
-            commandBus.Setup(x => x.Push(It.IsAny<ICommand>())).Callback(() => { });
-            builder.Register(x => commandBus.Object).AsImplementedInterfaces();
-
-            var directoriesSettings = new Mock<IDirectoriesSettings>();
-            builder.Register(x => directoriesSettings.Object).AsImplementedInterfaces();
-
-            var thumbnailService = new Mock<IThumbnailService>();
-            thumbnailService.Setup(x => x.GetThumbnailUrl(It.IsAny<Guid>())).Returns("https://testurl.com/thumb.jpg");
-            thumbnailService.Setup(x => x.GetPlaceholderThumbnailUrl()).Returns("https://placeholder-testurl.com/thumb.jpg");
-            builder.Register(x => thumbnailService.Object).AsImplementedInterfaces();
-
-            var videoBlobService = new Mock<IVideoBlobService>();
-            builder.Register(x => videoBlobService.Object).AsImplementedInterfaces();
-
-            builder.Register(x => new SHA256MessageSignerService(x.Resolve<ISecretServerKey>()))
-                .As<IMessageSignerService>();
-
-            builder.RegisterType<VideoMappings>().SingleInstance();
-            builder.RegisterType<VideoQueries>().As<IVideoQueries>();
-            builder.Register(x => new VideoQueries(new VideoMappings(
-                x.Resolve<IThumbnailService>()),
-                null,
-                x.Resolve<IVideoRepository>(),
-                x.Resolve<IDirectoriesSettings>(),
-                x.Resolve<IVideoBlobService>()))
-                .As<IVideoQueries>();
-
-            builder.Register<VideoController>(context =>
+            get
             {
-                var controller = new VideoController(
-                    context.Resolve<ICommandDispatcher>(),
-                    context.Resolve<IVideoQueries>(),
-                    context.Resolve<IMessageSignerService>());
-                controller.ControllerContext.HttpContext = new DefaultHttpContext();
-                return controller;
-            });
-
-            builder.Register<IPathStrategy>(ctx => new Mock<IPathStrategy>().Object);
-
-            return builder;
+                if (_container == null)
+                {
+                    _container = containerBuilder.Build();
+                }
+                return _container;
+            }
         }
 
         [SetUp]
         public void Setup()
         {
+            containerBuilder = new ContainerBuilder();
+            commandDispatcherMock = new Mock<ICommandDispatcher>();
+            containerBuilder.Register(x => commandDispatcherMock.Object).AsImplementedInterfaces();
+
+            videoQueriesMock = new Mock<IVideoQueries>();
+            containerBuilder.Register(x => videoQueriesMock.Object).AsImplementedInterfaces();
+
+            containerBuilder.RegisterUnused(typeof(IMessageSignerService));
+
+            containerBuilder.RegisterType<VideoController>();
+        }
+
+        private MethodInfo getMethodFromControllerThatTakeParameter(ControllerBase controller, Type parameter)
+        {
+            var uploadVideoMethod = controller.GetType().GetMethods()
+                                              .Where(x => x.GetParameters().Select(y => y.ParameterType)
+                                              .Contains(parameter)).First();
+            return uploadVideoMethod;
+        }
+
+        private MethodInfo getMethodFromControllerThatReturnType(ControllerBase controller, Type returnedType)
+        {
+            var uploadVideoMethod = controller.GetType().GetMethods()
+                                              .Where(x => x.ReturnType == returnedType).First();
+            return uploadVideoMethod;
+        }
+
+        private void testThatMethodHaveFilterClaim(MethodInfo methodInfo, string expectedClaim)
+        {
+            var attribute = methodInfo.CustomAttributes.Where(x => x.AttributeType == typeof(ClaimAuthorizeAttribute)).FirstOrDefault();
+            Assert.NotNull(attribute, "Method doesn't have ClaimAuthorize attribute!");
+
+            var claims = attribute.ConstructorArguments
+                                  .Where(x => x.ArgumentType == typeof(String[]))
+                                  .Select(x => x.Value).First() as ReadOnlyCollection<CustomAttributeTypedArgument>;
+            var containClaim = claims.FirstOrDefault(x => x.Value as string == expectedClaim);
+            Assert.NotNull(containClaim, $"ClaimAuthorize doesn't have {expectedClaim} claim!");
+        }
+
+        [Test]
+        public void CanUploadVideo_Claim_On_UploadVideo_Endpoint()
+        {
+            var videoController = container.Resolve<VideoController>();
+            var uploadVideoMethod = getMethodFromControllerThatTakeParameter(videoController, typeof(UploadVideoDTO));
+            testThatMethodHaveFilterClaim(uploadVideoMethod, Claims.CanUploadVideo);
+        }
+
+        [Test]
+        public void CanUploadVideo_Claim_On_GetUploadToken_Endpoint()
+        {
+            var videoController = container.Resolve<VideoController>();
+            var uploadVideoMethod = getMethodFromControllerThatReturnType(videoController, typeof(TokenDTO));
+            testThatMethodHaveFilterClaim(uploadVideoMethod, Claims.CanUploadVideo);
+        }
+
+        [Test]
+        public void CanUploadVideo_Claim_On_UploadVideoPart_Endpoint()
+        {
+            var videoController = container.Resolve<VideoController>();
+            var uploadVideoMethod = getMethodFromControllerThatTakeParameter(videoController, typeof(UploadVideoPartDTO));
+            testThatMethodHaveFilterClaim(uploadVideoMethod, Claims.CanUploadVideo);
         }
 
         [Test]
         public void Is_Adding_New_Video_Works()
         {
-            var videos = new List<Video>();
-            var container = GetBaseMockedContainerBuilder();
-
-            var videoRepository = new Mock<IVideoRepository>();
-            videoRepository.Setup(x => x.AddAsync(It.IsAny<Video>())).Returns((Video vid) =>
-            {
-                videos.Add(vid);
-                return Task.FromResult(0);
-            });
-            container.Register(x => videoRepository.Object).AsImplementedInterfaces();
-
-            var videoFileInfoService = new Mock<IVideoFileInfoService>();
-            videoFileInfoService.Setup(x => x.GetDetailsAsync(It.IsAny<string>())).Returns((string path) =>
-            {
-                var details = new VideoFileDetailsDTO();
-                details.Video.Codec = Application.Models.Enum.VideoCodec.h264;
-                return Task.FromResult(details);
-            });
-            container.Register(x => videoFileInfoService.Object).AsImplementedInterfaces();
-            var videoProcessingService = new Mock<IProcessVideoService>();
-            videoProcessingService.Setup(x => x.SupportedVideoCodecs()).Returns(new List<VideoCodec> {
-                VideoCodec.h264
-            });
-            container.Register(x => videoProcessingService.Object).AsImplementedInterfaces();
-
-            var componentContext = container.Build();
-
-            var signer = componentContext.Resolve<IMessageSignerService>();
-
-            var videoController = componentContext.Resolve<VideoController>();
+            var videoController = container.Resolve<VideoController>();
+            videoController.ControllerContext.HttpContext = new DefaultHttpContext();
             videoController.HttpContext.User = new ClaimsPrincipal();
             videoController.User.AddIdentity(new System.Security.Claims.ClaimsIdentity(new List<Claim>
             {
-                new Claim("http://streaming.com/claims", Claims.CanUploadVideo),
+                new Claim(Claims.ClaimsNamespace, Claims.CanUploadVideo),
                 new Claim(ClaimTypes.NameIdentifier, "testUser"),
                 new Claim(ClaimTypes.Email, "testEmail@email.co")
             }, JwtBearerDefaults.AuthenticationScheme));
@@ -142,65 +132,7 @@ namespace Streaming.Tests
                 UploadToken = videoController.GetUploadToken().Token
             }).GetAwaiter().GetResult();
 
-            Assert.AreEqual(1, videos.Count);
-            Assert.AreEqual("Title", videos[0].Title);
-            Assert.AreEqual("Description", videos[0].Description);
-            Assert.AreEqual((VideoState)0, videos[0].State);
-            Assert.AreEqual("testUser", videos[0].Owner.UserId);
-            Assert.AreEqual("testEmail@email.co", videos[0].Owner.Email);
-
-            Assert.IsNull(videos[0].ProcessingInfo);
-            Assert.IsNull(videos[0].VideoManifestHLS);
-            Assert.IsNull(videos[0].FinishedProcessingDate);
-            Assert.IsNull(videos[0].Length);
-            Assert.IsTrue(DateTime.UtcNow.Subtract(videos.First().CreatedDate).TotalSeconds < 10);  // check if the correct date is setted
-        }
-
-
-
-        [Test]
-        public void Query_Video_Works()
-        {
-            var videos = new List<Video>
-            {
-                new Video
-                {
-                    VideoId = Guid.NewGuid(),
-                    Title = "Vid title 1",
-                    CreatedDate = DateTime.UtcNow,
-                    FinishedProcessingDate = DateTime.UtcNow,
-                    Length = TimeSpan.FromSeconds(1)
-                },
-                new Video
-                {
-                    VideoId = Guid.NewGuid(),
-                    Title = "Vid title 2",
-                    CreatedDate = DateTime.UtcNow,
-                    FinishedProcessingDate = DateTime.UtcNow,
-                    Length = TimeSpan.FromSeconds(1)
-                },
-            };
-            var container = GetBaseMockedContainerBuilder();
-
-            var videoRepository = new Mock<IVideoRepository>();
-            videoRepository.Setup(x => x.SearchAsync(It.IsAny<VideoSearchDTO>())).Returns((VideoSearchDTO search) =>
-            {
-                return Task.FromResult(videos.Skip(search.Offset).Take(search.HowMuch));
-            });
-
-            container.Register(x => videoRepository.Object).AsImplementedInterfaces();
-            var componentContext = container.Build();
-
-            var videoController = componentContext.Resolve<VideoController>();
-            var searchResult = videoController.SearchAsync(new VideoSearchDTO
-            {
-                HowMuch = 10,
-                Offset = 0
-            }).GetAwaiter().GetResult().ToList();
-
-            Assert.AreEqual(2, searchResult.Count());
-            Assert.AreEqual("Vid title 1", searchResult[0].Title);
-            Assert.AreEqual("Vid title 2", searchResult[1].Title);
+            commandDispatcherMock.Verify(x => x.HandleAsync(It.IsAny<UploadVideoCommand>()), Times.Once);
         }
     }
 }

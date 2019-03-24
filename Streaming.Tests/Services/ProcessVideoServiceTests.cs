@@ -1,10 +1,9 @@
 ﻿using Autofac;
 using NUnit.Framework;
 using Streaming.Infrastructure.IoC.Extensions;
-using Streaming.Infrastructure.Services;
 using System.IO;
 
-namespace Streaming.Tests.Services.ProcessVideoService
+namespace Streaming.Tests.Services
 {
     class ProcessVideoServiceTests
     {

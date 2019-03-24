@@ -9,7 +9,7 @@ using System;
 using System.IO;
 using System.Linq;
 
-namespace Streaming.Tests.Services.VideoFileInfoService
+namespace Streaming.Tests.Services
 {
     class VideoFileInfoService
     {
