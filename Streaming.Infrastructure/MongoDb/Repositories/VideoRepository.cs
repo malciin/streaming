@@ -40,15 +40,16 @@ namespace Streaming.Infrastructure.MongoDb.Repositories
             return await videoCollection.Find(searchFilter).FirstAsync();
         }
 
-		public async Task UpdateAsync(Video video)
+		public Task UpdateAsync(Video video)
 		{
 			var idFilter = Builders<Video>.Filter.Eq(x => x.VideoId, video.VideoId);
 			var updateDefinition = Builders<Video>.Update.Set(x => x.Title, video.Title);
 
             this.addToCommit(() => videoCollection.UpdateOneAsync(idFilter, updateDefinition));
-		}
+            return Task.FromResult(0);
+        }
 
-        public async Task UpdateAsync(UpdateVideoInfo updateVideoInfo)
+        public Task UpdateAsync(UpdateVideoInfo updateVideoInfo)
         {
             var filters = new List<FilterDefinition<Domain.Models.Video>>();
             filters.Add(Builders<Domain.Models.Video>.Filter
@@ -65,9 +66,10 @@ namespace Streaming.Infrastructure.MongoDb.Repositories
                 .Set(x => x.Description, updateVideoInfo.NewVideoDescription);
 
             this.addToCommit(() => videoCollection.UpdateOneAsync(Builders<Domain.Models.Video>.Filter.And(filters), updateDefinition));
+            return Task.FromResult(0);
         }
 
-        public async Task UpdateAsync(UpdateVideoAfterProcessing updateVideoAfterProcessing)
+        public Task UpdateAsync(UpdateVideoAfterProcessing updateVideoAfterProcessing)
         {
             var searchFilter = Builders<Domain.Models.Video>.Filter.Eq(x => x.VideoId, updateVideoAfterProcessing.VideoId);
             var updateDefinition = Builders<Domain.Models.Video>.Update
@@ -78,12 +80,14 @@ namespace Streaming.Infrastructure.MongoDb.Repositories
                 .Set(x => x.State, updateVideoAfterProcessing.VideoState);
 
             this.addToCommit(() => videoCollection.UpdateOneAsync(searchFilter, updateDefinition));
+            return Task.FromResult(0);
         }
 
-        public async Task DeleteAsync(Guid VideoId)
+        public Task DeleteAsync(Guid VideoId)
         {
             var searchFilter = Builders<Domain.Models.Video>.Filter.Eq(x => x.VideoId, VideoId);
             this.addToCommit(() => videoCollection.DeleteOneAsync(searchFilter));
+            return Task.FromResult(0);
         }
     }
 }
