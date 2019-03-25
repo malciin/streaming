@@ -5,7 +5,7 @@ RUN apt-get update
 RUN apt-get install -y build-essential
 RUN apt-get install -y apt-utils
 RUN apt-get install -y git
-RUN apt-get install -y curl wget iputils-ping
+RUN apt-get install -y curl wget iputils-ping lsof
 RUN apt-get install -y vim
 
 # RTMP Nginx Server
@@ -20,7 +20,9 @@ RUN cd nginx-1.14.2 && make install
 # SSH Server
 EXPOSE 22
 RUN apt-get install -y sudo openssh-server
-
 ADD makeRequest.sh /root/makeRequest.sh
-ADD runServer.sh /root/runServer.sh
-CMD /root/runServer.sh
+ADD setupMachine.sh /root/setupMachine.sh
+ADD runMachine.sh /root/runMachine.sh
+RUN chmod u+x /root/setupMachine.sh
+RUN bash /root/setupMachine.sh
+CMD bash /root/runMachine.sh

@@ -39,7 +39,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Streaming.RTMPServer", "Str
 		Streaming.RTMPServer\Dockerfile = Streaming.RTMPServer\Dockerfile
 		Streaming.RTMPServer\makeRequest.sh = Streaming.RTMPServer\makeRequest.sh
 		Streaming.RTMPServer\removeCommands = Streaming.RTMPServer\removeCommands
-		Streaming.RTMPServer\runServer.sh = Streaming.RTMPServer\runServer.sh
+		Streaming.RTMPServer\runMachine.sh = Streaming.RTMPServer\runMachine.sh
+		Streaming.RTMPServer\setupMachine.sh = Streaming.RTMPServer\setupMachine.sh
 	EndProjectSection
 EndProject
 Global
