@@ -1,6 +1,16 @@
-.vs/*
-.git/*
-*/obj/*
-*/bin/*
-Streaming.Api/localStorage/*
-Streaming.Api/logs/*
+# Ignore everything
+**
+
+# Allow specific directories
+!Streaming.Domain/**
+!Streaming.Application/**
+!Streaming.Infrastructure/**
+!Streaming.Common/**
+!Streaming.Auth0/**
+!Streaming.Api/**
+
+# Ignore unneccessary files in upper allowed directories
+**/obj/*
+**/bin/*
+**/localStorage/*
+**/logs/*

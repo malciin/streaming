@@ -1,7 +1,8 @@
 FROM node:11.6.0-alpine
-ADD . /code
 WORKDIR /code
-RUN npm install -g create-react-app
+
+ADD package.json /code/package.json
 RUN npm i
-RUN npm rebuild node-sass
+
+ADD . /code
 CMD npm start
