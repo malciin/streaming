@@ -19,9 +19,10 @@ namespace Streaming.Infrastructure.MongoDb.Repositories
 			this.videoCollection = videoCollection;
 		}
 
-		public async Task AddAsync(Video video)
+		public Task AddAsync(Video video)
 		{
             this.addToCommit(() => videoCollection.InsertOneAsync(video));
+            return Task.FromResult(0);
 		}
 
 		public async Task<IEnumerable<Video>> SearchAsync(VideoSearchDTO filter)
