@@ -4,6 +4,9 @@ import { AppContext } from '../../AppContext';
 import UploadVideoForm from '../../components/forms/uploadVideoForm/uploadVideoForm';
 import UploadingVideoStatus from '../../components/blocks/uploadingVideoStatus/uploadingVideoStatus';
 import Console from '../../components/blocks/console/console';
+import { Config } from '../../shared/config';
+var signalR = require('@aspnet/signalr');
+
 class UploadVideoPage extends React.Component{
     constructor(props) {
         super(props);
@@ -18,9 +21,22 @@ class UploadVideoPage extends React.Component{
     }
 
     consoleOutput(line) {
-        this.setState({
-            output: [...this.state.output, line]
-        });
+        if (line.startsWith('frame')) {
+            this.setState({
+                output: [...this.state.output.slice(0, this.state.output.length - 1), line]
+            })
+        }
+        else {
+            this.setState({
+                output: [...this.state.output, line]
+            });
+        }
+    }
+
+    async componentDidMount()
+    {
+        await this.context.auth.silentLogin();
+        await this.context.auth.waitForAuth();
     }
 
     async uploadVideo(data) {
@@ -34,6 +50,16 @@ class UploadVideoPage extends React.Component{
             uploading: true
         });
         try {
+            this.connection = new signalR.HubConnectionBuilder().withUrl(`${Config.apiPath}/hub/processingInfo`, {
+                accessTokenFactory: () => this.context.auth.idToken,
+            }).build();
+
+            this.connection.on("ProcessingInformation", function (msg) {
+                this.consoleOutput(msg);
+            }.bind(this));
+
+            this.connection.start();
+            
             await this.context.streamingApi.uploadVideo(data, progress => this.setState({
                 progress: progress
             }));

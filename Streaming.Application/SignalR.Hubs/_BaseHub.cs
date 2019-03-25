@@ -7,7 +7,7 @@ namespace Streaming.Application.SignalR.Hubs
 {
     public abstract class _BaseHub : Hub
     {
-        protected static readonly HubConnectionsInformation Informations = new HubConnectionsInformation();
+        public static readonly HubConnectionsInformation Informations = new HubConnectionsInformation();
 
         public override Task OnConnectedAsync()
         {

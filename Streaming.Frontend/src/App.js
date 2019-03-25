@@ -2,7 +2,7 @@ import '../node_modules/bootstrap/dist/css/bootstrap.css'
 import React, { Component } from 'react';
 import { Router, Route } from "react-router-dom";
 import IndexPage from './pages/indexPage/IndexPage';
-import UploadVideoPage from './pages/uploadVideoPage/UploadVideoPage';
+import UploadVideoPage from './pages/uploadVideoPage/uploadVideoPage';
 import './App.scss'
 import VideoPage from './pages/videoPage/VideoPage';
 import { AppContext } from './AppContext';

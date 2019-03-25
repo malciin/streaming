@@ -8,7 +8,6 @@ export default class SignalRPage extends React.Component {
         super(props);
         this.connection = new signalR.HubConnectionBuilder().withUrl(`${Config.apiPath}/SignalR`, {
             accessTokenFactory: () => this.context.auth.idToken,
-
         }).build();
 
         this.state = {

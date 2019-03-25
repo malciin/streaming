@@ -1,7 +1,8 @@
-﻿using Streaming.Application.Interfaces.Repositories;
+﻿using Streaming.Application.Events;
+using Streaming.Application.Interfaces.Repositories;
 using Streaming.Application.Interfaces.Services;
 using Streaming.Application.Interfaces.Strategies;
-using Streaming.Application.Models;
+using Streaming.Application.Models.DTO.Video;
 using Streaming.Application.Models.Repository.Video;
 using Streaming.Domain.Enums;
 using Streaming.Domain.Models;
@@ -24,8 +25,10 @@ namespace Streaming.Application.Commands.Video
         private readonly IThumbnailService thumbnailService;
         private readonly IPathStrategy pathStrategy;
         private readonly IFileNameStrategy fileNameStrategy;
+        private readonly IEventEmmiter emitter;
 
         private VideoState videoState = 0;
+        private ProcessVideoCommand command;
 
         private DirectoryInfo processingDirectory;
         private DirectoryInfo thumbnailsDirectory;
@@ -41,7 +44,8 @@ namespace Streaming.Application.Commands.Video
             IVideoFileInfoService videoFileInfo,
             IThumbnailService thumbnailService,
             IPathStrategy pathStrategy,
-            IFileNameStrategy fileNameStrategy)
+            IFileNameStrategy fileNameStrategy,
+            IEventEmmiter emitter)
         {
 			this.videoRepo = videoRepo;
 			this.videoBlobService = videoBlobService;
@@ -50,26 +54,38 @@ namespace Streaming.Application.Commands.Video
             this.pathStrategy = pathStrategy;
             this.fileNameStrategy = fileNameStrategy;
             this.videoFileInfo = videoFileInfo;
+            this.emitter = emitter;
         }
 
-        public async Task HandleAsync(ProcessVideoCommand Command)
+
+        public async Task HandleAsync(ProcessVideoCommand command)
         {
+            this.command = command;
             var timer = Stopwatch.StartNew();
 
-            setupProcessingEnvironment(Command);
+            setupProcessingEnvironment();
 
-            var mp4VideoPath = pathStrategy.VideoConvertedToMp4FilePath(Command.VideoId);
-            await processVideoService.ConvertVideoToMp4(Command.InputFilePath, mp4VideoPath);
+            var mp4VideoPath = pathStrategy.VideoConvertedToMp4FilePath(command.VideoId);
+            emitStatus("Environment for processing setted up!");
+            await processVideoService.ConvertVideoToMp4(command.InputFilePath, mp4VideoPath, (output) => emitStatus(output));
+            emitStatus("File successfully converted to mp4!");
+
             var videoLength = await videoFileInfo.GetVideoLengthAsync(mp4VideoPath);
+            emitStatus($"Video length of conveted file: {videoLength.TotalMilliseconds}ms");
+
             await processVideoService.SplitMp4FileIntoTSFiles(mp4VideoPath, processingDirectory.FullName);
+            emitStatus($"Video successfully splitted to .ts files");
 
-            var manifest = await createManifest(Command.VideoId);
+            var manifest = await createManifest(command.VideoId);
+            emitStatus($"Manifest created");
 
-            await getThumbnails(Command.VideoId, mp4VideoPath, videoLength);
-            await uploadVideoParts(Command.VideoId);
-            await uploadVideoThumbnails(Command.VideoId);
+            await getThumbnails(command.VideoId, mp4VideoPath, videoLength);
+            await uploadVideoParts(command.VideoId);
+            await uploadVideoThumbnails(command.VideoId);
 
             timer.Stop();
+
+            emitStatus($"Total processing time: {timer.ElapsedMilliseconds}ms");
 
             processingDirectory.Delete(recursive: true);
             videoState |= VideoState.Processed;
@@ -79,18 +95,29 @@ namespace Streaming.Application.Commands.Video
                 FinishedProcessingDate = DateTime.UtcNow,
                 ProcessingInfo = $"Sucessfully processed after {timer.Elapsed.TotalMilliseconds}ms",
                 VideoState = videoState,
-                VideoId = Command.VideoId,
+                VideoId = command.VideoId,
                 VideoLength = videoLength,
                 VideoManifestHLS = manifest.ToString()
             });
             await videoRepo.CommitAsync();
         }
 
-        private void setupProcessingEnvironment(ProcessVideoCommand command)
+        private void emitStatus(string str)
+        {
+            emitter.Emit(new VideoProcessingStatusEvent
+            {
+                VideoId = command.VideoId,
+                UserId = command.UserId,
+                Output = str
+            });
+        }
+
+        private void setupProcessingEnvironment()
         {
             processingDirectory = Directory.CreateDirectory(pathStrategy.VideoProcessingDirectoryPath(command.VideoId));
             thumbnailsDirectory = Directory.CreateDirectory(pathStrategy.VideoThumbnailsDirectoryPath(command.VideoId));
             Directory.CreateDirectory(pathStrategy.VideoProcessedDirectoryPath(command.VideoId));
+            emitStatus("Environment for processing setted up!");
         }
 
         private async Task<VideoManifest> createManifest(Guid videoId)
