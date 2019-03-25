@@ -1,4 +1,4 @@
-version: "0.1"
+version: "2"
 services:
   api:
     container_name: streaming_api
@@ -7,9 +7,23 @@ services:
       dockerfile: Dockerfile
     image: streaming_api
     environment:
-    - ASPNETCORE_ENVIRONMENT=Docker
+      - ASPNETCORE_ENVIRONMENT=Docker
     ports:
       - "8086:8086"
+    networks:
+      - main-network
+  rtmpServer:
+    container_name: streaming_rtmp_server
+    build:
+      context: Streaming.RTMPServer/
+      dockerfile: Dockerfile
+    image: nginx_rtmp_server
+    environment:
+      - UPLOAD_ENDPOINT=http://host.docker.internal:8086/Live/UploadStreamPart
+      - PUBLISH_ENDPOINT=http://host.docker.internal:8086/Live/Publish
+      - STOP_PUBLISH_ENDPOINT=http://host.docker.internal:8086/Live/StopPublish
+    ports:
+      - "8085:1935"
     networks:
       - main-network
   frontend:

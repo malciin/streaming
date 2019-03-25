@@ -1,0 +1,7 @@
+docker rm -f $(docker ps -q --filter name=nginxRTMP)
+docker build -t nginxstream:0.1 .
+docker run -e UPLOAD_ENDPOINT=http://host.docker.internal:8086/Live/UploadStreamPart -e PUBLISH_ENDPOINT=http://host.docker.internal:8086/Live/Publish -e STOP_PUBLISH_ENDPOINT=http://host.docker.internal:8080/Live/StopPublish --name nginxRTMP -p 32544:1935 --restart unless-stopped nginxstream:0.1
+
+docker exec -it $(docker ps -q --filter name=nginxRTMP) /bin/bash
+
+tail -f /usr/local/nginx/logs/error.log
