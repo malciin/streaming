@@ -1,4 +1,4 @@
 docker rm -f $(docker ps -q --filter name=srsRTMP)
 docker build -t srs-rtmp:0.1 .
-docker run --name srsRTMP -e UPLOAD_FILE_ENDPOINT=http://host.docker.internal:8086/LiveSrs/UploadFile -p 8085:1935 --restart unless-stopped srs-rtmp:0.1
+docker run --name srsRTMP -e ON_CONNECT_ENDPOINT=http://host.docker.internal:8086/Live/OnConnect -e UPLOAD_FILE_ENDPOINT=http://host.docker.internal:8086/Live/UploadFile -p 8085:1935 --restart unless-stopped srs-rtmp:0.1
 docker exec -it $(docker ps -q --filter name=srsRTMP) /bin/bash

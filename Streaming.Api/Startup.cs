@@ -32,9 +32,9 @@ namespace Streaming.Api
         {
             services.AddCors(options =>
             {
-                options.AddPolicy("AllowLocalhost", x =>
+                options.AddPolicy("AllowAny", x =>
                 {
-                    x.WithOrigins("http://localhost:3000").AllowAnyMethod().AllowAnyHeader().AllowCredentials();
+                    x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader().AllowCredentials();
                 });
             });
 
@@ -69,7 +69,7 @@ namespace Streaming.Api
                 app.UseMiddleware<ExceptionHandlingMiddleware>();
             }
 
-            app.UseCors("AllowLocalhost");
+            app.UseCors("AllowAny");
             app.UseAuthentication();
             app.UseSignalR(config =>
             {

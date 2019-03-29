@@ -1,5 +1,6 @@
 ﻿using Autofac;
 using Streaming.Application.Interfaces.Services;
+using Streaming.Application.Models;
 using Streaming.Infrastructure.Services;
 
 namespace Streaming.Infrastructure.IoC
@@ -37,6 +38,9 @@ namespace Streaming.Infrastructure.IoC
 
             builder.RegisterType<SHA256MessageSignerService>()
                    .As<IMessageSignerService>()
+                   .SingleInstance();
+
+            builder.RegisterType<StreamManager>()
                    .SingleInstance();
         }
     }
