@@ -14,6 +14,8 @@ else
         useradd -m `echo $SSH_USERNAME`
         echo "$SSH_USERNAME:$SSH_PASSWORD" | chpasswd
         usermod -aG sudo `echo $SSH_USERNAME`
+        usermod -s /bin/bash `echo $SSH_USERNAME`
+        chmod -x /etc/update-motd.d/*
     fi
 	echo "Starting openSSH..."
 	/usr/sbin/sshd -D &

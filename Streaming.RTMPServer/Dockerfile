@@ -1,28 +1,27 @@
-FROM ubuntu:18.04
+FROM ubuntu:16.04
 RUN apt-get update
 
 # Basic utilities
-RUN apt-get install -y build-essential
-RUN apt-get install -y apt-utils
+RUN apt-get install -y build-essential python
+RUN apt-get install -y apt-utils net-tools curl wget iputils-ping lsof
 RUN apt-get install -y git
-RUN apt-get install -y curl wget iputils-ping lsof
 RUN apt-get install -y vim
+RUN apt-get install -y ffmpeg
+RUN apt-get install -y sudo
 
-# RTMP Nginx Server
+WORKDIR /root
+RUN git clone https://github.com/ossrs/srs
+WORKDIR /root/srs/trunk
+# RUN git checkout 3.0release
+RUN ./configure && make
 EXPOSE 1935
-RUN apt-get install -y libpcre3 libpcre3-dev libssl-dev zlib1g-dev -y
-RUN wget http://nginx.org/download/nginx-1.14.2.tar.gz
-RUN tar -xf nginx-1.14.2.tar.gz
-RUN git clone https://github.com/sergey-dryabzhinsky/nginx-rtmp-module.git
-RUN cd nginx-1.14.2 && ./configure --with-http_ssl_module --add-module=../nginx-rtmp-module
-RUN cd nginx-1.14.2 && make install
 
-# SSH Server
-EXPOSE 22
-RUN apt-get install -y sudo openssh-server
-ADD makeRequest.sh /root/makeRequest.sh
-ADD setupMachine.sh /root/setupMachine.sh
-ADD runMachine.sh /root/runMachine.sh
-RUN chmod u+x /root/setupMachine.sh
-RUN bash /root/setupMachine.sh
-CMD bash /root/runMachine.sh
+RUN curl -sL https://deb.nodesource.com/setup_10.x | bash - && apt-get install -y nodejs
+
+ADD package.json package.json
+ADD localServer.js localServer.js
+RUN npm i
+ADD srs.conf srs-custom.conf
+ADD runSrsServer.sh runSrsServer.sh
+RUN chmod u+x runSrsServer.sh
+CMD ./runSrsServer.sh

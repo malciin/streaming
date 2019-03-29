@@ -1,0 +1,14 @@
+{
+  "name": "streaming.rtmpserver",
+  "version": "1.0.0",
+  "description": "",
+  "main": "localServer.js",
+  "scripts": {
+    "server": "node localServer.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.16.4"
+  }
+}
