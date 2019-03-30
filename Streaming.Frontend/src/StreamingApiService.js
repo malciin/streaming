@@ -11,6 +11,7 @@ export default class ApiService {
         this.getVideo = this.getVideo.bind(this);
         this.uploadVideo = this.uploadVideo.bind(this);
         this.deleteVideo = this.deleteVideo.bind(this);
+        this.getStreamToken = this.getStreamToken.bind(this);
     }
 
     getJsonRequestHeaders() {
@@ -121,5 +122,14 @@ export default class ApiService {
             method: 'DELETE',
             headers: this.getJsonRequestHeaders()
         })
+    }
+
+    async getStreamToken() {
+        await this.authContext.waitForAuth();
+        let response = await fetch(`${Config.apiPath}/Live/Token`, {
+            method: 'GET',
+            headers: this.getJsonRequestHeaders()
+        })
+        return (await response.json()).token;
     }
 }

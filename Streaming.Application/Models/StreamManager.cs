@@ -11,7 +11,7 @@ namespace Streaming.Application.Models
 {
     public class StreamManager
     {
-        private readonly int maxTsFiles = 5;
+        private readonly static int maxTsFiles = 5;
         private readonly ConcurrentDictionary<Guid, string> streamKeyMappings;
         private readonly ConcurrentDictionary<string, StreamInternalModel> memoryModel;
 
@@ -100,7 +100,7 @@ namespace Streaming.Application.Models
             var manifestBuilder = new StringBuilder();
             manifestBuilder.AppendLine("#EXTM3U");
             manifestBuilder.AppendLine("#EXT-X-VERSION:3");
-            manifestBuilder.AppendLine($"#EXT-X-TARGETDURATION:3");
+            manifestBuilder.AppendLine($"#EXT-X-TARGETDURATION:10");
             manifestBuilder.AppendLine($"#EXT-X-MEDIA-SEQUENCE:{Math.Max(0, streamMemoryModel.MediaSequence- maxTsFiles)}");
 
             for (int i = Math.Max(0, streamMemoryModel.MediaSequence - maxTsFiles); i<streamMemoryModel.MediaSequence; i++)

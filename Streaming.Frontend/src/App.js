@@ -2,7 +2,7 @@ import '../node_modules/bootstrap/dist/css/bootstrap.css'
 import React, { Component } from 'react';
 import { Router, Route } from "react-router-dom";
 import IndexPage from './pages/indexPage/IndexPage';
-import UploadVideoPage from './pages/uploadVideoPage/UploadVideoPage';
+import UploadVideoPage from './pages/uploadVideoPage/uploadVideoPage';
 import './App.scss'
 import VideoPage from './pages/videoPage/VideoPage';
 import { AppContext } from './AppContext';
@@ -11,6 +11,7 @@ import history from './History';
 import AdminPage from './pages/adminPage/AdminPage';
 import EditVideoPage from './pages/editVideoPage/EditVideoPage';
 import SignalRPage from './pages/signalRPage/signalRPage';
+import StreamPage from './pages/streamPage/streamPage';
 
 class App extends Component {
 
@@ -29,6 +30,7 @@ class App extends Component {
           <Route exact path="/Edit/:id" component={EditVideoPage} />
           <Route exact path="/Admin" component={AdminPage} />
           <Route exact path="/SignalR" component={SignalRPage} />
+          <Route exact path="/Stream" component={StreamPage} />
           <Route path="/sign-in" render={(props) => {
             this.context.auth.loginCallback(props);
             return <Callback />

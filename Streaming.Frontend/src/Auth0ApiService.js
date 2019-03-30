@@ -1,5 +1,4 @@
 import { Config } from "./shared/config";
-import { AsyncFunctions } from "./shared/AsyncFunctions";
 
 export default class Auth0ApiService {
 
@@ -25,7 +24,7 @@ export default class Auth0ApiService {
 
     async updateClaims(updateClaimsObject) {
         await this.authContext.waitForAuth();
-        const response = await fetch(`${this.api}users/${updateClaimsObject.userId}`, {
+        await fetch(`${this.api}users/${updateClaimsObject.userId}`, {
             method: 'PATCH',
             headers: {
                 'Accept': 'application/json',
