@@ -19,9 +19,8 @@ services:
       dockerfile: Dockerfile
     image: nginx_rtmp_server
     environment:
-      - UPLOAD_ENDPOINT=http://host.docker.internal:8086/Live/UploadStreamPart
-      - PUBLISH_ENDPOINT=http://host.docker.internal:8086/Live/Publish
-      - STOP_PUBLISH_ENDPOINT=http://host.docker.internal:8086/Live/StopPublish
+      - UPLOAD_FILE_ENDPOINT=http://host.docker.internal:8086/Live/UploadFile
+      - ON_CONNECT_ENDPOINT=http://host.docker.internal:8086/Live/OnConnect
     ports:
       - "8085:1935"
     networks:
