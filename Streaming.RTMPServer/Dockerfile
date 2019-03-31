@@ -1,4 +1,5 @@
 FROM ubuntu:16.04
+
 RUN apt-get update
 
 # Basic utilities
@@ -8,20 +9,17 @@ RUN apt-get install -y git
 RUN apt-get install -y vim
 RUN apt-get install -y ffmpeg
 RUN apt-get install -y sudo
+RUN apt-get install -y unzip # needed for ./configure
 
 WORKDIR /root
-RUN git clone https://github.com/ossrs/srs
-WORKDIR /root/srs/trunk
-# RUN git checkout 3.0release
+RUN wget ny.malcin.tk/rtmp-1554068040.tgz
+RUN sudo tar -xvf rtmp-1554068040.tgz
+WORKDIR /root/trunk
+
 RUN ./configure && make
+
 EXPOSE 1935
+EXPOSE 80
 
-RUN curl -sL https://deb.nodesource.com/setup_10.x | bash - && apt-get install -y nodejs
-
-ADD package.json package.json
-ADD localServer.js localServer.js
-RUN npm i
-ADD srs.conf srs-custom.conf
-ADD runSrsServer.sh runSrsServer.sh
-RUN chmod u+x runSrsServer.sh
-CMD ./runSrsServer.sh
+COPY srs.conf srs.conf
+CMD ./objs/srs -c srs.conf && tail -f ./objs/srs.log -f localServer.log

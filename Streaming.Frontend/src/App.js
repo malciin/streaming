@@ -21,6 +21,7 @@ class App extends Component {
   }
 
   render() {
+    console.log(process.env.REACT_APP_API_URL);
     return (
       <Router history={history}>
         <div className="app">

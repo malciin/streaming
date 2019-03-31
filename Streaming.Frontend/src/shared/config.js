@@ -1,5 +1,5 @@
 export const Config = {
-    apiPath: process.env.API_URL,
+    apiPath: process.env.REACT_APP_API_URL,
     auth0: {
         clientID: "kkF9cfb31YAOvr8R5q1FQ8byH9YiQXyr",
         domain: "id0.eu.auth0.com",

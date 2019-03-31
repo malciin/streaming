@@ -40,7 +40,7 @@ namespace Streaming.Infrastructure.IoC
                    .As<IMessageSignerService>()
                    .SingleInstance();
 
-            builder.RegisterType<StreamManager>()
+            builder.RegisterType<LiveManager>()
                    .SingleInstance();
         }
     }

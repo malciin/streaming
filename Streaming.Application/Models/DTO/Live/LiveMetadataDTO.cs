@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace Streaming.Application.Commands.Live
+namespace Streaming.Application.Models.DTO.Live
 {
-    public class StartLiveCommand : ICommand
+    public class LiveMetadataDTO
     {
         public Guid StreamId { get; set; }
         public string ManifestUrl { get; set; }

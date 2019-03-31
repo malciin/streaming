@@ -34,6 +34,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Presentation", "Presentatio
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{03C432E8-688A-4B0A-8F80-D38F3DCBC509}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Streaming.RtmpServer", "Streaming.RtmpServer", "{246C4BB0-3729-497A-ABEB-79740D0621FC}"
+	ProjectSection(SolutionItems) = preProject
+		Streaming.RTMPServer\Dockerfile = Streaming.RTMPServer\Dockerfile
+		Streaming.RTMPServer\rebuild = Streaming.RTMPServer\rebuild
+		Streaming.RTMPServer\srs.conf = Streaming.RTMPServer\srs.conf
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -80,6 +87,7 @@ Global
 		{BF2F333C-C57B-4C12-A17D-85B7E5BF3A34} = {03C432E8-688A-4B0A-8F80-D38F3DCBC509}
 		{3C042F4F-41A1-4143-B453-21B8AE2C838F} = {6C694025-EB43-4DA2-94F6-BD5DD756F585}
 		{D3762445-CBB3-4BA5-9765-4ABEBE094C73} = {864467AA-40D6-4154-8637-8C6FB551B2C7}
+		{246C4BB0-3729-497A-ABEB-79740D0621FC} = {D231C19D-3379-43A2-93BF-F5DD695ACFB0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4DFA51A9-1A25-4CE8-942B-FE978749C720}
