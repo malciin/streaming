@@ -1,8 +1,8 @@
-import Navbar from "../../components/navbar/Navbar";
+import Navbar from "../../components/navbar/navbar";
 import React from 'react';
-import { AppContext } from "../../AppContext";
-import './AdminPage.scss';
-import UserListItem from "../../components/blocks/UserListItem/UserListItem";
+import { AppContext } from "../../appContext";
+import './adminPage.scss';
+import UserListItem from "../../components/blocks/userListItem/userListItem";
 
 export default class AdminPage extends React.Component {
     constructor(props) {

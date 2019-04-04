@@ -1,6 +1,6 @@
 import React from 'react';
-import Navbar from '../../components/navbar/Navbar';
-import { AppContext } from '../../AppContext';
+import Navbar from '../../components/navbar/navbar';
+import { AppContext } from '../../appContext';
 import UploadVideoForm from '../../components/forms/uploadVideoForm/uploadVideoForm';
 import UploadingVideoStatus from '../../components/blocks/uploadingVideoStatus/uploadingVideoStatus';
 import Console from '../../components/blocks/console/console';

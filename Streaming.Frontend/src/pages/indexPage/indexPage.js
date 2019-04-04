@@ -1,8 +1,8 @@
 import React from 'react';
-import './IndexPage.scss'
-import Navbar from '../../components/navbar/Navbar';
-import VideoListItem from '../../components/blocks/videoListItem/VideoListItem';
-import { AppContext } from '../../AppContext';
+import './indexPage.scss'
+import Navbar from '../../components/navbar/navbar';
+import VideoListItem from '../../components/blocks/videoListItem/videoListItem';
+import { AppContext } from '../../appContext';
 
 class IndexPage extends React.Component{
     constructor(props) {

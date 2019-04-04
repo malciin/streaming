@@ -1,5 +1,5 @@
 import { Config } from "./shared/config";
-import { AsyncFunctions } from "./shared/AsyncFunctions";
+import { AsyncFunctions } from "./shared/asyncFunctions";
 var SparkMD5 = require('spark-md5');
 
 export default class ApiService {

@@ -1,15 +1,15 @@
 import '../node_modules/bootstrap/dist/css/bootstrap.css'
 import React, { Component } from 'react';
 import { Router, Route } from "react-router-dom";
-import IndexPage from './pages/indexPage/IndexPage';
+import IndexPage from './pages/indexPage/indexPage';
 import UploadVideoPage from './pages/uploadVideoPage/uploadVideoPage';
-import './App.scss'
-import VideoPage from './pages/videoPage/VideoPage';
-import { AppContext } from './AppContext';
-import Callback from './pages/callback/Callback';
-import history from './History';
-import AdminPage from './pages/adminPage/AdminPage';
-import EditVideoPage from './pages/editVideoPage/EditVideoPage';
+import './app.scss'
+import VideoPage from './pages/videoPage/videoPage';
+import { AppContext } from './appContext';
+import Callback from './pages/callback/callback';
+import history from './history';
+import AdminPage from './pages/adminPage/adminPage';
+import EditVideoPage from './pages/editVideoPage/editVideoPage';
 import SignalRPage from './pages/signalRPage/signalRPage';
 import StreamPage from './pages/streamPage/streamPage';
 

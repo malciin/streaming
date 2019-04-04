@@ -1,6 +1,6 @@
 import React from 'react';
 import { Config } from '../../shared/config';
-import { AppContext } from '../../AppContext';
+import { AppContext } from '../../appContext';
 var signalR = require('@aspnet/signalr');
 
 export default class SignalRPage extends React.Component {

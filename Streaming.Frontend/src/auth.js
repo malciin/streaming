@@ -1,7 +1,7 @@
 import auth0 from 'auth0-js';
 import { Config } from './shared/config';
-import history from './History';
-import { AsyncFunctions } from './shared/AsyncFunctions';
+import history from './history';
+import { AsyncFunctions } from './shared/asyncFunctions';
 
 export default class Auth {
 

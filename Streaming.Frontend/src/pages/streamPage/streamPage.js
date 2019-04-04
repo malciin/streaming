@@ -1,9 +1,9 @@
 import React from 'react'
-import Navbar from '../../components/navbar/Navbar';
+import Navbar from '../../components/navbar/navbar';
 import VideoPlayer from '../../components/blocks/videoPlayer/videoPlayer';
 import { Config } from '../../shared/config';
 import './streamPage.scss';
-import { AppContext } from '../../AppContext';
+import { AppContext } from '../../appContext';
 
 export default class StreamPage extends React.Component {
     render() {

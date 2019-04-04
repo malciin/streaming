@@ -1,6 +1,6 @@
 import React from 'react';
-import { AppContext } from '../../AppContext';
-import Navbar from '../../components/navbar/Navbar';
+import { AppContext } from '../../appContext';
+import Navbar from '../../components/navbar/navbar';
 
 export default class EditVideoPage extends React.Component {
     render() {

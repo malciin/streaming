@@ -1,7 +1,7 @@
-import Auth from './Auth';
+import Auth from './auth';
 import React from 'react';
-import StreamingApiService from './StreamingApiService';
-import Auth0ApiService from './Auth0ApiService';
+import StreamingApiService from './streamingApiService';
+import Auth0ApiService from './auth0ApiService';
 
 const auth = new Auth();
 const streamingApiService = new StreamingApiService({ auth: auth });

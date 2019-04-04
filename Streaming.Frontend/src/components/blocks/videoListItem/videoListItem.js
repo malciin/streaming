@@ -1,8 +1,8 @@
 import React from 'react'
-import './VideoListItem.scss'
+import './videoListItem.scss'
 import { Link } from "react-router-dom";
-import { AppContext } from '../../../AppContext';
-import { Claims } from '../../../shared/Claims';
+import { AppContext } from '../../../appContext';
+import { Claims } from '../../../shared/claims';
 
 export default class VideoListItem extends React.Component {
     constructor(props) {

@@ -1,10 +1,10 @@
 import React from 'react'
-import Navbar from '../../components/navbar/Navbar';
+import Navbar from '../../components/navbar/navbar';
 import VideoPlayer from '../../components/blocks/videoPlayer/videoPlayer';
 import { Config } from '../../shared/config';
-import './VideoPage.scss';
+import './videoPage.scss';
 import moment from 'moment/moment.js'
-import { AppContext } from '../../AppContext';
+import { AppContext } from '../../appContext';
 
 export default class VideoPage extends React.Component {
     constructor(props) {

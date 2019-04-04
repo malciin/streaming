@@ -1,8 +1,8 @@
 import React from 'react';
-import './Navbar.scss'
+import './navbar.scss'
 import { NavLink } from "react-router-dom";
-import { AppContext } from '../../AppContext';
-import LoginControl from './loginControl/LoginControl';
+import { AppContext } from '../../appContext';
+import LoginControl from './loginControl/loginControl';
 
 class Navbar extends React.Component {
 

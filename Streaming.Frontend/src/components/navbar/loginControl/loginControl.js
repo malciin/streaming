@@ -1,6 +1,6 @@
 import React from 'react';
-import './LoginControl.scss';
-import { AppContext } from '../../../AppContext';
+import './loginControl.scss';
+import { AppContext } from '../../../appContext';
 
 export default class LoginControl extends React.Component {
     constructor(props)

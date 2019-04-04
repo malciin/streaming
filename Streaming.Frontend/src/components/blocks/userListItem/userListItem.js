@@ -1,5 +1,5 @@
 import React from 'react';
-import './UserListItem.scss';
+import './userListItem.scss';
 import moment from 'moment/moment.js'
 export default class UserListItem extends React.Component {
     constructor(props) {
