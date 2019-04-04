@@ -8,6 +8,7 @@ using Streaming.Infrastructure.IoC.Extensions;
 using System;
 using System.IO;
 using System.Linq;
+using Streaming.Common.Extensions;
 
 namespace Streaming.Tests.Services
 {
@@ -15,6 +16,12 @@ namespace Streaming.Tests.Services
     {
         private DirectoryInfo videoSamplesPath;
         private IVideoFileInfoService videoFileInfoService;
+
+        [OneTimeSetUp]
+        public void AssertFFmpegIsInstalled()
+        {
+            Assert.DoesNotThrowAsync(() => "ffmpeg -version".ExecuteBashAsync(), $"Ensure that FFmpeg is installed!");
+        }
 
         [SetUp]
         public void Setup()
