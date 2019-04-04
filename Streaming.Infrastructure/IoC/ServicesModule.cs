@@ -15,11 +15,11 @@ namespace Streaming.Infrastructure.IoC
                    .As<IVideoFileInfoService>()
                    .SingleInstance();
 
-            builder.RegisterType<LocalStorageVideoBlobService>()
-                   .As<IVideoBlobService>()
+            builder.RegisterType<VideoFilesLocalService>()
+                   .As<IVideoFilesService>()
                    .InstancePerLifetimeScope();
 
-            builder.RegisterType<ThumbnailService>()
+            builder.RegisterType<ThumbnailAzureBlobService>()
                    .As<IThumbnailService>()
                    .InstancePerLifetimeScope();
 

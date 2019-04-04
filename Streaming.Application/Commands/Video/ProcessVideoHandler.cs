@@ -18,7 +18,7 @@ namespace Streaming.Application.Commands.Video
     public class ProcessVideoHandler : ICommandHandler<ProcessVideoCommand>
     {
 		private readonly IVideoRepository videoRepo;
-		private readonly IVideoBlobService videoBlobService;
+		private readonly IVideoFilesService videoBlobService;
         private readonly IProcessVideoService processVideoService;
         private readonly IVideoFileInfoService videoFileInfo;
         private readonly IThumbnailService thumbnailService;
@@ -36,7 +36,7 @@ namespace Streaming.Application.Commands.Video
 
         public ProcessVideoHandler(
             IVideoRepository videoRepo,
-			IVideoBlobService videoBlobService,
+			IVideoFilesService videoBlobService,
             IProcessVideoService processVideoService,
             IVideoFileInfoService videoFileInfo,
             IThumbnailService thumbnailService,

@@ -8,11 +8,11 @@ using System.Threading.Tasks;
 
 namespace Streaming.Infrastructure.Services
 {
-    public class LocalStorageVideoBlobService : IVideoBlobService
+    public class VideoFilesLocalService : IVideoFilesService
     {
         private readonly IHttpContextAccessor httpContextAccessor;
         private readonly IPathStrategy pathStrategy;
-        public LocalStorageVideoBlobService(IHttpContextAccessor httpContextAccessor, IPathStrategy pathStrategy)
+        public VideoFilesLocalService(IHttpContextAccessor httpContextAccessor, IPathStrategy pathStrategy)
         {
             this.httpContextAccessor = httpContextAccessor;
             this.pathStrategy = pathStrategy;

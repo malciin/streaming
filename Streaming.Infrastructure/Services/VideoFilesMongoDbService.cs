@@ -8,12 +8,12 @@ using System.Threading.Tasks;
 
 namespace Streaming.Infrastructure.Services
 {
-	public class VideoMongoDbBlobService : IVideoBlobService
+	public class VideoFilesMongoDbService : IVideoFilesService
 	{
 		private readonly IGridFSBucket gridBucket;
         private readonly IHttpContextAccessor httpContextAccessor;
 
-		public VideoMongoDbBlobService(IGridFSBucket gridBucket, IHttpContextAccessor httpContextAccessor)
+		public VideoFilesMongoDbService(IGridFSBucket gridBucket, IHttpContextAccessor httpContextAccessor)
 		{
 			this.gridBucket = gridBucket;
             this.httpContextAccessor = httpContextAccessor;

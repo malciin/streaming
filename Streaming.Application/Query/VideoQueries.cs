@@ -20,14 +20,14 @@ namespace Streaming.Application.Query
         private readonly VideoMappings mapper;
         private readonly IVideoRepository videoRepo;
 		private readonly IDirectoriesSettings directoriesSettings;
-		private readonly IVideoBlobService videoBlobService;
+		private readonly IVideoFilesService videoBlobService;
         private readonly IProcessVideoService processVideoService;
 
         public VideoQueries(VideoMappings mapper,
             IProcessVideoService processVideoService,
             IVideoRepository videoRepo,
 			IDirectoriesSettings directoriesSettings,
-            IVideoBlobService videoBlobService)
+            IVideoFilesService videoBlobService)
         {
             this.mapper = mapper;
             this.videoRepo = videoRepo;
