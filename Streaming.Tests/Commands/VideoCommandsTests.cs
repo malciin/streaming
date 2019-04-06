@@ -35,7 +35,7 @@ namespace Streaming.Tests.Commands
             containerBuilder.RegisterModule<CommandModule>();
             containerBuilder.RegisterModule<StrategiesModule>();
 
-            containerBuilder.RegisterUnused(typeof(IDirectoriesSettings));
+            containerBuilder.RegisterUnused(typeof(ILogsDirectorySettings), typeof(ILocalStorageDirectorySettings));
 
             var processVideoService = new Mock<IProcessVideoService>();
             processVideoService.Setup(x => x.SupportedVideoCodecs()).Returns(new List<VideoCodec>

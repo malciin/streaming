@@ -32,10 +32,5 @@ namespace Streaming.Infrastructure.Services
         {
             await blobClient.UploadFileAsync(blobContainerName, fileNameStrategy.GetThumbnailFileName(VideoId), Stream);
         }
-
-        public string GetPlaceholderThumbnailUrl()
-        {
-            throw new NotImplementedException();
-        }
     }
 }

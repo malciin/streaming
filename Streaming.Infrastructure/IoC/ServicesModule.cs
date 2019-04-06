@@ -19,7 +19,7 @@ namespace Streaming.Infrastructure.IoC
                    .As<IVideoFilesService>()
                    .InstancePerLifetimeScope();
 
-            builder.RegisterType<ThumbnailAzureBlobService>()
+            builder.RegisterType<ThumbnailLocalService>()
                    .As<IThumbnailService>()
                    .InstancePerLifetimeScope();
 

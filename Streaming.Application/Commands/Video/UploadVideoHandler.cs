@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Streaming.Application.Interfaces.Repositories;
 using Streaming.Application.Interfaces.Services;
-using Streaming.Application.Interfaces.Settings;
 using Streaming.Application.Interfaces.Strategies;
 
 namespace Streaming.Application.Commands.Video
@@ -13,25 +12,24 @@ namespace Streaming.Application.Commands.Video
 		private readonly ICommandBus commandBus;
         private readonly IMessageSignerService messageSigner;
         private readonly IVideoRepository videoRepo;
-        private readonly IPathStrategy pathStrategy;
         private readonly IVideoFileInfoService videoFileInfoService;
+        private readonly IVideoProcessingFilesPathStrategy videoProcessingFilesPathStrategy;
         private readonly IProcessVideoService processVideoService;
 
 		public UploadVideoHandler(IVideoRepository videoRepo,
-			IDirectoriesSettings directoriesSettings,
             ICommandBus commandBus,
             IMessageSignerService messageSigner,
-            IPathStrategy pathStrategy,
             IVideoFileInfoService videoFileInfoService,
-            IProcessVideoService processVideoService)
+            IProcessVideoService processVideoService,
+            IVideoProcessingFilesPathStrategy videoProcessingFilesPathStrategy)
 		{
 			this.videoRepo = videoRepo;
             this.commandBus = commandBus;
             this.messageSigner = messageSigner;
-            this.pathStrategy = pathStrategy;
             this.processVideoService = processVideoService;
             this.videoFileInfoService = videoFileInfoService;
-		}
+            this.videoProcessingFilesPathStrategy = videoProcessingFilesPathStrategy;
+        }
 
         public Guid getVideoIdFromUploadToken(string uploadToken)
         {
@@ -40,10 +38,10 @@ namespace Streaming.Application.Commands.Video
             return new Guid(message);
         }
 
-        public async Task HandleAsync(UploadVideoCommand Command)
+        public async Task HandleAsync(UploadVideoCommand command)
 		{
-            var videoId = getVideoIdFromUploadToken(Command.UploadToken);
-            var inputFilePath = pathStrategy.VideoProcessingFilePath(videoId);
+            var videoId = getVideoIdFromUploadToken(command.UploadToken);
+            var inputFilePath = videoProcessingFilesPathStrategy.RawUploadedVideoFilePath(videoId);
 
             var videoFileInfo = await videoFileInfoService.GetDetailsAsync(inputFilePath);
             if (!processVideoService.SupportedVideoCodecs().Contains(videoFileInfo.Video.Codec))
@@ -54,14 +52,14 @@ namespace Streaming.Application.Commands.Video
 			var video = new Domain.Models.Video
             {
 				CreatedDate = DateTime.Now,
-				Title = Command.Title,
-				Description = Command.Description,
+				Title = command.Title,
+				Description = command.Description,
 				VideoId = videoId,
                 Owner = new Domain.Models.UserDetails
                 {
-                    UserId = Command.User.UserId,
-                    Email = Command.User.Email,
-                    Nickname = Command.User.Nickname
+                    UserId = command.User.UserId,
+                    Email = command.User.Email,
+                    Nickname = command.User.Nickname
                 }
 			};
 
@@ -73,7 +71,7 @@ namespace Streaming.Application.Commands.Video
 				VideoId = video.VideoId,
                 InputFilePath = inputFilePath,
                 InputFileInfo = videoFileInfo,
-                UserId = Command.User.UserId
+                UserId = command.User.UserId
             });
 		}
 	}

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Streaming.Application.Interfaces.Services;
 using Streaming.Application.Interfaces.Strategies;
+using Streaming.Common.Extensions;
 using Streaming.Common.Helpers;
 using System;
 using System.IO;
@@ -11,8 +12,9 @@ namespace Streaming.Infrastructure.Services
     public class VideoFilesLocalService : IVideoFilesService
     {
         private readonly IHttpContextAccessor httpContextAccessor;
-        private readonly IPathStrategy pathStrategy;
-        public VideoFilesLocalService(IHttpContextAccessor httpContextAccessor, IPathStrategy pathStrategy)
+        private readonly IVideoFilesPathStrategy pathStrategy;
+
+        public VideoFilesLocalService(IHttpContextAccessor httpContextAccessor, IVideoFilesPathStrategy pathStrategy)
         {
             this.httpContextAccessor = httpContextAccessor;
             this.pathStrategy = pathStrategy;
@@ -20,7 +22,7 @@ namespace Streaming.Infrastructure.Services
 
         public Task<Stream> GetVideoAsync(Guid VideoId, int PartNumber)
         {
-            return Task.FromResult(File.OpenRead(pathStrategy.VideoSplittedFilePath(VideoId, PartNumber)) as Stream);
+            return Task.FromResult(File.OpenRead(pathStrategy.TransportStreamFilePath(VideoId, PartNumber)) as Stream);
         }
 
         public string GetVideoUrl(Guid VideoId, int PartNumber)
@@ -31,8 +33,8 @@ namespace Streaming.Infrastructure.Services
 
         public async Task UploadAsync(Guid VideoId, int PartNumber, Stream Stream)
         {
-            Directory.CreateDirectory(pathStrategy.VideoProcessedDirectoryPath(VideoId));
-            using (var writeStream = File.OpenWrite(pathStrategy.VideoSplittedFilePath(VideoId, PartNumber)))
+            Directory.CreateDirectory(pathStrategy.TransportStreamFilePath(VideoId, 0).SubstringToLastOccurence(Path.DirectorySeparatorChar));
+            using (var writeStream = File.OpenWrite(pathStrategy.TransportStreamFilePath(VideoId, PartNumber)))
             {
                 await Stream.CopyToAsync(writeStream);
             }

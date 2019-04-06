@@ -9,12 +9,11 @@ namespace Streaming.Infrastructure.Services
     public class LoggerService : ILoggerService
     {
         private readonly DirectoryInfo outputDirectory;
-        private readonly StreamWriter fileStream;
         private readonly object locker = new object();
 
-        public LoggerService(IDirectoriesSettings directoriesSettings)
+        public LoggerService(ILogsDirectorySettings logsDirectory)
         {
-            outputDirectory = Directory.CreateDirectory(directoriesSettings.LogsDirectory);
+            outputDirectory = Directory.CreateDirectory(logsDirectory.LogsDirectory);
         }
 
         private string getCurrentLogFileName()

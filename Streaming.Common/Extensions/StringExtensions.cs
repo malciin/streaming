@@ -93,5 +93,20 @@ namespace Streaming.Common.Extensions
             // If we got here, then the value is a valid base64 string
             return true;
         }
+
+        /// <summary>
+        /// Return substring from begin to the last occurence from the string, for example
+        /// hello,world,hello with ',' give hello,world
+        /// </summary>
+        /// <param name="str"></param>
+        /// <param name="split"></param>
+        /// <returns></returns>
+        public static string SubstringToLastOccurence(this string str, char split)
+        {
+            var index = str.LastIndexOf(split);
+            if (index < 0)  // not found - we return original string
+                return str;
+            return str.Substring(0, index);
+        }
     }
 }
