@@ -82,7 +82,26 @@ namespace Streaming.Api.Controllers
                 ManifestUrl = $"{json["tcUrl"].ToString()}{json["stream"].ToString()}.m3u8".Replace("rtmp", "http")
             });
 
-            return Ok();
+            return Ok(0);
+        }
+
+        [HttpPost("OnUnpublish")]
+        public async Task<IActionResult> OnUnpublish()
+        {
+            var request = Request;
+            JObject json;
+            using (var str = new MemoryStream())
+            {
+                Request.Body.CopyTo(str);
+                json = JObject.Parse(Encoding.UTF8.GetString(str.ToArray()));
+            }
+
+            await CommandDispatcher.HandleAsync(new FinishLiveCommand
+            {
+                StreamId = Guid.Parse(json["stream"].ToString())
+            });
+
+            return Ok(0);
         }
     }
 }

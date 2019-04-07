@@ -5,7 +5,7 @@ using Streaming.Application.Interfaces.Strategies;
 
 namespace Streaming.Application.Strategies
 {
-    public class PathStrategies : IVideoFilesPathStrategy, IVideoProcessingFilesPathStrategy
+    public class PathStrategies : IVideoFilesPathStrategy, IVideoProcessingFilesPathStrategy, IThumbnailLocalPathStrategy
     {
         private readonly string localStorageDirectoryPath;
         public PathStrategies(ILocalStorageDirectorySettings localStorageDirectory)
@@ -14,7 +14,7 @@ namespace Streaming.Application.Strategies
         }
 
         string IVideoFilesPathStrategy.TransportStreamFilePath(Guid videoId, int partNumber)
-            => String.Format($"{localStorageDirectoryPath}{{0}}ts_files{{0}}{partNumber}_{videoId}.ts", Path.DirectorySeparatorChar);
+            => String.Format($"{localStorageDirectoryPath}{{0}}processed{{0}}ts_files{{0}}{partNumber}_{videoId}.ts", Path.DirectorySeparatorChar);
 
 
         string IVideoProcessingFilesPathStrategy.Mp4ConvertedFilePath(Guid videoId)
@@ -28,5 +28,8 @@ namespace Streaming.Application.Strategies
 
         string IVideoProcessingFilesPathStrategy.ThumbnailFilePath(Guid videoId)
             => String.Format($"{localStorageDirectoryPath}{{0}}processing{{0}}{videoId}.jpg", Path.DirectorySeparatorChar);
+
+        public string GetThumbnailPath(Guid videoId)
+            => String.Format($"{localStorageDirectoryPath}{{0}}processed{{0}}{videoId}.jpg", Path.DirectorySeparatorChar);
     }
 }

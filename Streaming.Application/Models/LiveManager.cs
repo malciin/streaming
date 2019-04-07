@@ -19,7 +19,7 @@ namespace Streaming.Application.Models
             streams = new ConcurrentDictionary<Guid, LiveInternalModel>();
         }
 
-        public void OnConnect(Guid streamId, UserDetails user)
+        public void StartNewStream(Guid streamId, UserDetails user)
         {
             streams.TryAdd(streamId, new LiveInternalModel
             {
@@ -30,6 +30,11 @@ namespace Streaming.Application.Models
         public void AddManifestUrl(Guid streamId, string manifestUrl)
         {
             streams[streamId].ManifestUrl = manifestUrl;
+        }
+
+        public void FinishStream(Guid streamId)
+        {
+            streams.TryRemove(streamId, out _);
         }
     }
 }

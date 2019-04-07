@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Streaming.Application.Interfaces.Settings;
+using System.Reflection;
 
 namespace Streaming.Application.Settings
 {
@@ -14,7 +15,7 @@ namespace Streaming.Application.Settings
 			SecretServerKey = configuration["Hosting:ServerSecretKey"];
 			AzureBlobConnectionString = configuration["Hosting:AzureBlobConnectionString"];
             ClientSecret = configuration["Auth0_ManagementApi:ClientSecret"];
-			this.GetType().GetMethod("PerformSecretDeveloperBinding")?.Invoke(this, null);
+			this.GetType().GetMethod("PerformSecretDeveloperBinding", BindingFlags.NonPublic | BindingFlags.Instance)?.Invoke(this, null);
         }
     }
 }

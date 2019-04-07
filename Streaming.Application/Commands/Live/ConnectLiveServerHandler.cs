@@ -30,7 +30,7 @@ namespace Streaming.Application.Commands.Live
             var clientIdentifierBytes = messageSignerService.GetMessage(bytes);
             var clientIdentifier = Encoding.UTF8.GetString(clientIdentifierBytes);
 
-            liveManager.OnConnect(Command.StreamId, new UserDetails
+            liveManager.StartNewStream(Command.StreamId, new UserDetails
             {
                 UserId = clientIdentifier
             });
