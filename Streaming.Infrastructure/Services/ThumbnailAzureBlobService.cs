@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace Streaming.Infrastructure.Services
 {
-    public class ThumbnailService : IThumbnailService
+    public class ThumbnailAzureBlobService : IThumbnailService
     {
         private readonly IAzureBlobClient blobClient;
         private readonly IFileNameStrategy fileNameStrategy;
         private readonly static string blobContainerName = "thumbnails";
 
-        public ThumbnailService(IAzureBlobClient blobClient, IFileNameStrategy fileNameStrategy)
+        public ThumbnailAzureBlobService(IAzureBlobClient blobClient, IFileNameStrategy fileNameStrategy)
         {
             this.blobClient = blobClient;
             this.fileNameStrategy = fileNameStrategy;
@@ -31,11 +31,6 @@ namespace Streaming.Infrastructure.Services
         public async Task UploadAsync(Guid VideoId, Stream Stream)
         {
             await blobClient.UploadFileAsync(blobContainerName, fileNameStrategy.GetThumbnailFileName(VideoId), Stream);
-        }
-
-        public string GetPlaceholderThumbnailUrl()
-        {
-            throw new NotImplementedException();
         }
     }
 }

@@ -1,7 +1,6 @@
 ﻿using MongoDB.Driver;
 using Streaming.Application.Interfaces.Repositories;
 using Streaming.Application.Interfaces.Services;
-using Streaming.Application.Interfaces.Settings;
 using Streaming.Application.Mappings;
 using Streaming.Application.Models.DTO.Video;
 using Streaming.Common.Extensions;
@@ -19,21 +18,16 @@ namespace Streaming.Application.Query
     {
         private readonly VideoMappings mapper;
         private readonly IVideoRepository videoRepo;
-		private readonly IDirectoriesSettings directoriesSettings;
-		private readonly IVideoBlobService videoBlobService;
-        private readonly IProcessVideoService processVideoService;
+		private readonly IVideoFilesService videoBlobService;
 
         public VideoQueries(VideoMappings mapper,
             IProcessVideoService processVideoService,
             IVideoRepository videoRepo,
-			IDirectoriesSettings directoriesSettings,
-            IVideoBlobService videoBlobService)
+            IVideoFilesService videoBlobService)
         {
             this.mapper = mapper;
             this.videoRepo = videoRepo;
-			this.directoriesSettings = directoriesSettings;
 			this.videoBlobService = videoBlobService;
-            this.processVideoService = processVideoService;
         }
 
         public async Task<VideoMetadataDTO> GetBasicVideoMetadataAsync(Guid VideoId)

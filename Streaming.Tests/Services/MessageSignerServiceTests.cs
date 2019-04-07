@@ -18,6 +18,11 @@ namespace Streaming.Tests.Services
             var builder = new ContainerBuilder();
             builder.UseDefaultModules();
             builder.Register(x => new Mock<Microsoft.Extensions.Configuration.IConfigurationRoot>().Object).AsImplementedInterfaces();
+
+            var secretServerKey = new Mock<ISecretServerKey>();
+            secretServerKey.Setup(x => x.SecretServerKey).Returns("Some test secret server key");
+            builder.Register(x => secretServerKey.Object).AsImplementedInterfaces();
+
             componentContext = builder.Build();
         }
 

@@ -9,10 +9,10 @@ namespace Streaming.Infrastructure.IoC
         protected override void Load(ContainerBuilder builder)
         {
             base.Load(builder);
-            var assembly = typeof(PathStrategy).GetTypeInfo().Assembly;
+            var assembly = typeof(PathStrategies).GetTypeInfo().Assembly;
 
             builder.RegisterAssemblyTypes(assembly)
-                   .InNamespaceOf<PathStrategy>()
+                   .InNamespaceOf<PathStrategies>()
                    .AsImplementedInterfaces()
                    .SingleInstance();
         }
