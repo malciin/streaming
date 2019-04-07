@@ -24,18 +24,19 @@ namespace Streaming.Tests.Commands
     {
         private List<Video> videos;
         private ContainerBuilder containerBuilder;
-
         private Mock<IVideoRepository> videoRepositoryMock;
 
         [SetUp]
         public void SetUp()
         {
             videos = new List<Video>();
-            containerBuilder = new ContainerBuilder();
+			containerBuilder = new ContainerBuilder();
             containerBuilder.RegisterModule<CommandModule>();
             containerBuilder.RegisterModule<StrategiesModule>();
 
             containerBuilder.RegisterUnused(typeof(ILogsDirectorySettings), typeof(ILocalStorageDirectorySettings));
+
+            /// MOCKS ///
 
             var processVideoService = new Mock<IProcessVideoService>();
             processVideoService.Setup(x => x.SupportedVideoCodecs()).Returns(new List<VideoCodec>
@@ -44,6 +45,17 @@ namespace Streaming.Tests.Commands
             });
             containerBuilder.Register(x => processVideoService.Object).AsImplementedInterfaces();
 
+            var videoFileInfoService = new Mock<IVideoFileInfoService>();
+            videoFileInfoService.Setup(x => x.GetDetailsAsync(It.IsAny<string>())).Returns(Task.FromResult(new VideoFileDetailsDTO
+			{
+				Video = new VideoFileDetailsDTO.VideoDetailsDTO
+				{
+					Codec = VideoCodec.h264
+				}
+			}));
+            containerBuilder.Register(x => videoFileInfoService.Object).AsImplementedInterfaces();
+
+
             videoRepositoryMock = new Mock<IVideoRepository>();
             videoRepositoryMock.Setup(x => x.AddAsync(It.IsAny<Video>())).Returns((Video vid) =>
             {
@@ -51,7 +63,7 @@ namespace Streaming.Tests.Commands
                 return Task.FromResult(0);
             });
 
-            videoRepositoryMock.Setup(x => x.DeleteAsync(It.IsAny<Guid>())).Returns((Guid id) =>
+			videoRepositoryMock.Setup(x => x.DeleteAsync(It.IsAny<Guid>())).Returns((Guid id) =>
             {
                 videos = videos.Where(x => x.VideoId != id).ToList();
                 return Task.FromResult(0);
@@ -70,21 +82,8 @@ namespace Streaming.Tests.Commands
             containerBuilder.Register(x => videoRepositoryMock.Object).AsImplementedInterfaces();
 
             var messageSignerService = new Mock<IMessageSignerService>();
-            messageSignerService.Setup(x => x.GetMessage(It.IsAny<byte[]>())).Returns(Guid.NewGuid().ToByteArray());
+			messageSignerService.Setup(x => x.GetMessage(It.IsAny<byte[]>())).Returns(Guid.NewGuid().ToByteArray());
             containerBuilder.Register(x => messageSignerService.Object).AsImplementedInterfaces();
-        }
-
-        private void addDefaultVideoFileInfoService()
-        {
-            var videoFileInfoService = new Mock<IVideoFileInfoService>();
-            videoFileInfoService.Setup(x => x.GetDetailsAsync(It.IsAny<string>())).Returns(Task.FromResult(new VideoFileDetailsDTO
-            {
-                Video = new VideoFileDetailsDTO.VideoDetailsDTO
-                {
-                    Codec = VideoCodec.h264
-                }
-            }));
-            containerBuilder.Register(x => videoFileInfoService.Object).AsImplementedInterfaces();
         }
 
         [Test]
@@ -99,7 +98,7 @@ namespace Streaming.Tests.Commands
                 }
             }));
             containerBuilder.Register(x => videoFileInfoService.Object).AsImplementedInterfaces();
-
+            containerBuilder.RegisterType<UploadVideoHandler>().AsImplementedInterfaces();
             var ctx = containerBuilder.Build();
 
             var repo = ctx.Resolve<IVideoRepository>();
@@ -121,8 +120,10 @@ namespace Streaming.Tests.Commands
         [Test]
         public void UploadVideoCommand_Adding_Video_Works()
         {
-            addDefaultVideoFileInfoService();
+			containerBuilder.RegisterType<UploadVideoHandler>().AsImplementedInterfaces();
             var ctx = containerBuilder.Build();
+
+            var videoRepo = ctx.Resolve<IVideoRepository>();
 
             ctx.Resolve<ICommandDispatcher>().HandleAsync(new UploadVideoCommand
             {
@@ -145,6 +146,29 @@ namespace Streaming.Tests.Commands
             Assert.AreEqual("id", videos[0].Owner.UserId);
             Assert.AreEqual("nick", videos[0].Owner.Nickname);
             Assert.AreEqual(VideoState.Fresh, videos[0].State);
+        }
+
+        [Test]
+        public void UploadVideoCommand_Should_Push_ProcessVideoCommand()
+        {
+            containerBuilder.RegisterType<UploadVideoHandler>().AsImplementedInterfaces();
+            var commandBus = new Mock<ICommandBus>();
+            containerBuilder.Register(x => commandBus.Object).AsImplementedInterfaces();
+            
+            var ctx = containerBuilder.Build();
+            ctx.Resolve<ICommandDispatcher>().HandleAsync(new UploadVideoCommand
+            {
+                Title = "Title",
+                Description = "Desc",
+                User = new UserDetailsDTO
+                {
+                    Email = "email@gmail.com",
+                    Nickname = "nick",
+                    UserId = "id"
+                },
+                UploadToken = Convert.ToBase64String(new byte[] { 0x10 })
+            }).GetAwaiter().GetResult();
+            commandBus.Verify(x => x.Push(It.IsAny<ProcessVideoCommand>()), Times.Once);
         }
     }
 }
