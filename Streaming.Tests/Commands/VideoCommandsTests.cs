@@ -17,7 +17,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Reflection;
 
 namespace Streaming.Tests.Commands
 {
@@ -25,58 +24,40 @@ namespace Streaming.Tests.Commands
     {
         private List<Video> videos;
         private ContainerBuilder containerBuilder;
+        private Mock<IVideoRepository> videoRepositoryMock;
 
-		private Mock<IVideoRepository> videoRepositoryMock = new Mock<IVideoRepository>();
-		private Mock<IProcessVideoService> processVideoService = new Mock<IProcessVideoService>();
-		private Mock<IVideoFileInfoService> videoFileInfoService = new Mock<IVideoFileInfoService>();
-		private Mock<IMessageSignerService> messageSignerService = new Mock<IMessageSignerService>();
-
-		public IComponentContext BuildContext()
-		{
-			var mockObjects = this.GetType()
-									.GetFields(BindingFlags.NonPublic | BindingFlags.Instance)
-									.Select(x => x.GetValue(this))
-									.Where(x => x.GetType().IsAssignableTo<Mock>());
-
-			var mockedObjects = mockObjects.Select(x => x.GetType()
-														 .GetProperty("Object", x.GetType().GenericTypeArguments[0])
-														 .GetValue(x));
-
-			foreach (var mockedObject in mockedObjects)
-			{
-				var mockedObjectType = mockedObject.GetType();
-				containerBuilder.Register(x => mockedObject).AsImplementedInterfaces();
-			}
-			return containerBuilder.Build();
-		}
-
-		[SetUp]
+        [SetUp]
         public void SetUp()
         {
             videos = new List<Video>();
 			containerBuilder = new ContainerBuilder();
-			containerBuilder.RegisterType<CommandDispatcher>().AsImplementedInterfaces().SingleInstance();
-			containerBuilder.RegisterType<CommandBus>().AsImplementedInterfaces().SingleInstance();
+            containerBuilder.RegisterModule<CommandModule>();
             containerBuilder.RegisterModule<StrategiesModule>();
 
 			containerBuilder.RegisterUnused(typeof(IDirectoriesSettings));
-            processVideoService = new Mock<IProcessVideoService>();
+            
+            /// MOCKS ///
 
-			/// MOCKS ///
-			videoFileInfoService.Setup(x => x.GetDetailsAsync(It.IsAny<string>())).Returns(Task.FromResult(new VideoFileDetailsDTO
+            var processVideoService = new Mock<IProcessVideoService>();
+            processVideoService.Setup(x => x.SupportedVideoCodecs()).Returns(new List<VideoCodec>
+            {
+                VideoCodec.h264
+            });
+            containerBuilder.Register(x => processVideoService.Object).AsImplementedInterfaces();
+
+            var videoFileInfoService = new Mock<IVideoFileInfoService>();
+            videoFileInfoService.Setup(x => x.GetDetailsAsync(It.IsAny<string>())).Returns(Task.FromResult(new VideoFileDetailsDTO
 			{
 				Video = new VideoFileDetailsDTO.VideoDetailsDTO
 				{
 					Codec = VideoCodec.h264
 				}
 			}));
+            containerBuilder.Register(x => videoFileInfoService.Object).AsImplementedInterfaces();
 
-			processVideoService.Setup(x => x.SupportedVideoCodecs()).Returns(new List<VideoCodec>
-            {
-                VideoCodec.h264
-            });
 
-			videoRepositoryMock.Setup(x => x.AddAsync(It.IsAny<Video>())).Returns((Video vid) =>
+            videoRepositoryMock = new Mock<IVideoRepository>();
+            videoRepositoryMock.Setup(x => x.AddAsync(It.IsAny<Video>())).Returns((Video vid) =>
             {
                 videos.Add(vid);
                 return Task.FromResult(0);
@@ -98,13 +79,17 @@ namespace Streaming.Tests.Commands
                 }
                 return Task.FromResult(0);
             });
+            containerBuilder.Register(x => videoRepositoryMock.Object).AsImplementedInterfaces();
 
+            var messageSignerService = new Mock<IMessageSignerService>();
 			messageSignerService.Setup(x => x.GetMessage(It.IsAny<byte[]>())).Returns(Guid.NewGuid().ToByteArray());
+            containerBuilder.Register(x => messageSignerService.Object).AsImplementedInterfaces();
         }
 
         [Test]
         public void UploadVideoCommand_Unsupported_Video_Codec_Should_Throw_NotSupportedException()
         {
+            var videoFileInfoService = new Mock<IVideoFileInfoService>();
             videoFileInfoService.Setup(x => x.GetDetailsAsync(It.IsAny<string>())).Returns(Task.FromResult(new VideoFileDetailsDTO
             {
                 Video = new VideoFileDetailsDTO.VideoDetailsDTO
@@ -112,7 +97,9 @@ namespace Streaming.Tests.Commands
                     Codec = VideoCodec.mpeg1video
                 }
             }));
-            var ctx = BuildContext();
+            containerBuilder.Register(x => videoFileInfoService.Object).AsImplementedInterfaces();
+            containerBuilder.RegisterType<UploadVideoHandler>().AsImplementedInterfaces();
+            var ctx = containerBuilder.Build();
 
             var repo = ctx.Resolve<IVideoRepository>();
 
@@ -134,7 +121,9 @@ namespace Streaming.Tests.Commands
         public void UploadVideoCommand_Adding_Video_Works()
         {
 			containerBuilder.RegisterType<UploadVideoHandler>().AsImplementedInterfaces();
-            var ctx = BuildContext();
+            var ctx = containerBuilder.Build();
+
+            var videoRepo = ctx.Resolve<IVideoRepository>();
 
             ctx.Resolve<ICommandDispatcher>().HandleAsync(new UploadVideoCommand
             {
@@ -157,6 +146,29 @@ namespace Streaming.Tests.Commands
             Assert.AreEqual("id", videos[0].Owner.UserId);
             Assert.AreEqual("nick", videos[0].Owner.Nickname);
             Assert.AreEqual(VideoState.Fresh, videos[0].State);
+        }
+
+        [Test]
+        public void UploadVideoCommand_Should_Push_ProcessVideoCommand()
+        {
+            containerBuilder.RegisterType<UploadVideoHandler>().AsImplementedInterfaces();
+            var commandBus = new Mock<ICommandBus>();
+            containerBuilder.Register(x => commandBus.Object).AsImplementedInterfaces();
+            
+            var ctx = containerBuilder.Build();
+            ctx.Resolve<ICommandDispatcher>().HandleAsync(new UploadVideoCommand
+            {
+                Title = "Title",
+                Description = "Desc",
+                User = new UserDetailsDTO
+                {
+                    Email = "email@gmail.com",
+                    Nickname = "nick",
+                    UserId = "id"
+                },
+                UploadToken = Convert.ToBase64String(new byte[] { 0x10 })
+            }).GetAwaiter().GetResult();
+            commandBus.Verify(x => x.Push(It.IsAny<ProcessVideoCommand>()), Times.Once);
         }
     }
 }
