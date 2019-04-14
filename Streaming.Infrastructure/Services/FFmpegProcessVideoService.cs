@@ -60,6 +60,10 @@ namespace Streaming.Infrastructure.Services
         {
             var videoDetails = new VideoFileDetailsDTO();
 
+            // We removing new lines because sometimes ffmpeg can add accidentally newline and as a consequence
+            // regex will throw an exception - we only save newlines before "Stream" to correctly recognize multiple streams
+            output = output.Replace(Environment.NewLine, String.Empty).Replace("Stream #", $"{Environment.NewLine}Stream #");
+
             var durationAndBitrateRegex = Regex.Match(output, @"Duration: (?<duration>(\d+[:\.]?)+).*bitrate: (?<bitrate>\d+) kb\/s");
             var duration = durationAndBitrateRegex.Groups["duration"].Value;
             videoDetails.Duration = TimeSpan.ParseExact(duration, @"hh\:mm\:ss\.ff", CultureInfo.InvariantCulture);

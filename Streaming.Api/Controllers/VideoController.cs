@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Streaming.Api.Attributes;
+using Streaming.Api.Requests.Video;
 using Streaming.Application.Commands;
 using Streaming.Application.Commands.Video;
 using Streaming.Application.DTO;
@@ -29,13 +30,13 @@ namespace Streaming.Api.Controllers
 
         [HttpPost]
         [ClaimAuthorize(Claims.CanUploadVideo)]
-        public async Task<IActionResult> UploadVideoAsync([FromBody] UploadVideoDTO uploadVideo)
+        public async Task<IActionResult> UploadVideoAsync([FromBody] UploadVideoRequest request)
         {
             await CommandDispatcher.HandleAsync(new UploadVideoCommand
             {
-                UploadToken = uploadVideo.UploadToken,
-                Title = uploadVideo.Title,
-                Description = uploadVideo.Description,
+                UploadToken = request.UploadToken,
+                Title = request.Title,
+                Description = request.Description,
                 User = new UserDetailsDTO
                 {
                     UserId = User.FindFirst(ClaimTypes.NameIdentifier).Value,
@@ -60,13 +61,13 @@ namespace Streaming.Api.Controllers
 
         [HttpPost("UploadPart")]
         [ClaimAuthorize(Claims.CanUploadVideo)]
-        public async Task<IActionResult> UploadPartAsync ([FromForm] UploadVideoPartDTO videoPart)
+        public async Task<IActionResult> UploadPartAsync ([FromForm] UploadVideoPartRequest request)
         {
             await CommandDispatcher.HandleAsync(new UploadVideoPartCommand
             {
-                PartMD5Hash = videoPart.PartMD5Hash,
-                UploadToken = videoPart.UploadToken,
-                PartBytes = videoPart.PartBytes
+                PartMD5Hash = request.PartMD5Hash,
+                UploadToken = request.UploadToken,
+                PartBytes = request.PartBytes
             });
             return NoContent();
         }
@@ -109,13 +110,13 @@ namespace Streaming.Api.Controllers
 
         [HttpPut]
         [ClaimAuthorize(Claims.CanEditAnyVideo, Claims.CanEditOwnVideo)]
-        public async Task<IActionResult> UpdateVideoAsync([FromBody] UpdateVideoDTO update)
+        public async Task<IActionResult> UpdateVideoAsync([FromBody] UpdateVideoRequest request)
         {
             await CommandDispatcher.HandleAsync(new UpdateVideoCommand
             {
-                VideoId = update.VideoId,
-                NewTitle = update.Title,
-                NewDescription = update.Description,
+                VideoId = request.VideoId,
+                NewTitle = request.Title,
+                NewDescription = request.Description,
                 User = User
             });
             return NoContent();

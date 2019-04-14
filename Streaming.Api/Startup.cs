@@ -50,7 +50,7 @@ namespace Streaming.Api
 
             services.AddMvc().AddFluentValidation(x =>
             {
-                x.RegisterValidatorsFromAssemblyContaining<Application.Validators.UploadVideoDTOValidator>();
+                x.RegisterValidatorsFromAssemblyContaining<Application.Validators.UploadVideoCommandValidator>();
             });
 
             var builder = new ContainerBuilder();
@@ -68,7 +68,7 @@ namespace Streaming.Api
             {
                 app.UseMiddleware<ExceptionHandlingMiddleware>();
             }
-
+            app.UseMiddleware<ValidationExceptionHandlerMiddleware>();
             app.UseCors("AllowAny");
             app.UseAuthentication();
             app.UseSignalR(config =>

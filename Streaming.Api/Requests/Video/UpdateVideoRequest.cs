@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace Streaming.Application.Models.DTO.Video
+namespace Streaming.Api.Requests.Video
 {
-    public class UpdateVideoDTO
+    public class UpdateVideoRequest
     {
         public Guid VideoId { get; set; }
         public string Title { get; set; }

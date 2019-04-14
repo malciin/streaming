@@ -7,15 +7,13 @@ using Moq;
 using NUnit.Framework;
 using Streaming.Api.Attributes;
 using Streaming.Api.Controllers;
+using Streaming.Api.Requests.Video;
 using Streaming.Application.Commands;
 using Streaming.Application.Commands.Video;
 using Streaming.Application.DTO;
-using Streaming.Application.Interfaces.Repositories;
 using Streaming.Application.Interfaces.Services;
 using Streaming.Application.Models;
-using Streaming.Application.Models.DTO.Video;
 using Streaming.Application.Query;
-using Streaming.Domain.Models;
 using Streaming.Tests.Extensions;
 using System;
 using System.Collections.Generic;
@@ -23,7 +21,6 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
 using System.Security.Claims;
-using System.Threading.Tasks;
 
 namespace Streaming.Tests
 {
@@ -92,7 +89,7 @@ namespace Streaming.Tests
         public void CanUploadVideo_Claim_On_UploadVideo_Endpoint()
         {
             var videoController = container.Resolve<VideoController>();
-            var uploadVideoMethod = getMethodFromControllerThatTakeParameter(videoController, typeof(UploadVideoDTO));
+            var uploadVideoMethod = getMethodFromControllerThatTakeParameter(videoController, typeof(UploadVideoRequest));
             testThatMethodHaveFilterClaim(uploadVideoMethod, Claims.CanUploadVideo);
         }
 
@@ -108,7 +105,7 @@ namespace Streaming.Tests
         public void CanUploadVideo_Claim_On_UploadVideoPart_Endpoint()
         {
             var videoController = container.Resolve<VideoController>();
-            var uploadVideoMethod = getMethodFromControllerThatTakeParameter(videoController, typeof(UploadVideoPartDTO));
+            var uploadVideoMethod = getMethodFromControllerThatTakeParameter(videoController, typeof(UploadVideoPartRequest));
             testThatMethodHaveFilterClaim(uploadVideoMethod, Claims.CanUploadVideo);
         }
 
@@ -125,7 +122,7 @@ namespace Streaming.Tests
                 new Claim(ClaimTypes.Email, "testEmail@email.co")
             }, JwtBearerDefaults.AuthenticationScheme));
 
-            videoController.UploadVideoAsync(new UploadVideoDTO
+            videoController.UploadVideoAsync(new UploadVideoRequest
             {
                 Title = "Title",
                 Description = "Description",

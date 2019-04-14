@@ -1,6 +1,6 @@
-﻿namespace Streaming.Application.Models.DTO.Video
+﻿namespace Streaming.Api.Requests.Video
 {
-    public class UploadVideoDTO
+    public class UploadVideoRequest
     {
         public string UploadToken { get; set; }
         public string Title { get; set; }

@@ -1,11 +1,11 @@
 ﻿using FluentValidation;
-using Streaming.Application.Models.DTO.Video;
+using Streaming.Application.Commands.Video;
 
 namespace Streaming.Application.Validators
 {
-    public class UploadVideoDTOValidator : AbstractValidator<UploadVideoDTO>
+    public class UploadVideoCommandValidator : AbstractValidator<UploadVideoCommand>
     {
-        public UploadVideoDTOValidator()
+        public UploadVideoCommandValidator()
         {
             RuleFor(x => x.Title)
                 .NotNull()

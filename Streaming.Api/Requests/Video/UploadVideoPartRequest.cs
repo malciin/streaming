@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 
-namespace Streaming.Application.Models.DTO.Video
+namespace Streaming.Api.Requests.Video
 {
-    public class UploadVideoPartDTO
+    public class UploadVideoPartRequest
     {
         public string UploadToken { get; set; }
         public string PartMD5Hash { get; set; }
