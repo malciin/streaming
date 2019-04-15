@@ -221,6 +221,8 @@ namespace Streaming.Tests.Services
                 Duration = TimeSpan.FromMilliseconds(5_700)
             });
 
+        [Ignore("Currently ffmpeg probe have issue with that .rmvb file with error: " +
+            "[rm @ 0000019ccd9abe80] Invalid stream index 2 for index at pos 1214774")]
         [Test]
         public void Valid_Video_Info_For_Rmvb_Format() =>
             testVideoFormatInfo(".rmvb", new VideoFileDetailsDTO
