@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using MongoDB.Driver;
 using Streaming.Application.Interfaces.Repositories;
-using Streaming.Application.Models.DTO.Video;
 using Streaming.Application.Models.Repository.Video;
-using Streaming.Domain.Enums;
 using Streaming.Domain.Models;
+using System.Linq.Expressions;
 
 namespace Streaming.Infrastructure.MongoDb.Repositories
 {
@@ -19,27 +18,32 @@ namespace Streaming.Infrastructure.MongoDb.Repositories
 			this.videoCollection = videoCollection;
 		}
 
+		public async Task<Video> SingleAsync(Expression<Func<Video, bool>> filter)
+		{
+			return await videoCollection.Find(filter).FirstAsync();
+		}
+
+		public async Task<IEnumerable<Video>> GetAsync(Expression<Func<Video, bool>> filter, int skip = 0, int limit = 0)
+		{
+			var fluentFindDefinition = videoCollection.Find(filter);
+
+			if (skip != 0)
+			{
+				fluentFindDefinition = fluentFindDefinition.Skip(skip);
+			}
+			if (limit != 0)
+			{
+				fluentFindDefinition = fluentFindDefinition.Limit(limit);
+			}
+
+			return await fluentFindDefinition.ToListAsync();
+		}
+
 		public Task AddAsync(Video video)
 		{
             this.addToCommit(() => videoCollection.InsertOneAsync(video));
             return Task.FromResult(0);
 		}
-
-		public async Task<IEnumerable<Video>> SearchAsync(VideoSearchDTO filter)
-		{
-            return await videoCollection
-                .Find(x => x.State.HasFlag(VideoState.Processed))
-                .Skip(filter.Offset)
-                .Limit(filter.HowMuch)
-                .SortByDescending(x => x.FinishedProcessingDate)
-                .ToListAsync();
-        }
-
-		public async Task<Video> GetAsync(Guid videoId)
-		{
-            var searchFilter = Builders<Domain.Models.Video>.Filter.Eq(x => x.VideoId, videoId);
-            return await videoCollection.Find(searchFilter).FirstAsync();
-        }
 
 		public Task UpdateAsync(Video video)
 		{
@@ -90,5 +94,5 @@ namespace Streaming.Infrastructure.MongoDb.Repositories
             this.addToCommit(() => videoCollection.DeleteOneAsync(searchFilter));
             return Task.FromResult(0);
         }
-    }
+	}
 }

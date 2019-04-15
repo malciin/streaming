@@ -31,8 +31,8 @@ namespace Streaming.Infrastructure.MongoDb.IoC
                    .As<IMongoCollection<Video>>()
                    .InstancePerLifetimeScope();
 
-            builder.RegisterType<Repositories.VideoRepository>()
-                   .As<IVideoRepository>()
+			builder.RegisterType<Repositories.VideoRepository>()
+				   .AsImplementedInterfaces()
                    .InstancePerLifetimeScope();
         }
     }

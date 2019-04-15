@@ -8,6 +8,7 @@ namespace Streaming.Tests.External
         [TestCase("test.mp4", ".mp4")]
         [TestCase("test.", "")]
         [TestCase("some/directory/to/photo.jpg", ".jpg")]
+		[TestCase(@"some\windows\directory\photo.jpg", ".jpg")]
         public void GetExtensions_Should_Return_Path_With_Dot(string input, string expectedOutput)
         {
             var result = Path.GetExtension(input);

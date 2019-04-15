@@ -17,28 +17,28 @@ namespace Streaming.Application.Query
     public class VideoQueries : IVideoQueries
     {
         private readonly VideoMappings mapper;
-        private readonly IVideoRepository videoRepo;
+        private readonly IFilterableRepository<Video> filterableVideos;
 		private readonly IVideoFilesService videoBlobService;
 
         public VideoQueries(VideoMappings mapper,
             IProcessVideoService processVideoService,
-            IVideoRepository videoRepo,
+            IVideoRepository filterableVideos,
             IVideoFilesService videoBlobService)
         {
             this.mapper = mapper;
-            this.videoRepo = videoRepo;
+            this.filterableVideos = filterableVideos;
 			this.videoBlobService = videoBlobService;
         }
 
-        public async Task<VideoMetadataDTO> GetBasicVideoMetadataAsync(Guid VideoId)
+        public async Task<VideoMetadataDTO> GetBasicVideoMetadataAsync(Guid videoId)
         {
-            var searchFilter = Builders<Video>.Filter.Eq(x => x.VideoId, VideoId);
-            return mapper.MapVideoMetadataDTO(await videoRepo.GetAsync(VideoId));
+            var searchFilter = Builders<Video>.Filter.Eq(x => x.VideoId, videoId);
+            return mapper.MapVideoMetadataDTO(await filterableVideos.SingleAsync(x => x.VideoId == videoId));
         }
 
-		public async Task<string> GetVideoManifestAsync(Guid VideoId)
+		public async Task<string> GetVideoManifestAsync(Guid videoId)
 		{
-            var rawManifest = (await videoRepo.GetAsync(VideoId)).VideoManifestHLS;
+            var rawManifest = (await filterableVideos.SingleAsync(x => x.VideoId == videoId)).VideoManifestHLS;
 
             var pattern = VideoManifest.EndpointPlaceholder.Replace("[", "\\[");
             var match = Regex.Match(rawManifest, pattern);
@@ -46,20 +46,21 @@ namespace Streaming.Application.Query
             while (match.Success)
             {
                 rawManifest = rawManifest.Replace(match.Index, match.Length,
-                    videoBlobService.GetVideoUrl(VideoId, partNum++));
+                    videoBlobService.GetVideoUrl(videoId, partNum++));
                 match = Regex.Match(rawManifest, pattern);
             }
             return rawManifest;
 		}
 
-		public async Task<Stream> GetVideoPartAsync(Guid VideoId, int Part)
+		public async Task<Stream> GetVideoPartAsync(Guid videoId, int part)
 		{
-			return await videoBlobService.GetVideoAsync(VideoId, Part);
+			return await videoBlobService.GetVideoAsync(videoId, part);
 		}
 
-		public async Task<IEnumerable<VideoMetadataDTO>> SearchAsync(VideoSearchDTO Search)
+		public async Task<IEnumerable<VideoMetadataDTO>> SearchAsync(VideoSearchDTO search)
 		{
-			return (await videoRepo.SearchAsync(Search))
+			return (await filterableVideos.GetAsync(x => 
+					x.Title.Contains(String.Join(" ", search.Keywords)), skip: search.Offset, limit: search.HowMuch))
 				.Select(x => mapper.MapVideoMetadataDTO(x));
 		}
     }
