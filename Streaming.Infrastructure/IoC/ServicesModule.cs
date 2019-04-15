@@ -3,6 +3,7 @@ using Streaming.Application.Interfaces.Services;
 using Streaming.Application.Models;
 using Streaming.Infrastructure.Services;
 
+
 namespace Streaming.Infrastructure.IoC
 {
     public class ServicesModule : Autofac.Module
@@ -40,7 +41,8 @@ namespace Streaming.Infrastructure.IoC
                    .As<IMessageSignerService>()
                    .SingleInstance();
 
-            builder.RegisterType<LiveManager>()
+            builder.RegisterType<LiveStreamManager>()
+                   .As<ILiveStreamManager>()
                    .SingleInstance();
         }
     }

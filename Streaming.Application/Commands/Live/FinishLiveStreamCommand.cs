@@ -2,7 +2,7 @@
 
 namespace Streaming.Application.Commands.Live
 {
-    public class FinishLiveCommand : ICommand
+    public class FinishLiveStreamCommand : ICommand
     {
         public Guid StreamId { get; set; }
     }

@@ -49,8 +49,4 @@
     <ProjectReference Include="..\Streaming.Infrastructure\Streaming.Infrastructure.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Requests\Live\" />
-  </ItemGroup>
-
 </Project>

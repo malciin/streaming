@@ -5,6 +5,6 @@ namespace Streaming.Application.Query
 {
     public interface ILiveQueries
     {
-        IEnumerable<LiveMetadataDTO> Search(int offset, int howMuch);
+        IEnumerable<LiveStreamMetadataDTO> Search(int offset, int howMuch);
     }
 }
