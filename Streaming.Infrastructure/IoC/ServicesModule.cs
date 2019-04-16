@@ -1,5 +1,7 @@
-﻿using Autofac;
+﻿using Auth0.ManagementApi;
+using Autofac;
 using Streaming.Application.Interfaces.Services;
+using Streaming.Application.Interfaces.Settings;
 using Streaming.Application.Models;
 using Streaming.Infrastructure.Services;
 
@@ -33,16 +35,16 @@ namespace Streaming.Infrastructure.IoC
                    .As<ILoggerService>()
                    .SingleInstance();
 
-            builder.RegisterType<Auth0ManagementApiTokenAccessor>()
-                   .As<IAuth0ManagementApiTokenAccessor>()
-                   .SingleInstance();
-
             builder.RegisterType<SHA256MessageSignerService>()
                    .As<IMessageSignerService>()
                    .SingleInstance();
 
             builder.RegisterType<LiveStreamManager>()
                    .As<ILiveStreamManager>()
+                   .SingleInstance();
+
+            builder.RegisterType<Auth0ClientWrapper>()
+                   .As<IAuth0Client>()
                    .SingleInstance();
         }
     }

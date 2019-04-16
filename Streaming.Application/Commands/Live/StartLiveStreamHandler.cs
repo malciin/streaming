@@ -12,14 +12,16 @@ namespace Streaming.Application.Commands.Live
     {
         private readonly IMessageSignerService messageSignerService;
         private readonly ILiveStreamManager liveManager;
+        private readonly IAuth0Client auth0Client;
 
-        public StartLiveStreamHandler(ILiveStreamManager liveManager, IMessageSignerService messageSignerService)
+        public StartLiveStreamHandler(ILiveStreamManager liveManager, IMessageSignerService messageSignerService, IAuth0Client auth0Client)
         {
             this.messageSignerService = messageSignerService;
             this.liveManager = liveManager;
+            this.auth0Client = auth0Client;
         }
 
-        public Task HandleAsync(StartLiveStreamCommand command)
+        public async Task HandleAsync(StartLiveStreamCommand command)
         {
             if (!String.Equals(command.App, "live", StringComparison.InvariantCultureIgnoreCase))
             {
@@ -30,14 +32,19 @@ namespace Streaming.Application.Commands.Live
             var clientIdentifierBytes = messageSignerService.GetMessage(bytes);
             var clientIdentifier = Encoding.UTF8.GetString(clientIdentifierBytes);
 
+            var clientInfo = await auth0Client.GetInfoAsync(clientIdentifier);
+
             liveManager.StartNewStream(new NewLiveStreamDTO
             {
                 LiveStreamId = command.StreamId,
                 ManifestUri = command.ManifestUri,
-                User = new UserDetails { }
+                User = new UserDetails
+                {
+                    Email = clientInfo.Email,
+                    Nickname = clientInfo.NickName,
+                    UserId = clientInfo.UserId
+                }
             });
-
-            return Task.FromResult(0);
         }
     }
 }
