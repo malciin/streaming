@@ -8,9 +8,11 @@ using Streaming.Application.Commands.Live;
 using Streaming.Application.DTO;
 using Streaming.Application.Interfaces.Services;
 using Streaming.Application.Models;
+using Streaming.Application.Models.DTO.Live;
 using Streaming.Application.Query;
 using Streaming.Common.Extensions;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Security.Claims;
 using System.Text;
@@ -32,6 +34,14 @@ namespace Streaming.Api.Controllers
             this.queries = liveQueries;
         }
 
+        [HttpGet("{Id}")]
+        public LiveStreamMetadataDTO Get(Guid Id)
+            => queries.Get(Id);
+
+        [HttpPost]
+        public IEnumerable<LiveStreamMetadataDTO> Search([FromBody] SearchLiveStreamsRequest request)
+            => queries.Get(request.Offset, request.HowMuch);
+               
         [Authorize, ClaimAuthorize(Claims.CanStream)]
         [HttpGet("Token")]
         public TokenDTO GetStreamToken()

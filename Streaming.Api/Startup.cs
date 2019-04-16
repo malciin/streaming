@@ -27,7 +27,6 @@ namespace Streaming.Api
             this.hostingEnvironment = hostingEnvironment;
         }
 
-
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
             services.AddCors(options =>

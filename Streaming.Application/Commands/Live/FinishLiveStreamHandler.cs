@@ -14,7 +14,7 @@ namespace Streaming.Application.Commands.Live
 
         public Task HandleAsync(FinishLiveStreamCommand command)
         {
-            liveManager.FinishStream(command.StreamId);
+            liveManager.FinishLiveStream(command.StreamId);
             return Task.FromResult(0);
         }
     }

@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Auth0.ManagementApi" Version="6.0.0" />
     <PackageReference Include="Autofac" Version="4.8.1" />
     <PackageReference Include="FluentValidation" Version="8.1.2" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="2.2.0" />

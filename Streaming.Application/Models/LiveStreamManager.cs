@@ -5,7 +5,6 @@ using Streaming.Domain.Models;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Streaming.Application.Models
 {
@@ -20,7 +19,7 @@ namespace Streaming.Application.Models
             this.componentContext = componentContext;
         }
 
-        public void StartNewStream(NewLiveStreamDTO newLiveStream)
+        public void StartNewLiveStream(NewLiveStreamDTO newLiveStream)
         {
             streams.TryAdd(newLiveStream.LiveStreamId, new LiveStream
             {
@@ -31,16 +30,32 @@ namespace Streaming.Application.Models
             });
         }
 
-        public void FinishStream(Guid streamId)
+        public void FinishLiveStream(Guid streamId)
         {
             streams.TryRemove(streamId, out _);
         }
 
-        public IEnumerable<LiveStreamMetadataDTO> GetAll()
-            => streams.Values.Select(x => new LiveStreamMetadataDTO
+        public LiveStreamMetadataDTO Get(Guid liveStreamId)
+            => new LiveStreamMetadataDTO
             {
-                LiveStreamId = x.LiveStreamId,
-                ManifestUrl = x.ManifestUrl.ToString()
+                LiveStreamId = Guid.NewGuid(),
+                ManifestUrl = "https://bitdash-a.akamaihd.net/content/MI201109210084_1/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8",
+                Started = DateTime.UtcNow.Subtract(TimeSpan.FromMinutes(30)),
+                UserStarted = "malciin"
+            };
+
+        public IEnumerable<LiveStreamMetadataDTO> Get(EnumerableFilter<LiveStreamMetadataDTO> filter)
+        {
+            return filter(new List<LiveStreamMetadataDTO>
+            {
+                new LiveStreamMetadataDTO
+                {
+                    LiveStreamId = Guid.NewGuid(),
+                    ManifestUrl = "https://bitdash-a.akamaihd.net/content/MI201109210084_1/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8",
+                    Started = DateTime.UtcNow.Subtract(TimeSpan.FromMinutes(30)),
+                    UserStarted = "malciin"
+                }
             });
+        }
     }
 }

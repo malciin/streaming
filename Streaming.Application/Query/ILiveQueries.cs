@@ -1,10 +1,13 @@
-﻿using Streaming.Application.Models.DTO.Live;
+﻿using Streaming.Application.Models;
+using Streaming.Application.Models.DTO.Live;
+using System;
 using System.Collections.Generic;
 
 namespace Streaming.Application.Query
 {
     public interface ILiveQueries
     {
-        IEnumerable<LiveStreamMetadataDTO> Search(int offset, int howMuch);
+        LiveStreamMetadataDTO Get(Guid liveStreamId);
+        IEnumerable<LiveStreamMetadataDTO> Get(int offset, int howMuch);
     }
 }
