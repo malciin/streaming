@@ -1,9 +1,9 @@
 import auth0 from 'auth0-js';
-import { Config } from './shared/config';
-import history from './history';
-import { AsyncFunctions } from './shared/asyncFunctions';
+import { Config } from '../shared/config';
+import history from '../history';
+import { AsyncFunctions } from '../shared/asyncFunctions';
 
-export default class Auth {
+export default class AuthService {
 
     loggedInSessionKey = "isLoggedIn";
     pendingSilentLogin = false;

@@ -1,4 +1,4 @@
-import { Config } from "./shared/config";
+import { Config } from "../shared/config";
 
 export default class Auth0ApiService {
 

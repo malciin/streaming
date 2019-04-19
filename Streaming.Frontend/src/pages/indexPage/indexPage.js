@@ -37,14 +37,9 @@ class IndexPage extends React.Component{
                 <div className="container">
                     {
                         this.state.videos.map((video, i) => {
-                            return <VideoListItem key={video.videoId} model={{
-                                videoId: video.videoId,
-                                createdDate: video.createdDate,
-                                title: video.title,
-                                description: video.description,
-                                length: video.length,
-                                thumbnailUrl: video.thumbnailUrl
-                            }} deleteVideoRequest={this.deleteVideoRequest} />
+                            return <VideoListItem key={video.videoId} 
+                                                  model={video} 
+                                                  deleteVideoRequest={this.deleteVideoRequest} />
                         })
                     }
                 </div>

@@ -12,6 +12,8 @@ import AdminPage from './pages/adminPage/adminPage';
 import EditVideoPage from './pages/editVideoPage/editVideoPage';
 import SignalRPage from './pages/signalRPage/signalRPage';
 import StreamPage from './pages/streamPage/streamPage';
+import LiveStreamsPage from './pages/liveStreamsPage/liveStreamsPage';
+import LiveStreamPage from './pages/liveStreamPage/liveStreamPage';
 
 class App extends Component {
 
@@ -32,6 +34,8 @@ class App extends Component {
           <Route exact path="/Admin" component={AdminPage} />
           <Route exact path="/SignalR" component={SignalRPage} />
           <Route exact path="/Stream" component={StreamPage} />
+          <Route exact path="/Live" component={LiveStreamsPage} />
+          <Route exact path="/Live/:id" component={LiveStreamPage} />
           <Route path="/sign-in" render={(props) => {
             this.context.auth.loginCallback(props);
             return <Callback />
