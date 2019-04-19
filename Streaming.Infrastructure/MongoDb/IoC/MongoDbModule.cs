@@ -1,7 +1,6 @@
 ﻿using Autofac;
 using MongoDB.Driver;
 using MongoDB.Driver.GridFS;
-using Streaming.Application.Interfaces.Repositories;
 using Streaming.Domain.Models;
 
 namespace Streaming.Infrastructure.MongoDb.IoC
@@ -29,6 +28,10 @@ namespace Streaming.Infrastructure.MongoDb.IoC
 
             builder.Register(context => context.Resolve<IMongoDatabase>().GetCollection<Video>("Videos"))
                    .As<IMongoCollection<Video>>()
+                   .InstancePerLifetimeScope();
+
+            builder.Register(context => context.Resolve<IMongoDatabase>().GetCollection<LiveStream>("LiveStream"))
+                   .As<IMongoCollection<LiveStream>>()
                    .InstancePerLifetimeScope();
 
 			builder.RegisterType<Repositories.VideoRepository>()

@@ -34,7 +34,7 @@ namespace Streaming.Application.Commands.Live
 
             var clientInfo = await auth0Client.GetInfoAsync(clientIdentifier);
 
-            liveManager.StartNewLiveStream(new NewLiveStreamDTO
+            await liveManager.StartNewLiveStreamAsync(new NewLiveStreamDTO
             {
                 LiveStreamId = command.StreamId,
                 ManifestUri = command.ManifestUri,

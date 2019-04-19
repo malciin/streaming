@@ -62,7 +62,7 @@ namespace Streaming.Api.Controllers
                 StreamId = streamId,
                 App = request.App.ToString(),
                 StreamKey = request.StreamKey,
-                ManifestUri = new Uri(request.HttpUrl, $"{streamId}/{streamId}.m3u8")
+                ManifestUri = new Uri(request.HttpUrl, $"{streamId}.m3u8")
             });
 
             return Ok(streamId.ToString());

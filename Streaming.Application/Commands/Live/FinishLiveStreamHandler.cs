@@ -12,10 +12,9 @@ namespace Streaming.Application.Commands.Live
             this.liveManager = liveManager;
         }
 
-        public Task HandleAsync(FinishLiveStreamCommand command)
+        public async Task HandleAsync(FinishLiveStreamCommand command)
         {
-            liveManager.FinishLiveStream(command.StreamId);
-            return Task.FromResult(0);
+            await liveManager.FinishLiveStreamAsync(command.StreamId);
         }
     }
 }

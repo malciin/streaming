@@ -29,7 +29,7 @@ namespace Streaming.Infrastructure.Services
         public async Task UploadAsync(Guid VideoId, Stream Stream)
         {
             var thumbnailPath = pathStrategy.GetThumbnailPath(VideoId);
-            Directory.CreateDirectory(thumbnailPath.SubstringToLastOccurence('/'));
+            Directory.CreateDirectory(thumbnailPath.SubstringToLastOccurence(Path.DirectorySeparatorChar));
             using (var file = File.Open(thumbnailPath, FileMode.CreateNew, FileAccess.ReadWrite))
             {
                 await Stream.CopyToAsync(file);

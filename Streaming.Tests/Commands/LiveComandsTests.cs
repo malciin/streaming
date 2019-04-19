@@ -4,9 +4,13 @@ using Moq;
 using NUnit.Framework;
 using Streaming.Application.Commands;
 using Streaming.Application.Commands.Live;
+using Streaming.Application.Interfaces.Repositories;
 using Streaming.Application.Interfaces.Services;
+using Streaming.Domain.Models;
 using Streaming.Infrastructure.IoC;
 using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
 
 namespace Streaming.Tests.Commands
 {
@@ -16,6 +20,11 @@ namespace Streaming.Tests.Commands
         {
             builder.RegisterModule<CommandModule>();
             builder.RegisterModule<ServicesModule>();
+
+            var liveStreamRepo = new Mock<ILiveStreamRepository>();
+            liveStreamRepo.Setup(x => x.GetAsync(It.IsAny<Expression<Func<LiveStream, bool>>>(), It.IsAny<int>(), It.IsAny<int>()))
+                          .ReturnsAsync(() => new List<LiveStream> { new LiveStream { Title = "some title" } });
+            builder.Register(x => liveStreamRepo.Object).AsImplementedInterfaces();
 
             var messageSigner = new Mock<IMessageSignerService>();
             messageSigner.Setup(x => x.GetMessage(It.IsAny<byte[]>())).Returns(Guid.NewGuid().ToByteArray());

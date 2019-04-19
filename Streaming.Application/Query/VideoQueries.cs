@@ -4,6 +4,7 @@ using Streaming.Application.Interfaces.Services;
 using Streaming.Application.Mappings;
 using Streaming.Application.Models.DTO.Video;
 using Streaming.Common.Extensions;
+using Streaming.Domain.Enums;
 using Streaming.Domain.Models;
 using System;
 using System.Collections.Generic;
@@ -60,7 +61,8 @@ namespace Streaming.Application.Query
 		public async Task<IEnumerable<VideoMetadataDTO>> SearchAsync(VideoSearchDTO search)
 		{
 			return (await filterableVideos.GetAsync(x => 
-					x.Title.Contains(String.Join(" ", search.Keywords)), skip: search.Offset, limit: search.HowMuch))
+					x.Title.Contains(String.Join(" ", search.Keywords)) &&
+                    x.State.HasFlag(VideoState.Processed), skip: search.Offset, limit: search.HowMuch))
 				.Select(x => mapper.MapVideoMetadataDTO(x));
 		}
     }
