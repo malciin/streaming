@@ -23,8 +23,8 @@ namespace Streaming.Application.Strategies
         string IVideoProcessingFilesPathStrategy.RawUploadedVideoFilePath(Guid videoId)
             => String.Format($"{localStorageDirectoryPath}{{0}}processing{{0}}{videoId}", Path.DirectorySeparatorChar);
 
-        string IVideoProcessingFilesPathStrategy.TransportStreamFilePath(Guid videoId, int partNumber)
-            => String.Format($"{localStorageDirectoryPath}{{0}}processing{{0}}ts_files{{0}}{partNumber}_{videoId}.ts", Path.DirectorySeparatorChar);
+        string IVideoProcessingFilesPathStrategy.TransportStreamDirectoryPath(Guid videoId)
+            => String.Format($"{localStorageDirectoryPath}{{0}}processing{{0}}ts_files{{0}}{videoId}{{0}}", Path.DirectorySeparatorChar);
 
         string IVideoProcessingFilesPathStrategy.ThumbnailFilePath(Guid videoId)
             => String.Format($"{localStorageDirectoryPath}{{0}}processing{{0}}{videoId}.jpg", Path.DirectorySeparatorChar);

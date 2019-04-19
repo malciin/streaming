@@ -92,7 +92,7 @@ namespace Streaming.Application.Commands.Video
 
         private void setupProcessingEnvironment(ProcessVideoCommand command)
         {
-            trasportFilesDirectory = Directory.CreateDirectory(videoFilesPath.TransportStreamFilePath(command.VideoId, 0).SubstringToLastOccurence(Path.DirectorySeparatorChar));
+            trasportFilesDirectory = Directory.CreateDirectory(videoFilesPath.TransportStreamDirectoryPath(command.VideoId));
         }
 
         private async Task<VideoManifest> createManifest(Guid videoId)

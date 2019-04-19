@@ -5,7 +5,7 @@ namespace Streaming.Application.Interfaces.Strategies
     public interface IVideoProcessingFilesPathStrategy
     {
         string ThumbnailFilePath(Guid videoId);
-        string TransportStreamFilePath(Guid videoId, int partNumber);
+        string TransportStreamDirectoryPath(Guid videoId);
         string RawUploadedVideoFilePath(Guid videoId);
         string Mp4ConvertedFilePath(Guid videoId);
     }
