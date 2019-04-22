@@ -18,7 +18,8 @@ namespace Streaming.Infrastructure.IoC
             builder.RegisterAssemblyTypes(assembly)
                    .InNamespaceOf<KeysSettings>()
                    .AsImplementedInterfaces()
-                   .SingleInstance();
+                   .SingleInstance()
+                   .AutoActivate();
         }
     }
 }

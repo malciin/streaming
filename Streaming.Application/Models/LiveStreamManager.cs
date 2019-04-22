@@ -1,5 +1,4 @@
 ﻿using Autofac;
-using MongoDB.Driver;
 using Streaming.Application.Interfaces.Repositories;
 using Streaming.Application.Interfaces.Services;
 using Streaming.Application.Models.DTO.Live;

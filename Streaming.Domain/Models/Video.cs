@@ -13,7 +13,7 @@ namespace Streaming.Domain.Models
         public VideoState State { get; set; }
 
         public TimeSpan? Length { get; set; }
-        public string VideoManifestHLS { get; set; }
+        public VideoManifest VideoManifest { get; set; }
         public string ProcessingInfo { get; set; }
 
         public UserDetails Owner { get; set; }

@@ -2,7 +2,6 @@
 using Streaming.Application.Interfaces.Services;
 using Streaming.Application.Interfaces.Strategies;
 using Streaming.Application.Models.Repository.Video;
-using Streaming.Common.Extensions;
 using Streaming.Domain.Enums;
 using Streaming.Domain.Models;
 using System;
@@ -77,7 +76,7 @@ namespace Streaming.Application.Commands.Video
                 VideoState = videoState,
                 VideoId = command.VideoId,
                 VideoLength = videoLength,
-                VideoManifestHLS = manifest.ToString()
+                VideoManifest = manifest
             });
             await videoRepo.CommitAsync();
         }
@@ -97,13 +96,12 @@ namespace Streaming.Application.Commands.Video
 
         private async Task<VideoManifest> createManifest(Guid videoId)
         {
-            var manifest = new VideoManifest();
-            manifest.SetHeaders(TargetDurationSeconds: 5);
+            var manifest = VideoManifest.Create(videoId);
 
             foreach(var file in splittedFiles)
             {
                 var length = await videoFileInfo.GetVideoLengthAsync(file.FullName);
-                manifest.AddPart(videoId, length);
+                manifest.AddPart(length);
             }
             videoState |= VideoState.ManifestGenerated;
             return manifest;

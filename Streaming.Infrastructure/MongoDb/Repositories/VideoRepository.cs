@@ -49,7 +49,7 @@ namespace Streaming.Infrastructure.MongoDb.Repositories
             var updateDefinition = Builders<Video>.Update
                 .Set(x => x.FinishedProcessingDate, updateVideoAfterProcessing.FinishedProcessingDate)
                 .Set(x => x.ProcessingInfo, updateVideoAfterProcessing.ProcessingInfo)
-                .Set(x => x.VideoManifestHLS, updateVideoAfterProcessing.VideoManifestHLS)
+                .Set(x => x.VideoManifest, updateVideoAfterProcessing.VideoManifest)
                 .Set(x => x.Length, updateVideoAfterProcessing.VideoLength)
                 .Set(x => x.State, updateVideoAfterProcessing.VideoState);
 
