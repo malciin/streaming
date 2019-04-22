@@ -6,7 +6,7 @@ export default class ApiService
         this.makeApiRequest = this.makeApiRequest.bind(this);
     }
 
-    async makeApiRequest(uri, method, object, waitForAuth = false)
+    async makeApiRequest(uri, method, object, waitForAuth = false, responseType = 'json')
     {
         if (waitForAuth === true)
             await this.authContext.waitForAuth();
@@ -27,6 +27,9 @@ export default class ApiService
             body: object === null ? null : JSON.stringify(object)
         });
 
-        return await response.json();
+        if (responseType == 'raw')
+            return response;
+        else if (responseType == 'json')
+            return await response.json();
     }
 }

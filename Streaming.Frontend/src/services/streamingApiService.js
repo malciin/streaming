@@ -49,7 +49,7 @@ export default class StreamingApiService extends ApiService {
 
     async deleteVideo(videoId) {
         return await this.makeApiRequest(`${Config.apiPath}/Video/${videoId}`,
-            'DELETE', null, true);
+            'DELETE', null, true, 'raw');
     }
 
     async getStreamToken() {
@@ -59,7 +59,6 @@ export default class StreamingApiService extends ApiService {
 
     async uploadVideo(data, progressFunc) {
         var token = (await this.getUploadToken()).token;
-        console.log(token);
 
         var sendPartXmlRequest = function (idToken, uploadToken, bytes, md5Hash,
             soFarTransferedBytes, bytesToTransfer) {
@@ -113,6 +112,6 @@ export default class StreamingApiService extends ApiService {
                 uploadToken: token,
                 title: data.videoTitle,
                 description: data.videoDescription
-            }, true);
+            }, true, 'raw');
     }
 }
