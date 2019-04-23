@@ -1,12 +1,15 @@
 import * as React from 'react';
 import { Link } from "react-router-dom";
 import Claims from '../../../Models/Claims';
+import './VideoListItem.scss';
+import { AppContext } from '../../../AppContext';
+
 interface VideoListItemProps {
     videoId: string,
     thumbnailUrl: string,
     title: string,
     description: string,
-    onDeleteVideo: (videoId: string) => void;
+    onDeleteVideo: (videoId: string) => Promise<void>;
 }
 
 export default class VideoListItem extends React.Component<VideoListItemProps, { callbackInProgress: boolean}> {
@@ -41,3 +44,4 @@ export default class VideoListItem extends React.Component<VideoListItemProps, {
         </div>;
     }
 }
+VideoListItem.contextType = AppContext;

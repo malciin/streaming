@@ -1,4 +1,5 @@
 const path = require('path');
+const Dotenv = require('dotenv-webpack');
 
 module.exports = {
     mode: 'development',
@@ -25,12 +26,17 @@ module.exports = {
         extensions: [ '.ts', '.tsx', '.js' ]
     },
     output: {
-        path: path.resolve(__dirname, 'dist'),
-        filename: 'bundle.js'
+        path: path.resolve(__dirname, 'public'),
+        filename: 'bundle.js',
+        publicPath: '/'
     },
     devServer: {
-        contentBase: path.join(__dirname, 'dist'),
+        historyApiFallback: true,
+        contentBase: path.join(__dirname, 'public'),
         compress: true,
         port: 3000
-    }
+    },
+    plugins: [
+        new Dotenv()
+    ]
 }
