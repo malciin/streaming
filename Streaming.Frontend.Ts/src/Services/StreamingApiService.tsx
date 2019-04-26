@@ -3,6 +3,7 @@ import { AsyncFunctions } from "../Shared/AsyncFunctions";
 import ApiService, { HttpMethod, RespType } from "./ApiService";
 import * as SparkMD5 from 'spark-md5';
 import Auth0Service from './Auth0Service';
+import VideoFormData from '../Models/Forms/VideoFormData';
 
 export default class StreamingApiService extends ApiService {
     constructor(authContext: Auth0Service) {
@@ -57,7 +58,7 @@ export default class StreamingApiService extends ApiService {
             HttpMethod.GET, null, true);
     }
 
-    async uploadVideo(data, progressFunc) {
+    async uploadVideo(video: VideoFormData, progressFunc: (percentProgress: Number) => void) {
         var token = (await this.getUploadToken()).token;
 
         var sendPartXmlRequest = function (idToken, uploadToken, bytes, md5Hash,
@@ -98,20 +99,20 @@ export default class StreamingApiService extends ApiService {
         }.bind(this);
 
         var singlePartLength = 5000000;
-        for(var i = 0; i<data.video.size; i += singlePartLength) {
+        for(var i = 0; i<video.file.size; i += singlePartLength) {
             var startByte = i;
             var endByte = startByte + singlePartLength;
-            if (endByte > data.video.size)
-                endByte = data.video.size;
-            await sendPart(token, data.video.slice(startByte, endByte), startByte, data.video.size);
-            progressFunc(endByte / data.video.size * 100);
+            if (endByte > video.file.size)
+                endByte = video.file.size;
+            await sendPart(token, video.file.slice(startByte, endByte), startByte, video.file.size);
+            progressFunc(endByte / video.file.size * 100);
         }
 
         return await this.makeApiRequest(`${Config.apiPath}/Video`, HttpMethod.POST,
             {
                 uploadToken: token,
-                title: data.videoTitle,
-                description: data.videoDescription
+                title: video.title,
+                description: video.description
             }, true, RespType.Raw);
     }
 }

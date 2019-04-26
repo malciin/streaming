@@ -3,6 +3,7 @@ import { Config } from '../Shared/Config';
 import history from '../Shared/History';
 import { AsyncFunctions } from '../Shared/AsyncFunctions';
 import { Type, Store } from '../Redux';
+import User from '../Models/User';
 
 export default class Auth0Service {
 
@@ -108,7 +109,12 @@ export default class Auth0Service {
         this.managementApiIdToken = authResult.managementApiIdToken;
         this.idToken = authResult.idToken;
         this.expiresAt = expiresAt;
-        Store.dispatch({ type: Type.UserLoggedIn });
+        console.log(this);
+        var user: User = {
+            nickname: this.idTokenPayload.nickname,
+            claims: this.idTokenPayload[Config.auth0.claimsNamespace]
+        };
+        Store.dispatch({ type: Type.UserLoggedIn, user: user });
     }
 
     haveClaim(claim) {

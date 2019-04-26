@@ -1,6 +1,6 @@
 interface Video {
-    thumbnailUrl: string;
-    description: string;
+    videoId: string;
     title: string;
-    videoId: string
+    description: string;
+    thumbnailUrl: string;
 }

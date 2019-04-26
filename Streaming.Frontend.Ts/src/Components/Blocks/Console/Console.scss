@@ -1,0 +1,25 @@
+@import '../../../Shared/GlobalStyle.scss';
+
+.console-container {
+    font-family: 'Inconsolata', monospace;
+    background-color: darken($background-color, 5%);
+    .console-bar {
+        text-align: center;
+        font-size: 18px;
+
+    }
+    
+    .console-buffer {
+        height: 200px;
+        overflow-y: auto;
+        color: darken($text-color, 20%);
+    }
+
+    .console-input {
+        cursor: text;
+        padding: 5px;
+        &:focus {
+            background-color: $accent-color;
+        }
+    }
+}

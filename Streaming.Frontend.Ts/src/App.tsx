@@ -9,6 +9,7 @@ import Navbar from './Components/Navbar/Navbar';
 import { Provider } from 'react-redux';
 import { Store } from './Redux';
 import { AppContext } from './AppContext';
+import UploadVideo from './Components/Pages/UploadVideo/UploadVideo';
 
 class App extends React.Component {
     constructor(props) {
@@ -24,9 +25,16 @@ class App extends React.Component {
         <Router history={History}>
             <div className="app">
                 <Navbar />
-                <Route exact path="/" component={() => <Index />} />
+                <Route exact path="/" component={Index} />
+                <Route exact path="/Upload" component={UploadVideo} />
+                {/* <Route exact path="/Upload" component={UploadVideo} />
+                <Route exact path="/Vid/:id" component={Video} />
+                <Route exact path="/Edit/:id" component={EditVideo} />
+                <Route exact path="/Admin" component={Admin} />
+                <Route exact path="/Live" component={LiveStreams} />
+                <Route exact path="/Live/:id" component={LiveStream} /> */}
                 <Route path="/sign-in" render={(props) => {
-                    this.context.auth.loginCallback();
+                    this.context.auth.loginCallback(props);
                     return <Callback />
                 }} />
             </div>

@@ -1,10 +1,10 @@
 import * as React from 'react';
 import './LoginControl.scss';
 import { connect } from 'react-redux';
-import { AppContext } from '../../../AppContext';
+import User from '../../../Models/User';
 
 interface LoginControlState {
-    loggedIn: boolean,
+    user: User,
     pendingLogin: boolean
 }
 
@@ -25,19 +25,21 @@ class LoginControl extends React.Component<LoginControlState> {
     render() {
         if(this.props.pendingLogin) {
             return <div className="nav-item"></div>
-        }        
-
-        if (!this.props.loggedIn)
+        }
+        console.log("Props:");
+        console.log(this.props);
+        console.log("USER:"); 
+        console.log(this.props.user);
+        if (this.props.user == null)
             return <div className="nav-link hoverable" onClick={this.loginCallback}>Login</div>;
         else
-            return <div className="nav-link">Hello {this.context.auth.getUserInfo().nickname}!</div>
+            return <div className="nav-link">Hello {this.props.user.nickname}!</div>
     }
 }
-LoginControl.contextType = AppContext;
 
 const mapStateToProps = (state) => {
     var loginControlState: LoginControlState = {
-        loggedIn: state.loggedIn,
+        user: state.user,
         pendingLogin: state.pendingLogin
     };
     return loginControlState;
@@ -46,7 +48,7 @@ const mapStateToProps = (state) => {
 const loginControl = connect(function (state) {
     return {
         pendingLogin: state.pendingLogin,
-        loggedIn: state.loggedIn
+        user: state.user
     }
 }, {})(LoginControl);
 export default loginControl;

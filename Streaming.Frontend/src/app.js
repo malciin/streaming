@@ -26,7 +26,6 @@ class App extends Component {
     console.log(process.env.REACT_APP_API_URL);
     return (
       <Router history={history}>
-        <div className="app">
           <Route exact path="/" component={() => <IndexPage tea={this.updated}/>} />
           <Route exact path="/Upload" component={UploadVideoPage} />
           <Route exact path="/Vid/:id" component={VideoPage} />
@@ -40,7 +39,6 @@ class App extends Component {
             this.context.auth.loginCallback(props);
             return <Callback />
           }} />
-        </div>
       </Router>
     );
   }

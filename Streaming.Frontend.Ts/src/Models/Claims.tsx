@@ -1,5 +1,5 @@
 export default class Claims {
-    public static canUploadVideo: 'canUploadVideo';
-    public static canDeleteVideo: 'canDeleteVideo';
-    public static canAccessAuth0Api: 'canAccessAuth0Api';
+    public static readonly canUploadVideo = 'canUploadVideo';
+    public static readonly canDeleteVideo = 'canDeleteVideo';
+    public static readonly canAccessAuth0Api = 'canAccessAuth0Api';
 }
