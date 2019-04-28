@@ -10,6 +10,7 @@ import { Provider } from 'react-redux';
 import { Store } from './Redux';
 import { AppContext } from './AppContext';
 import UploadVideo from './Components/Pages/UploadVideo/UploadVideo';
+import VideoPage from './Components/Pages/VideoPage/VideoPage';
 
 class App extends React.Component {
     constructor(props) {
@@ -27,8 +28,10 @@ class App extends React.Component {
                 <Navbar />
                 <Route exact path="/" component={Index} />
                 <Route exact path="/Upload" component={UploadVideo} />
+                <Route exact path="/Vid/:id" component={(ctx) => {
+                    return <VideoPage videoId={ctx.match.params.id} />
+                }} />
                 {/* <Route exact path="/Upload" component={UploadVideo} />
-                <Route exact path="/Vid/:id" component={Video} />
                 <Route exact path="/Edit/:id" component={EditVideo} />
                 <Route exact path="/Admin" component={Admin} />
                 <Route exact path="/Live" component={LiveStreams} />

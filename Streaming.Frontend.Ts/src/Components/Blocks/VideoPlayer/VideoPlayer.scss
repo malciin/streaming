@@ -1,0 +1,121 @@
+@import '../../../Shared/GlobalStyle.scss';
+
+$slider-bg-color: lighten($accent-color, 33%);
+
+.video-js {
+    width: 100%;
+    height: 624px;
+
+    .vjs-big-play-button {
+        border: 0px solid #fff;
+        border-radius: 0.3em;
+      
+        left: 50%;
+        top: 50%;
+        margin-left: -(3em / 2);
+        margin-top: -(1.5em / 2);   
+    }
+
+    .vjs-big-play-button, .vjs-menu-button .vjs-menu-content {
+        background-color: rgba($accent-color, 0.7);
+    }
+
+    .vjs-control-bar {
+        background-color: transparent;
+        
+        .vjs-play-control, .vjs-volume-panel,
+        .vjs-fullscreen-control, .vjs-remaining-time {
+            background-color: rgba($accent-color, 0.7);
+        }
+
+        .vjs-volume-panel {
+            .vjs-volume-control {
+                padding-right: 5px;
+            }
+        }
+
+        .vjs-progress-control {
+            align-items: flex-end;
+            
+            .vjs-progress-holder{
+
+                height: 10px;
+                background-color: darken(white, 80%);
+                margin-left: 0px;
+                margin-right: 0px;
+                .vjs-load-progress, .vjs-load-progress div{
+                    background-color: rgba(orange, 0.2);
+                }
+    
+                .vjs-play-progress {
+                    background-color: rgba(orange, 0.2);
+                    &::before {
+                        content: "";
+                        width: 0px;
+                        height: 100%;
+                        background-color: $accent-color;
+                        display: block;
+                        top: 0;
+                        right: 0;
+                    }
+                }
+            }
+        }
+        
+    }
+}
+
+
+
+.vjs-loading-spinner {
+    border: 0px;
+    margin: -40px 0 0 -40px;
+}
+
+.vjs-loading-spinner:before{
+    content: "";
+}
+
+.vjs-loading-spinner:after {
+    content: "";
+}
+
+.vjs-custom-spinner {
+    width: 80px;
+    height: 80px;
+  
+    position: relative;
+
+    .vjs-custom-spinner-bounce-1, .vjs-custom-spinner-bounce-2 {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background-color: $accent-color;
+        opacity: 0.6;
+        position: absolute;
+        top: 0;
+        left: 0;
+        -webkit-animation: sk-bounce 1.5s infinite ease-in-out;
+        animation: sk-bounce 1.5s infinite ease-in-out;
+    }
+      
+    .vjs-custom-spinner-bounce-2 {
+        -webkit-animation-delay: -0.75s;
+        animation-delay: -0.75s;
+    }
+}
+  
+  @-webkit-keyframes sk-bounce {
+    0%, 100% { -webkit-transform: scale(0.0) }
+    50% { -webkit-transform: scale(1.0) }
+}
+  
+  @keyframes sk-bounce {
+    0%, 100% { 
+        transform: scale(0.0);
+        -webkit-transform: scale(0.0);
+    } 75% { 
+        transform: scale(1.0);
+        -webkit-transform: scale(1.0);
+    }
+}

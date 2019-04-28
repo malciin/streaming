@@ -1,10 +1,11 @@
 import * as React from 'react';
 import './LoginControl.scss';
 import { connect } from 'react-redux';
-import User from '../../../Models/User';
+import LoggedUser from '../../../Models/LoggedUser';
+import { AppContext } from '../../../AppContext';
 
 interface LoginControlState {
-    user: User,
+    user: LoggedUser,
     pendingLogin: boolean
 }
 
@@ -36,6 +37,8 @@ class LoginControl extends React.Component<LoginControlState> {
             return <div className="nav-link">Hello {this.props.user.nickname}!</div>
     }
 }
+
+LoginControl.contextType = AppContext;
 
 const mapStateToProps = (state) => {
     var loginControlState: LoginControlState = {

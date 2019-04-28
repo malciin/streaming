@@ -2,12 +2,12 @@ import * as React from 'react';
 import Dropzone, { DropEvent } from 'react-dropzone';
 import './DropzoneFileField.scss'
 
-interface DropzoneFileFieldSettings {
+interface DropzoneFileFieldProps {
     onDropFile?: (acceptedFiles: File[], rejectedFiles: File[]) => void;
     removeFiles?: () => void;
 }
 
-export default class DropzoneFileField extends React.Component<DropzoneFileFieldSettings> {
+export default class DropzoneFileField extends React.Component<DropzoneFileFieldProps> {
     constructor(props) {
         super(props);
     }

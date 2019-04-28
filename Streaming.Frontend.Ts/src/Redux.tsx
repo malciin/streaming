@@ -2,11 +2,11 @@ import * as React from 'react';
 import { render } from 'react-dom';
 import { createStore } from 'redux';
 import { connect, Provider } from 'react-redux';
-import User from './Models/User';
+import LoggedUser from './Models/LoggedUser';
 
 export interface ReduxState {
     pendingLogin: boolean,
-    user: User
+    user: LoggedUser
 }
 
 export enum Type {

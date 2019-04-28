@@ -4,6 +4,8 @@ import ApiService, { HttpMethod, RespType } from "./ApiService";
 import * as SparkMD5 from 'spark-md5';
 import Auth0Service from './Auth0Service';
 import VideoFormData from '../Models/Forms/VideoFormData';
+import VideoMetadata from '../Models/VideoMetadata';
+import * as moment from 'moment';
 
 export default class StreamingApiService extends ApiService {
     constructor(authContext: Auth0Service) {
@@ -33,14 +35,26 @@ export default class StreamingApiService extends ApiService {
             });
     }
 
-    async getLiveStream(id) {
+    async getLiveStream(id: string): Promise<void> {
         return await this.makeApiRequest(`${Config.apiPath}/Live/${id}`, 
             HttpMethod.GET, null);
     }
 
-    async getVideo(id) {
-        return await this.makeApiRequest(`${Config.apiPath}/Video/${id}`,
-            HttpMethod.GET, null);
+    async getVideo(id:string): Promise<VideoMetadata> {
+        var json = await this.makeApiRequest(`${Config.apiPath}/Video/${id}`,
+            HttpMethod.GET, null, false, RespType.Json);
+        
+        var result: VideoMetadata = {
+            videoId: json["videoId"],
+            title: json["title"],
+            description: json["description"],
+            createdDate: moment(json["createdDate"]),
+            length: json["length"],
+            ownerNickname: json["ownerNickname"],
+            thumbnailUrl: json["thumbnailUrl"]
+        };
+        
+        return result;
     }
 
     async getUploadToken() {

@@ -1,8 +1,9 @@
 import * as React from 'react';
 import VideoListItem from '../../Blocks/VideoListItem/VideoListItem';
 import { AppContext } from '../../../AppContext';
+import VideoMetadata from '../../../Models/VideoMetadata';
 
-export default class Index extends React.Component<{}, { videos: Video[] }>{
+export default class Index extends React.Component<{}, { videos: VideoMetadata[] }>{
     constructor(props) {
         super(props);
         this.state = {

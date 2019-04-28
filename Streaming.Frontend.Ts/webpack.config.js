@@ -33,7 +33,8 @@ module.exports = {
     devServer: {
         historyApiFallback: true,
         contentBase: path.join(__dirname, 'public'),
-        compress: true,
+        compress: false,
+        filename: 'bundle.js',
         port: 3000
     },
     plugins: [

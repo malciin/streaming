@@ -3,7 +3,7 @@ import { Config } from '../Shared/Config';
 import history from '../Shared/History';
 import { AsyncFunctions } from '../Shared/AsyncFunctions';
 import { Type, Store } from '../Redux';
-import User from '../Models/User';
+import LoggedUser from '../Models/LoggedUser';
 
 export default class Auth0Service {
 
@@ -110,7 +110,7 @@ export default class Auth0Service {
         this.idToken = authResult.idToken;
         this.expiresAt = expiresAt;
         console.log(this);
-        var user: User = {
+        var user: LoggedUser = {
             nickname: this.idTokenPayload.nickname,
             claims: this.idTokenPayload[Config.auth0.claimsNamespace]
         };

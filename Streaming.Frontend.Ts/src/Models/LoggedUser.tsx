@@ -1,4 +1,4 @@
-export default interface User {
+export default interface LoggedUser {
     nickname: string,
     claims: string[]
 }
