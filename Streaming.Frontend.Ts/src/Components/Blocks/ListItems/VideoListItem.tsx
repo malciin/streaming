@@ -3,12 +3,10 @@ import { Link } from "react-router-dom";
 import Claims from '../../../Models/Claims';
 import './VideoListItem.scss';
 import { AppContext } from '../../../AppContext';
+import VideoMetadata from '../../../Models/VideoMetadata';
 
 interface VideoListItemProps {
-    videoId: string,
-    thumbnailUrl: string,
-    title: string,
-    description: string,
+    videoModel: VideoMetadata,
     onDeleteVideo: (videoId: string) => Promise<void>;
 }
 
@@ -22,24 +20,24 @@ export default class VideoListItem extends React.Component<VideoListItemProps, {
 
     render() {
         return <div className="video-list-item">
-            <Link to={"/Vid/" + this.props.videoId }>
+            <Link to={"/Vid/" + this.props.videoModel.videoId }>
             <div className="thumbnail">
                 <div className="thumbnail-box">
-                    <img className="thumbnail-image icon-video" alt="Video thumbnail" src={this.props.thumbnailUrl} />
+                    <img className="thumbnail-image icon-video" alt="Video thumbnail" src={this.props.videoModel.thumbnailUrl} />
                 </div>
             </div>
             </Link>
             <div className="video-metadata">
                 <div className="video-title">
-                    {this.props.title} 
+                    {this.props.videoModel.title} 
                 </div>
                 <div className="description text-secondary-color">
-                    {this.props.description}
+                    {this.props.videoModel.description}
                 </div>
             </div>
             <div className="management">
                 { !this.state.callbackInProgress && this.context.auth.haveClaim(Claims.canDeleteVideo) && 
-                    <i className="icon-trash cursor-pointer" onClick={(any) => this.props.onDeleteVideo(this.props.videoId)}></i> }
+                    <i className="icon-trash cursor-pointer" onClick={(any) => this.props.onDeleteVideo(this.props.videoModel.videoId)}></i> }
             </div>
         </div>;
     }

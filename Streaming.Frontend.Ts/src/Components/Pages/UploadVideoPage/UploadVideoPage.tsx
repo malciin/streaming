@@ -11,7 +11,7 @@ interface UploadVideoPageState {
     consoleOutput: string[]
 }
 
-class UploadVideo extends React.Component<{}, UploadVideoPageState>{
+class UploadVideoPage extends React.Component<{}, UploadVideoPageState>{
 
     private console: Console;
 
@@ -73,5 +73,5 @@ class UploadVideo extends React.Component<{}, UploadVideoPageState>{
     }
 }
 
-UploadVideo.contextType = AppContext;
-export default UploadVideo;
+UploadVideoPage.contextType = AppContext;
+export default UploadVideoPage;

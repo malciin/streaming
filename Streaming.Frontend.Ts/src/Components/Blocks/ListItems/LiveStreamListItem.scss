@@ -1,0 +1,30 @@
+@import '../../../Shared/GlobalStyle.scss';
+
+.live-stream-list-item {
+    margin-top: 10px;
+    display: flex;
+    .thumbnail {
+        img {
+            width: 200px;
+        }
+    }
+
+    .metadata {
+        margin-left: 15px;
+        .title {
+            .live-mark {
+                $horizontal-side-padding: 10px;
+                $vertical-side-padding: 3px;
+
+                font-size: 14px;
+                background-color: red;
+                padding-left: $horizontal-side-padding;
+                padding-right: $horizontal-side-padding;
+                padding-top: $vertical-side-padding;
+                padding-bottom: $vertical-side-padding;
+                border-radius: 15px;
+            }
+            font-size: 20px;
+        }
+    }
+}

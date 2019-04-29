@@ -82,6 +82,7 @@ export default class Auth0Service {
     {
         if (localStorage.getItem(this.loggedInSessionKey) === 'true' && !this.idToken)
         {
+            this.pendingSilentLogin = true;
             Store.dispatch({ type: Type.StartPendingLogin });
             console.log(Store.getState());
             var authResult = await AsyncFunctions.auth0.checkSession(this.auth0);
@@ -114,6 +115,7 @@ export default class Auth0Service {
             nickname: this.idTokenPayload.nickname,
             claims: this.idTokenPayload[Config.auth0.claimsNamespace]
         };
+        this.pendingSilentLogin = false;
         Store.dispatch({ type: Type.UserLoggedIn, user: user });
     }
 

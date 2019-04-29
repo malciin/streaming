@@ -1,9 +1,9 @@
 import * as React from 'react';
-import VideoListItem from '../../Blocks/VideoListItem/VideoListItem';
+import VideoListItem from '../../Blocks/ListItems/VideoListItem';
 import { AppContext } from '../../../AppContext';
 import VideoMetadata from '../../../Models/VideoMetadata';
 
-export default class Index extends React.Component<{}, { videos: VideoMetadata[] }>{
+export default class VideoListPage extends React.Component<{}, { videos: VideoMetadata[] }>{
     constructor(props) {
         super(props);
         this.state = {
@@ -14,9 +14,13 @@ export default class Index extends React.Component<{}, { videos: VideoMetadata[]
     }
     
     async componentDidMount() {
-        let jsonData = await this.context.streamingApi.getVideos({});
+        let videos = await this.context.streamingApi.getVideos({
+            keywords: [],
+            howMuch: 10,
+            offset: 0
+        });
         this.setState ({
-            videos: jsonData
+            videos: videos
         });
     }
 
@@ -33,12 +37,9 @@ export default class Index extends React.Component<{}, { videos: VideoMetadata[]
                 <div className="container">
                     {
                         this.state.videos.map((video, i) => {
-                            return <VideoListItem key={video.videoId}
-                                                  title={video.title} 
-                                                  description={video.description}
-                                                  videoId={video.videoId}
-                                                  thumbnailUrl={video.thumbnailUrl}
-                                                  onDeleteVideo={this.deleteVideoRequest} />
+                            return <VideoListItem key={video.videoId} 
+                                videoModel={video}
+                                onDeleteVideo={this.deleteVideoRequest} />
                         })
                     }
                 </div>
@@ -46,4 +47,5 @@ export default class Index extends React.Component<{}, { videos: VideoMetadata[]
         );
     }
 }
-Index.contextType = AppContext;
+
+VideoListPage.contextType = AppContext;

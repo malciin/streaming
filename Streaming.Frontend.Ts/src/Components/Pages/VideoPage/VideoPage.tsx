@@ -1,10 +1,10 @@
 import * as React from 'react'
-import * as moment from 'moment';
 import VideoMetadata from '../../../Models/VideoMetadata';
 import { Config } from '../../../Shared/Config';
 import VideoPlayer from '../../Blocks/VideoPlayer/VideoPlayer';
 import { AppContext } from '../../../AppContext';
 import './VideoPage.scss';
+import Helpers from '../../../Shared/Helpers';
 
 interface VideoPageProps {
     videoId: string
@@ -20,24 +20,16 @@ export default class VideoPage extends React.Component<VideoPageProps, VideoPage
         this.state = {
             video: null
         }
-
-        this.getUploadDateAgoHumanize = this.getUploadDateAgoHumanize.bind(this);
     }
     
     async componentWillMount() {
-        var videoInfo = await this.context.streamingApi.getVideo(this.props.videoId); 
+        var videoInfo = await this.context.streamingApi.getVideo(this.props.videoId);
         this.setState({
             video: videoInfo
         });
     }
 
-    getUploadDateAgoHumanize(): string {
-        var dateDifference = moment().diff(this.state.video.createdDate);
-        return moment.duration(dateDifference).humanize();
-    }
-    
     render() {
-        
         return <div className="videoPage">
             { this.state.video && <div className="container">
                 <VideoPlayer 
@@ -49,7 +41,7 @@ export default class VideoPage extends React.Component<VideoPageProps, VideoPage
                         <h2>{this.state.video.title}</h2>
                     </div>
                     <div className="videoCreation">
-                        <h3>{`${this.getUploadDateAgoHumanize()} ago`}</h3>
+                        <h3>{`${Helpers.getHumanizedDateAgoDifference(this.state.video.createdDate)} ago`}</h3>
                     </div>
                 </div>
                 

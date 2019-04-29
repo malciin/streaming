@@ -1,11 +1,13 @@
 import { Config } from '../Shared/Config';
 import { AsyncFunctions } from "../Shared/AsyncFunctions";
-import ApiService, { HttpMethod, RespType } from "./ApiService";
+import ApiService, { HttpMethod, RespType, AuthLevel } from "./ApiService";
 import * as SparkMD5 from 'spark-md5';
 import Auth0Service from './Auth0Service';
 import VideoFormData from '../Models/Forms/VideoFormData';
 import VideoMetadata from '../Models/VideoMetadata';
-import * as moment from 'moment';
+import LiveStreamMetadata from '../Models/LiveStreamMetadata';
+import Mapper from './Mapper';
+import VideoFilter from '../Models/Services/Streaming.Api/VideoFilter';
 
 export default class StreamingApiService extends ApiService {
     constructor(authContext: Auth0Service) {
@@ -17,59 +19,47 @@ export default class StreamingApiService extends ApiService {
         this.deleteVideo = this.deleteVideo.bind(this);
         this.getStreamToken = this.getStreamToken.bind(this);
     }
-
-    async getStreams() {
-        return await this.makeApiRequest(Config.apiPath + '/Live', 
-            HttpMethod.POST, {
-                offset: 0,
-                howMuch: 10
-            });
+ 
+    async getVideo(id:string): Promise<VideoMetadata> {
+        let json = await this.makeApiRequest(`${Config.apiPath}/Video/${id}`,
+            HttpMethod.GET);
+        return Mapper.mapVideoMetadata(json);
     }
-
-    async getVideos(filterObject) {
-        return await this.makeApiRequest(Config.apiPath + '/Video/Search',
-            HttpMethod.POST, {
-                keywords: [],
-                offset: 0,
-                howMuch: 10
-            });
+    
+    async getVideos(filterObject: VideoFilter): Promise<VideoMetadata[]> {
+        let json = await this.makeApiRequest(Config.apiPath + '/Video/Search',
+            HttpMethod.POST, filterObject);
+        return json.map(x => Mapper.mapVideoMetadata(x));
     }
-
+    
     async getLiveStream(id: string): Promise<void> {
         return await this.makeApiRequest(`${Config.apiPath}/Live/${id}`, 
             HttpMethod.GET, null);
     }
-
-    async getVideo(id:string): Promise<VideoMetadata> {
-        var json = await this.makeApiRequest(`${Config.apiPath}/Video/${id}`,
-            HttpMethod.GET, null, false, RespType.Json);
+    
+    async getLiveStreams(): Promise<LiveStreamMetadata[]> {
+        let liveStreamsJson = await this.makeApiRequest(Config.apiPath + '/Live', 
+            HttpMethod.POST, {
+                offset: 0,
+                howMuch: 10
+            });
         
-        var result: VideoMetadata = {
-            videoId: json["videoId"],
-            title: json["title"],
-            description: json["description"],
-            createdDate: moment(json["createdDate"]),
-            length: json["length"],
-            ownerNickname: json["ownerNickname"],
-            thumbnailUrl: json["thumbnailUrl"]
-        };
-        
-        return result;
+        return liveStreamsJson.map(x => Mapper.mapLiveStreamMetadata(x));
     }
 
     async getUploadToken() {
         return await this.makeApiRequest(`${Config.apiPath}/Video/UploadToken`,
-            HttpMethod.GET, null, true);
+            HttpMethod.GET, null, AuthLevel.User);
     }
 
-    async deleteVideo(videoId) {
+    async deleteVideo(videoId: string) {
         return await this.makeApiRequest(`${Config.apiPath}/Video/${videoId}`,
-            HttpMethod.DELETE, null, true, RespType.Raw);
+            HttpMethod.DELETE, null, AuthLevel.User, RespType.Raw);
     }
 
     async getStreamToken() {
         return await this.makeApiRequest(`${Config.apiPath}/Live/Token`,
-            HttpMethod.GET, null, true);
+            HttpMethod.GET, null, AuthLevel.User);
     }
 
     async uploadVideo(video: VideoFormData, progressFunc: (percentProgress: Number) => void) {
@@ -127,6 +117,6 @@ export default class StreamingApiService extends ApiService {
                 uploadToken: token,
                 title: video.title,
                 description: video.description
-            }, true, RespType.Raw);
+            }, AuthLevel.User, RespType.Raw);
     }
 }

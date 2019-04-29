@@ -31,10 +31,12 @@ class UploadVideoForm extends React.Component<UploadVideoFormProps, UploadVideoF
     }
 
     handleFieldChange (fieldName: string, value: string): void {
+        console.log(`fieldName: ${fieldName} | value: ${value}`);
         // @ts-ignore
         this.setState({
             [fieldName]: value
         });
+        console.log(this.state);
     }
 
     onDropFile(videoFile: File): void {
