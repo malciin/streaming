@@ -1,4 +1,11 @@
 {
+  "Logging": {
+    "LogLevel": {
+      "Default": "Trace",
+      "System": "Trace",
+      "Microsoft": "Warning"
+    }
+  },
   "Hosting": {
     "HttpPort": "8086",
     "SecretServerKey": "Type your supersecretkeyhere"
@@ -18,6 +25,6 @@
   "Auth0_ManagementApi": {
     "Audience": "https://id0.eu.auth0.com/api/v2/",
     "ClientId": "o0manqM8zThK5OQV7HUXKKIgitvhwx1r",
-    "ClientSecret":  "Type here your super secret auth0 client secret or in KeysSettings.Secret.cs method"
+    "ClientSecret": "Type here your super secret auth0 client secret or in KeysSettings.Secret.cs method"
   }
 }

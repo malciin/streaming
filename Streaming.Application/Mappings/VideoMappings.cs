@@ -25,7 +25,7 @@ namespace Streaming.Application.Mappings
                 Length = (TimeSpan)Video.Length,
                 Title = Video.Title,
                 ThumbnailUrl = Video.State.HasFlag(VideoState.MainThumbnailGenerated) ? thumbnailService.GetThumbnailUrl(Video.VideoId) : null,
-                Owner = Video.Owner
+                OwnerNickname = Video.Owner.Nickname
             };
         }
     }

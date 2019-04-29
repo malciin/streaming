@@ -18,13 +18,11 @@ namespace Streaming.Api
 {
     public class Startup
     {
-        private readonly IHostingEnvironment hostingEnvironment;
         private readonly IConfiguration configuration;
-
-        public Startup(IHostingEnvironment hostingEnvironment, IConfiguration configuration)
+        public Startup(IConfiguration configuration, IHostingEnvironment hostingEnvironment)
         {
+            BannerPrinter.Print(configuration, hostingEnvironment);
             this.configuration = configuration;
-            this.hostingEnvironment = hostingEnvironment;
         }
 
         public IServiceProvider ConfigureServices(IServiceCollection services)

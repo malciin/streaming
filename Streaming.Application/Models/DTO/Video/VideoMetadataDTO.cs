@@ -15,6 +15,6 @@ namespace Streaming.Application.Models.DTO.Video
 
         public TimeSpan Length { get; set; }
 
-        public UserDetails Owner { get; set; }
+        public string OwnerNickname { get; set; }
     }
 }
