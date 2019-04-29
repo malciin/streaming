@@ -34,7 +34,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Presentation", "Presentatio
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{03C432E8-688A-4B0A-8F80-D38F3DCBC509}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Streaming.Tests.External", "Streaming.Tests.External\Streaming.Tests.External.csproj", "{3BFD56F5-9FA0-4354-B1CE-77100B33662B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Streaming.Tests.External", "Streaming.Tests.External\Streaming.Tests.External.csproj", "{3BFD56F5-9FA0-4354-B1CE-77100B33662B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Streaming.Tests.EndToEnd", "Streaming.Tests.EndToEnd\Streaming.Tests.EndToEnd.csproj", "{3D834A7F-295E-4D49-BA85-EA2CC9EE9B58}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -74,6 +76,10 @@ Global
 		{3BFD56F5-9FA0-4354-B1CE-77100B33662B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3BFD56F5-9FA0-4354-B1CE-77100B33662B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3BFD56F5-9FA0-4354-B1CE-77100B33662B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3D834A7F-295E-4D49-BA85-EA2CC9EE9B58}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3D834A7F-295E-4D49-BA85-EA2CC9EE9B58}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3D834A7F-295E-4D49-BA85-EA2CC9EE9B58}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3D834A7F-295E-4D49-BA85-EA2CC9EE9B58}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -87,6 +93,7 @@ Global
 		{3C042F4F-41A1-4143-B453-21B8AE2C838F} = {6C694025-EB43-4DA2-94F6-BD5DD756F585}
 		{D3762445-CBB3-4BA5-9765-4ABEBE094C73} = {864467AA-40D6-4154-8637-8C6FB551B2C7}
 		{3BFD56F5-9FA0-4354-B1CE-77100B33662B} = {03C432E8-688A-4B0A-8F80-D38F3DCBC509}
+		{3D834A7F-295E-4D49-BA85-EA2CC9EE9B58} = {03C432E8-688A-4B0A-8F80-D38F3DCBC509}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4DFA51A9-1A25-4CE8-942B-FE978749C720}
