@@ -31,10 +31,6 @@ namespace Streaming.Infrastructure.IoC
                    .As<IAzureBlobClient>()
                    .InstancePerLifetimeScope();
 
-            builder.RegisterType<LoggerService>()
-                   .As<ILoggerService>()
-                   .SingleInstance();
-
             builder.RegisterType<SHA256MessageSignerService>()
                    .As<IMessageSignerService>()
                    .SingleInstance();

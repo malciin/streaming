@@ -1,18 +1,18 @@
 ﻿using Autofac;
-using Streaming.Application.Interfaces.Services;
 using System;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace Streaming.Application.Commands
 {
     public class CommandBus : ICommandBus
 	{
 		private readonly ILifetimeScope lifetimeScope;
-		private ConcurrentQueue<dynamic> queue = new ConcurrentQueue<dynamic>();
+		private readonly ConcurrentQueue<dynamic> queue = new ConcurrentQueue<dynamic>();
 
         private Task worker;
-        private object lockObj = new object();
+        private readonly object lockObj = new object();
 		private bool running = false;
         
 
@@ -25,8 +25,7 @@ namespace Streaming.Application.Commands
 		{
 			while(!queue.IsEmpty)
 			{
-				dynamic command;
-				queue.TryDequeue(out command);
+                queue.TryDequeue(out var command);
 				using (var scope = lifetimeScope.BeginLifetimeScope())
 				{
 					var dispatcher = scope.Resolve<ICommandDispatcher>();
@@ -36,7 +35,7 @@ namespace Streaming.Application.Commands
                     }
                     catch(Exception ex)
                     {
-                        scope.Resolve<ILoggerService>().Log(dispatcher, ex);
+                        scope.Resolve<ILogger<CommandBus>>().LogError(ex, "Processing video failed");
                     }
                 }
 			}
@@ -51,12 +50,11 @@ namespace Streaming.Application.Commands
 			queue.Enqueue(Command);
 			lock(lockObj)
 			{
-				if (!running)
-				{
-					running = true;
-                    worker = Task.Factory.StartNew(WorkerTask, TaskCreationOptions.LongRunning);
-				}
-			}
+                if (running)
+                    return;
+                running = true;
+                worker = Task.Factory.StartNew(WorkerTask, TaskCreationOptions.LongRunning);
+            }
 		}
 	}
 }

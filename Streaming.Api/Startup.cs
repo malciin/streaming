@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Streaming.Api.Middlewares;
-using Streaming.Api.Monitor;
 using Streaming.Application.SignalR.Hubs;
 using Streaming.Auth0;
 using Streaming.Infrastructure.IoC.Extensions;
@@ -35,8 +34,6 @@ namespace Streaming.Api
                 });
             });
 
-            services.AddScoped<ICustomLogger, CustomLogger>();
-
             services.AddAuthentication(x =>
             {
                 x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -61,10 +58,7 @@ namespace Streaming.Api
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            if (env.IsProduction())
-            {
-                app.UseMiddleware<ExceptionHandlingMiddleware>();
-            }
+            app.UseMiddleware<ExceptionHandlingMiddleware>();
             app.UseMiddleware<ValidationExceptionHandlerMiddleware>();
             app.UseCors("AllowAny");
             app.UseAuthentication();

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 
@@ -14,7 +13,7 @@ namespace Streaming.Api
             Console.WriteLine("  __                                           ");
             Console.WriteLine(" (_ _|_ ._ _   _. ._ _  o ._   _    ._   _ _|_ ");
             Console.WriteLine(" __) |_ | (/_ (_| | | | | | | (_| o | | (/_ |_ ");
-            Console.WriteLine("      ver. Development        _ |              ");
+            Console.WriteLine("      ver. Development        __|              ");
             Console.WriteLine();
             Console.ForegroundColor = defaultColor;
             Console.WriteLine($"Application name: {hostingEnvironment.ApplicationName}");

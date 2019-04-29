@@ -4,9 +4,7 @@ using Streaming.Common.Exceptions;
 using Streaming.Common.Extensions;
 using System;
 using System.IO;
-using System.Linq;
 using System.Security.Cryptography;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Streaming.Application.Commands.Video
@@ -21,7 +19,7 @@ namespace Streaming.Application.Commands.Video
             this.messageSigner = messageSigner;
         }
 
-        public Guid getVideoIdFromToken(string uploadToken)
+        private Guid getVideoIdFromToken(string uploadToken)
         {
             var signedMessage = Convert.FromBase64String(uploadToken);
             var message = messageSigner.GetMessage(signedMessage);
@@ -29,16 +27,16 @@ namespace Streaming.Application.Commands.Video
             return new Guid(message);
         }
 
-        public async Task HandleAsync(UploadVideoPartCommand Command)
+        public async Task HandleAsync(UploadVideoPartCommand command)
         {
-            Guid videoId = getVideoIdFromToken(Command.UploadToken);
+            Guid videoId = getVideoIdFromToken(command.UploadToken);
 
             var hasher = MD5.Create();
 
-            using (var partStream = Command.PartBytes.OpenReadStream())
+            using (var partStream = command.PartBytes.OpenReadStream())
             {
                 var hash = Convert.ToBase64String(hasher.ComputeHash(partStream));
-                if (!String.Equals(hash, Command.PartMD5Hash))
+                if (!String.Equals(hash, command.PartMD5Hash))
                 {
                     throw new HashesNotEqualException();
                 }
