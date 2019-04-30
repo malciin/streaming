@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Streaming.Api.FileLogger;
 
@@ -23,6 +24,10 @@ namespace Streaming.Api
                 .ConfigureLogging((ctx, config) =>
                 {
                     config.AddProvider(new FileLoggerProvider(ctx.Configuration["Directories:LogsDirectory"]));
+                })
+                .ConfigureServices(services =>
+                {
+                    services.AddSingleton<IStartupEvents, NoneStartupEvents>();
                 })
                 .UseKestrel((ctx, options) =>
                 {
