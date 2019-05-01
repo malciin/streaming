@@ -137,7 +137,6 @@ namespace Streaming.Tests.EndToEnd
                 {
                     repo.AddAsync(video).GetAwaiter().GetResult();
                 }
-                repo.CommitAsync().GetAwaiter().GetResult();
             });
             return this;
         }

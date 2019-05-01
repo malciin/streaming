@@ -18,7 +18,7 @@ namespace Streaming.Tests.EndToEnd
         {
             try
             {
-                $"docker rm -f $(docker ps -q --filter name={containerName})"
+                $"docker rm -f $(docker ps -aq --filter name={containerName})"
                     .ExecuteBashAsync().GetAwaiter().GetResult();
             }
             catch (Exception)

@@ -1,4 +1,5 @@
-﻿using Autofac;
+﻿using System.Linq;
+using Autofac;
 using MongoDB.Driver;
 using MongoDB.Driver.GridFS;
 using Streaming.Application.Interfaces.Repositories;
@@ -44,7 +45,7 @@ namespace Streaming.Infrastructure.MongoDb.IoC
             var assembly = typeof(IRepositoryMarker).Assembly;
             builder.RegisterAssemblyTypes(assembly)
                 .InNamespaceOf<IRepositoryMarker>()
-                .Where(x => x.IsAssignableFrom(typeof(IRepositoryMarker)))
+                .Where(x => x.IsClass && x.GetInterfaces().Contains(typeof(IRepositoryMarker)))
                 .AsImplementedInterfaces()
                 .InstancePerLifetimeScope();
         }
