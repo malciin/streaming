@@ -16,7 +16,7 @@ namespace Streaming.Domain.Models
         }
 
         private Guid mediaId;
-        private List<TimeSpan> partsLength;
+        private readonly List<TimeSpan> partsLength;
 
         private VideoManifest()
         {
@@ -46,8 +46,12 @@ namespace Streaming.Domain.Models
             return manifest;
         }
 
-        public void AddPart(TimeSpan partLength)
-            => partsLength.Add(partLength);
+        public VideoManifest AddPart(TimeSpan partLength)
+        {
+            partsLength.Add(partLength);
+            return this;
+        }
+
 
         public byte[] ToByteArray()
         {
@@ -73,7 +77,7 @@ namespace Streaming.Domain.Models
             var manifest = new StringBuilder();
 
             int counter = 0;
-            TimeSpan maxPartLength = TimeSpan.FromSeconds(0);
+            var maxPartLength = TimeSpan.FromSeconds(0);
             foreach(var partLength in partsLength)
             {
                 if (maxPartLength < partLength)
