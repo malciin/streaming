@@ -78,7 +78,6 @@ namespace Streaming.Application.Commands.Video
                 VideoLength = videoLength,
                 VideoManifest = manifest
             });
-            await videoRepo.CommitAsync();
         }
 
         private void filesCleanup(ProcessVideoCommand command)

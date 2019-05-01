@@ -20,6 +20,9 @@ namespace Streaming.Infrastructure.MongoDb.IoC
         {
             base.Load(builder);
 
+            builder.Register<IClientSessionHandle>(context => new MongoClient(connectionString).StartSession())
+                   .InstancePerLifetimeScope();
+
             builder.Register<IMongoDatabase>(context => new MongoClient(connectionString).GetDatabase(databaseName))
                    .SingleInstance();
 

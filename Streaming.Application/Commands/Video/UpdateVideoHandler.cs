@@ -15,22 +15,21 @@ namespace Streaming.Application.Commands.Video
             this.videoRepo = videoRepo;
         }
 
-        public async Task HandleAsync(UpdateVideoCommand Command)
+        public async Task HandleAsync(UpdateVideoCommand command)
         {
             var updateVideoInfo = new UpdateVideoInfo
             {
-                UpdateByVideoId = Command.VideoId,
-                NewVideoTitle = Command.NewTitle,
-                NewVideoDescription = Command.NewDescription
+                UpdateByVideoId = command.VideoId,
+                NewVideoTitle = command.NewTitle,
+                NewVideoDescription = command.NewDescription
             };
 
-            if (!Command.User.HasStreamingClaim(Claims.CanEditAnyVideo))
+            if (!command.User.HasStreamingClaim(Claims.CanEditAnyVideo))
             {
-                updateVideoInfo.UpdateByUserIdentifier = Command.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                updateVideoInfo.UpdateByUserIdentifier = command.User.FindFirst(ClaimTypes.NameIdentifier).Value;
             }
 
             await videoRepo.UpdateAsync(updateVideoInfo);
-            await videoRepo.CommitAsync();
         }
     }
 }

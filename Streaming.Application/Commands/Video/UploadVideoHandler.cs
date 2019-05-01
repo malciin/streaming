@@ -31,7 +31,7 @@ namespace Streaming.Application.Commands.Video
             this.videoProcessingFilesPathStrategy = videoProcessingFilesPathStrategy;
         }
 
-        public Guid getVideoIdFromUploadToken(string uploadToken)
+        private Guid getVideoIdFromUploadToken(string uploadToken)
         {
             var signedMessage = Convert.FromBase64String(uploadToken);
             var message = messageSigner.GetMessage(signedMessage);
@@ -64,7 +64,6 @@ namespace Streaming.Application.Commands.Video
 			};
 
 			await videoRepo.AddAsync(video);
-            await videoRepo.CommitAsync();
 
             commandBus.Push(new ProcessVideoCommand
             {
