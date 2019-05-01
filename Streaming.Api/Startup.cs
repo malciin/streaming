@@ -51,7 +51,7 @@ namespace Streaming.Api
 
             builder.Populate(services);
             builder.UseDefaultModules();
-            builder.UseMongoDb(configuration["Database:ConnectionString"], "streaming");
+            builder.UseMongoDb(configuration["Database:ConnectionString"]);
 
             return new AutofacServiceProvider(builder.Build());
         }

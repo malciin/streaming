@@ -16,11 +16,11 @@ namespace Streaming.Infrastructure.MongoDb.Extensions
                 mapMethod.Invoke(null, new object[] { });
         }
 
-        public static ContainerBuilder UseMongoDb(this ContainerBuilder containerBuilder, string connectionString, string databaseName)
+        public static ContainerBuilder UseMongoDb(this ContainerBuilder containerBuilder, string connectionString)
         {
             runAllMongoDbMappingMethods();
 
-            containerBuilder.RegisterModule(new IoC.MongoDbModule(connectionString, databaseName));
+            containerBuilder.RegisterModule(new IoC.MongoDbModule(connectionString));
             return containerBuilder;
         }
     }
