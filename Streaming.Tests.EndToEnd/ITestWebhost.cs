@@ -2,18 +2,29 @@
 using System.Collections.Generic;
 using Autofac;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Configuration;
 using Streaming.Domain.Models;
 
 namespace Streaming.Tests.EndToEnd
 {
     public interface ITestWebhost
     {
+        IConfigurationRoot Configuration { get; }
+
+        IServiceProvider Services { get; }
+
         bool WebhostStarted { get; }
-        
+
         /// <summary>
         /// It returns api url if WebhostStarted == true
         /// </summary>
         Uri ApiUri { get; }
+
+        /// <summary>
+        /// Explicitly disable database creation for tests that didn't use it
+        /// for faster testing
+        /// </summary>
+        ITestWebhost DontUseDatabase();
 
         /// <summary>
         /// Inject some app configuration at beginning

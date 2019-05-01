@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
-using System.Threading.Tasks;
-using Autofac;
+﻿using Autofac;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -15,6 +10,13 @@ using Streaming.Api;
 using Streaming.Application.Interfaces.Repositories;
 using Streaming.Application.Models;
 using Streaming.Domain.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Security.Claims;
+using System.Threading.Tasks;
+using MongoDB.Bson.Serialization;
 
 namespace Streaming.Tests.EndToEnd
 {
@@ -24,8 +26,10 @@ namespace Streaming.Tests.EndToEnd
         private IWebHost hostServer;
         private readonly StartupEvents startupEvents;
         private readonly RequestedTestClaims requestedTestClaimsObj;
-        private bool useTestUser = false;
+        private bool useDatabase = true;
 
+        public IConfigurationRoot Configuration { get; }
+        public IServiceProvider Services { get; private set; }
         public bool WebhostStarted { get; set; }
 
         public Uri ApiUri { get; set; }
@@ -36,12 +40,21 @@ namespace Streaming.Tests.EndToEnd
             ApiUri = null;
             startupEvents = new StartupEvents();
             requestedTestClaimsObj = new RequestedTestClaims();
-            database = new DockerTestDatabase();
+            database = new DockerMongoDbTestDatabase();
+            Configuration = new ConfigurationBuilder()
+                .AddJsonFile("Configuration.json", optional: false, reloadOnChange: false)
+                .Build();
         }
 
         public ITestWebhost ConfigureAutofacServices(Action<ContainerBuilder> services)
         {
             startupEvents.ServicesConfigurationCallbacks.Add(services);
+            return this;
+        }
+
+        public ITestWebhost DontUseDatabase()
+        {
+            this.useDatabase = false;
             return this;
         }
 
@@ -59,7 +72,24 @@ namespace Streaming.Tests.EndToEnd
 
         public ITestWebhost Start()
         {
-            var databaseConnectionString = database.Start();
+            var databaseConnectionString = String.Empty;
+            if (useDatabase)
+                databaseConnectionString = database.Start();
+
+            var anyClassMap = BsonClassMap.GetRegisteredClassMaps().FirstOrDefault();
+            if (anyClassMap != null)
+            {
+                var classMapDictionaryField = typeof(BsonClassMap).GetField("__classMaps",
+                    BindingFlags.Static | BindingFlags.NonPublic);
+                var classMapDictionary = (Dictionary<Type, BsonClassMap>)classMapDictionaryField.GetValue(anyClassMap);
+                classMapDictionary.Clear();
+            }
+
+            ConfigureAppAfterAuthentication(app =>
+            {
+                app.UseMiddleware<AuthenticationTestMiddleware>();
+            });
+
             hostServer = WebHost.CreateDefaultBuilder(null)
                 .ConfigureAppConfiguration(config =>
                 {
@@ -76,6 +106,7 @@ namespace Streaming.Tests.EndToEnd
                 .UseStartup<Startup>()
                 .Build();
 
+            this.Services = hostServer.Services;
             hostServer.Start();
             WebhostStarted = true;
             ApiUri = new Uri(hostServer.ServerFeatures.Get<IServerAddressesFeature>().Addresses.First(x => x.StartsWith("http://")));
@@ -94,14 +125,6 @@ namespace Streaming.Tests.EndToEnd
         public ITestWebhost ConfigureTestUser(params string[] claims)
         {
             this.requestedTestClaimsObj.RequestedClaims = claims;
-            if (!useTestUser)
-            {
-                useTestUser = true;
-                ConfigureAppAfterAuthentication(app =>
-                {
-                    app.UseMiddleware<AuthenticationTestMiddleware>();
-                });
-            }
             return this;
         }
 
@@ -121,22 +144,23 @@ namespace Streaming.Tests.EndToEnd
 
         private class AuthenticationTestMiddleware
         {
-            private readonly string[] requestedClaims;
             private readonly RequestDelegate next;
 
-            public AuthenticationTestMiddleware(RequestDelegate next, RequestedTestClaims requestedTestClaims)
+            public AuthenticationTestMiddleware(RequestDelegate next)
             {
-                this.requestedClaims = requestedTestClaims.RequestedClaims;
                 this.next = next;
             }
 
-            public async Task Invoke(HttpContext context /* other dependencies */)
+            public async Task Invoke(HttpContext context, RequestedTestClaims requestedTestClaims)
             {
-                var claims = requestedClaims
+                var claims = requestedTestClaims.RequestedClaims
                     .Select(claim => new Claim(Claims.ClaimsNamespace, claim))
                     .ToList();
-                var claimsIdentity = new ClaimsIdentity(claims);
-                context.User.AddIdentity(claimsIdentity);
+                if (claims.Any())
+                {
+                    var claimsIdentity = new ClaimsIdentity(claims, "testAuthentication");
+                    context.User = new ClaimsPrincipal(claimsIdentity);
+                }
                 await next(context);
             }
         }
@@ -144,6 +168,11 @@ namespace Streaming.Tests.EndToEnd
         private class RequestedTestClaims
         {
             public string[] RequestedClaims;
+
+            public RequestedTestClaims()
+            {
+                RequestedClaims = new string[] { };
+            }
         }
 
         private class StartupEvents : IStartupEvents

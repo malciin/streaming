@@ -13,7 +13,7 @@ namespace Streaming.Tests.EndToEnd.VideoController
     public partial class VideoControllerTests : EndToEndTestClass
     {
         [Test]
-        public void PaginationWorks()
+        public void Search_PaginationWorks()
         {
             var videos = new List<Video>();
             for (int i = 1; i < 10; i++)

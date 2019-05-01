@@ -8,7 +8,7 @@ using Streaming.Common.Extensions;
 
 namespace Streaming.Tests.EndToEnd
 {
-    public class DockerTestDatabase : ITestDatabase
+    public class DockerMongoDbTestDatabase : ITestDatabase
     {
         private const string MongoDbContainerName = "streaming-mongodb-tests";
         private static bool _databaseAlreadyRunning = false;
@@ -43,14 +43,6 @@ namespace Streaming.Tests.EndToEnd
             }
             else
             {
-                var anyClassMap = BsonClassMap.GetRegisteredClassMaps().FirstOrDefault();
-                if (anyClassMap != null)
-                {
-                    var classMapDictionaryField = typeof(BsonClassMap).GetField("__classMaps", BindingFlags.Static | BindingFlags.NonPublic);
-                    var classMapDictionary = (Dictionary<Type, BsonClassMap>)classMapDictionaryField.GetValue(anyClassMap);
-                    classMapDictionary.Clear();
-                }
-
                 var client = new MongoClient(_alreadyRunningDatabaseConnectionString);
                 foreach (var name in client.ListDatabaseNames().ToEnumerable())
                 {

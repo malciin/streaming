@@ -9,7 +9,7 @@ namespace Streaming.Tests.EndToEnd
         protected HttpClient Client { get; private set; }
 
         [SetUp]
-        public virtual void StartUp()
+        public void StartUp()
         {
             WebHost = new TestWebhost();
             Client = new HttpClient();
