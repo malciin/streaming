@@ -9,6 +9,7 @@ using System;
 using System.IO;
 using System.Linq;
 using Streaming.Common.Extensions;
+using Streaming.Infrastructure.IoC;
 
 namespace Streaming.Tests.Services
 {
@@ -27,7 +28,7 @@ namespace Streaming.Tests.Services
         public void Setup()
         {
             var container = new ContainerBuilder();
-            container.UseDefaultModules();
+            container.RegisterModule<ServicesModule>();
             var componentContext = container.Build();
             videoFileInfoService = componentContext.Resolve<IVideoFileInfoService>();
             videoSamplesPath = new DirectoryInfo("_Data/VideoSamples");

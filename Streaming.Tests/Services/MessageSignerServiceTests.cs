@@ -4,8 +4,8 @@ using NUnit.Framework;
 using Streaming.Application.Exceptions;
 using Streaming.Application.Interfaces.Services;
 using Streaming.Application.Interfaces.Settings;
-using Streaming.Infrastructure.IoC.Extensions;
 using System;
+using Streaming.Infrastructure.IoC;
 
 namespace Streaming.Tests.Services
 {
@@ -16,8 +16,7 @@ namespace Streaming.Tests.Services
         public void Setup()
         {
             var builder = new ContainerBuilder();
-            builder.UseDefaultModules();
-            builder.Register(x => new Mock<Microsoft.Extensions.Configuration.IConfigurationRoot>().Object).AsImplementedInterfaces();
+            builder.RegisterModule<ServicesModule>();
 
             var secretServerKey = new Mock<ISecretServerKey>();
             secretServerKey.Setup(x => x.SecretServerKey).Returns("Some test secret server key");
@@ -59,6 +58,8 @@ namespace Streaming.Tests.Services
             var mockedSecretServerKey = new Mock<ISecretServerKey>();
             mockedSecretServerKey.Setup(x => x.SecretServerKey).Returns("otherKey");
             var messageSignerServiceOtherKey = Activator.CreateInstance(messageSingerService.GetType(), mockedSecretServerKey.Object) as IMessageSignerService;
+            Assert.NotNull(messageSignerServiceOtherKey, "Getting null MessageSignerService with other key " +
+                                                         "check that you provide the needed constructor arguments");
             Assert.Throws<MessageWrongSignatureException>(() => messageSignerServiceOtherKey.GetMessage(signed));
         }
     }

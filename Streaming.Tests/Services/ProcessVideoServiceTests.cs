@@ -14,16 +14,10 @@ namespace Streaming.Tests.Services
         public void Setup()
         {
             var builder = new ContainerBuilder();
-            builder.UseDefaultModules();
             componentContext = builder.Build();
 
             testDirectory = Directory.CreateDirectory("Services/Tests");
             Directory.CreateDirectory("Services/ProcessVideoService/Tests");
-        }
-
-        [Test]
-        public void TestMethod()
-        {
         }
     }
 }
