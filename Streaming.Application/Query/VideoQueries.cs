@@ -1,6 +1,5 @@
 ﻿using Streaming.Application.Interfaces.Repositories;
 using Streaming.Application.Interfaces.Services;
-using Streaming.Application.Mappings;
 using Streaming.Application.Models.DTO.Video;
 using Streaming.Domain.Enums;
 using Streaming.Domain.Models;
@@ -14,12 +13,11 @@ namespace Streaming.Application.Query
 {
     public class VideoQueries : IVideoQueries
     {
-        private readonly VideoMappings mapper;
+        private readonly Mapper mapper;
         private readonly IFilterableRepository<Video> filterableVideos;
 		private readonly IVideoFilesService videoBlobService;
 
-        public VideoQueries(VideoMappings mapper,
-            IProcessVideoService processVideoService,
+        public VideoQueries(Mapper mapper,
             IVideoRepository filterableVideos,
             IVideoFilesService videoBlobService)
         {

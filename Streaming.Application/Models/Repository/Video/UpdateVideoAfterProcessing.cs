@@ -12,5 +12,6 @@ namespace Streaming.Application.Models.Repository.Video
         public VideoManifest VideoManifest { get; set; }
         public TimeSpan VideoLength { get; set; }
         public VideoState VideoState { get; set; }
+        public string MainThumbnailUrl { get; set; }
     }
 }

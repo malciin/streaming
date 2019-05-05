@@ -1,6 +1,5 @@
 ﻿using Autofac;
-using Streaming.Application.Mappings;
-using System.Reflection;
+using Streaming.Application;
 
 namespace Streaming.Infrastructure.IoC
 {
@@ -9,10 +8,8 @@ namespace Streaming.Infrastructure.IoC
         protected override void Load(ContainerBuilder builder)
         {
             base.Load(builder);
-            var assembly = typeof(VideoMappings).GetTypeInfo().Assembly;
 
-            builder.RegisterAssemblyTypes(assembly)
-                   .InNamespaceOf<VideoMappings>()
+            builder.RegisterType<Mapper>()
                    .SingleInstance();
         }
     }
