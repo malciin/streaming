@@ -12,7 +12,7 @@ using Streaming.Infrastructure.IoC;
 
 namespace Streaming.Tests.Services
 {
-    class VideoFileInfoService
+    class VideoFileInfoServiceTests
     {
         private DirectoryInfo videoSamplesPath;
         private IVideoFileInfoService videoFileInfoService;

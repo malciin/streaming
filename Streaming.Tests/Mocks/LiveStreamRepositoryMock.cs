@@ -11,9 +11,9 @@ namespace Streaming.Tests.Mocks
 {
     public static class LiveStreamRepositoryMock
     {
-        public static Mock<ILiveStreamRepository> CreateForData(ICollection<LiveStream> data)
+        public static Mock<IPastLiveStreamRepository> CreateForData(ICollection<LiveStream> data)
         {
-            var mock = new Mock<ILiveStreamRepository>();
+            var mock = new Mock<IPastLiveStreamRepository>();
 
             mock.Setup(x => x.AddAsync(It.IsAny<LiveStream>()))
                 .Returns((LiveStream liveStream) =>
@@ -24,7 +24,7 @@ namespace Streaming.Tests.Mocks
                     return Task.FromResult(0);
                 });
 
-            mock.Setup(x => x.SingleAsync(It.IsAny<Expression<Func<LiveStream, bool>>>()))
+            mock.Setup(x => x.GetSingleAsync(It.IsAny<Expression<Func<LiveStream, bool>>>()))
                 .ReturnsAsync((Expression<Func<LiveStream, bool>> filter) =>
                     data.Where(filter.Compile()).FirstOrDefault());
             

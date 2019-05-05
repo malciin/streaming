@@ -27,10 +27,10 @@ namespace Streaming.Application.Query
         }
 
         public async Task<VideoMetadataDTO> GetBasicVideoMetadataAsync(Guid videoId)
-            => mapper.MapVideoMetadataDTO(await filterableVideos.SingleAsync(x => x.VideoId == videoId));
+            => mapper.MapVideoMetadataDTO(await filterableVideos.GetSingleAsync(x => x.VideoId == videoId));
 
 		public async Task<string> GetVideoManifestAsync(Guid videoId)
-		    => (await filterableVideos.SingleAsync(x => x.VideoId == videoId))
+		    => (await filterableVideos.GetSingleAsync(x => x.VideoId == videoId))
                 .VideoManifest.GenerateManifest(ctx => videoBlobService.GetVideoUrl(ctx.VideoId, ctx.PartNumber));
 
 		public async Task<Stream> GetVideoPartAsync(Guid videoId, int part)

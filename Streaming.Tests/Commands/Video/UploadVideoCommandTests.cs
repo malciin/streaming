@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Auth0.ManagementApi.Models;
 using Autofac;
 using Moq;
@@ -15,7 +13,6 @@ using Streaming.Application.Models.DTO.Video;
 using Streaming.Application.Models.Enum;
 using Streaming.Domain.Enums;
 using Streaming.Infrastructure.IoC;
-using Streaming.Tests.Extensions;
 using Streaming.Tests.Mocks;
 using Streaming.Tests.TestExtensions;
 

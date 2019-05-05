@@ -1,5 +1,4 @@
 ﻿using System;
-using Streaming.Application.Models.DTO.Video;
 
 namespace Streaming.Application.Commands.Video
 {

@@ -1,5 +1,4 @@
-﻿using Streaming.Domain.Models;
-using System;
+﻿using System;
 
 namespace Streaming.Application.Models.DTO.Video
 {

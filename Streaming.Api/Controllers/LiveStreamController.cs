@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json.Linq;
 using Streaming.Api.Attributes;
 using Streaming.Api.Requests.Live;
 using Streaming.Application.Commands;
@@ -13,7 +12,6 @@ using Streaming.Application.Query;
 using Streaming.Common.Extensions;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;

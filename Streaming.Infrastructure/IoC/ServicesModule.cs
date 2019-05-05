@@ -1,7 +1,5 @@
-﻿using Auth0.ManagementApi;
-using Autofac;
+﻿using Autofac;
 using Streaming.Application.Interfaces.Services;
-using Streaming.Application.Interfaces.Settings;
 using Streaming.Application.Models;
 using Streaming.Infrastructure.Services;
 
