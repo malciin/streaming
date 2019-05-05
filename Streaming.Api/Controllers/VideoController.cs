@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -18,7 +17,7 @@ namespace Streaming.Api.Controllers
 {
     [Route("/Video")]
     [ApiController]
-    public class VideoController : _ApiControllerBase
+    public class VideoController : ApiControllerBase
     {
         private readonly IVideoQueries queries;
         private readonly IMessageSignerService messageSigner;
@@ -32,17 +31,11 @@ namespace Streaming.Api.Controllers
         [ClaimAuthorize(Claims.CanUploadVideo)]
         public async Task<IActionResult> UploadVideoAsync([FromBody] UploadVideoRequest request)
         {
-            await CommandDispatcher.HandleAsync(new UploadVideoCommand
+            await DispatchAsync(new UploadVideoCommand
             {
                 UploadToken = request.UploadToken,
                 Title = request.Title,
-                Description = request.Description,
-                User = new UserDetailsDTO
-                {
-                    UserId = User.FindFirst(ClaimTypes.NameIdentifier).Value,
-                    Email = User.FindFirst(ClaimTypes.Email).Value,
-                    Nickname = User.FindFirst(x => x.Type == "nickname")?.Value
-                }
+                Description = request.Description
             });
             return NoContent();
         }
@@ -63,7 +56,7 @@ namespace Streaming.Api.Controllers
         [ClaimAuthorize(Claims.CanUploadVideo)]
         public async Task<IActionResult> UploadPartAsync ([FromForm] UploadVideoPartRequest request)
         {
-            await CommandDispatcher.HandleAsync(new UploadVideoPartCommand
+            await DispatchAsync(new UploadVideoPartCommand
             {
                 PartMD5Hash = request.PartMD5Hash,
                 UploadToken = request.UploadToken,
@@ -85,25 +78,25 @@ namespace Streaming.Api.Controllers
         }
 
         [HttpGet("{Id}/{Part}")]
-        public async Task<IActionResult> GetVideoPartAsync (Guid Id, int Part)
+        public async Task<IActionResult> GetVideoPartAsync (Guid id, int part)
         {
-            return File(await queries.GetVideoPartAsync(Id, Part), "video/MP2T", $"{Part}.ts");
+            return File(await queries.GetVideoPartAsync(id, part), "video/MP2T", $"{part}.ts");
         }
 
         [HttpGet("Manifest/{Id}")]
-        public async Task<IActionResult> GetVideoManifestAsync (Guid Id)
+        public async Task<IActionResult> GetVideoManifestAsync (Guid id)
         {
-			var manifest = await queries.GetVideoManifestAsync(Id);
-			return File(Encoding.UTF8.GetBytes(manifest), "application/x-mpegURL", $"{Id}.m3u8");
+			var manifest = await queries.GetVideoManifestAsync(id);
+			return File(Encoding.UTF8.GetBytes(manifest), "application/x-mpegURL", $"{id}.m3u8");
 		}
 
         [HttpDelete("{Id}")]
         [ClaimAuthorize(Claims.CanDeleteVideo)]
-        public async Task<IActionResult> DeleteVideoAsync (Guid Id)
+        public async Task<IActionResult> DeleteVideoAsync (Guid id)
         {
-            await CommandDispatcher.HandleAsync(new DeleteVideoCommand
+            await DispatchAsync(new DeleteVideoCommand
             {
-                VideoId = Id
+                VideoId = id
             });
             return NoContent();
         }
@@ -112,12 +105,11 @@ namespace Streaming.Api.Controllers
         [ClaimAuthorize(Claims.CanEditAnyVideo, Claims.CanEditOwnVideo)]
         public async Task<IActionResult> UpdateVideoAsync([FromBody] UpdateVideoRequest request)
         {
-            await CommandDispatcher.HandleAsync(new UpdateVideoCommand
+            await DispatchAsync(new UpdateVideoCommand
             {
                 VideoId = request.VideoId,
                 NewTitle = request.Title,
                 NewDescription = request.Description,
-                User = User
             });
             return NoContent();
         }

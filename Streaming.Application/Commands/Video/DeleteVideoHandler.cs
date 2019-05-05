@@ -12,10 +12,9 @@ namespace Streaming.Application.Commands.Video
             this.videoRepo = videoRepo;
         }
 
-        public async Task HandleAsync(DeleteVideoCommand Command)
+        public async Task HandleAsync(DeleteVideoCommand command)
         {
-            await videoRepo.DeleteAsync(Command.VideoId);
-            await videoRepo.CommitAsync();
+            await videoRepo.DeleteAsync(command.VideoId);
         }
     }
 }

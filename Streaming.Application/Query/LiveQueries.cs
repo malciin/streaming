@@ -16,7 +16,7 @@ namespace Streaming.Application.Query
         }
 
         public LiveStreamMetadataDTO Get(Guid liveStreamId)
-            => streamManager.Get(liveStreamId);
+            => streamManager.GetSingle(liveStreamId);
 
         public IEnumerable<LiveStreamMetadataDTO> Get(int offset, int howMuch)
             => streamManager.Get(x => x.OrderByDescending(y => y.Started).Skip(offset).Take(howMuch));

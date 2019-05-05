@@ -1,0 +1,29 @@
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Trace",
+      "System": "Trace",
+      "Microsoft": "Warning"
+    }
+  },
+  "Hosting": {
+    "SecretServerKey": "Type your supersecretkeyhere"
+  },
+  "Directories": {
+    "LocalStorageDirectory": "localStorage",
+    "VideoProcessingDirectory": "localStorage/processing",
+    "LogsDirectory": "logs"
+  },
+  "Database": {
+    "Name": "streaming"
+  },
+  "Jwt": {
+    "Issuer": "https://id0.eu.auth0.com/",
+    "Audience": "kkF9cfb31YAOvr8R5q1FQ8byH9YiQXyr"
+  },
+  "Auth0_ManagementApi": {
+    "Audience": "https://id0.eu.auth0.com/api/v2/",
+    "ClientId": "o0manqM8zThK5OQV7HUXKKIgitvhwx1r",
+    "ClientSecret": "Type here your super secret auth0 client secret or in KeysSettings.Secret.cs method"
+  }
+}

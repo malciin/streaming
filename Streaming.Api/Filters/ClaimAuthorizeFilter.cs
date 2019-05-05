@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Streaming.Application.Extensions;
+using Streaming.Api.Extensions;
 
 namespace Streaming.Api.Attributes
 {

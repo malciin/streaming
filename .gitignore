@@ -1,4 +1,5 @@
 .vs/**
+.idea*/**
 */bin/**
 */obj/**
 */logs/**
@@ -7,3 +8,5 @@
 Streaming.Api/logs/*
 Streaming.Api/localStorage/*
 Streaming.Api/auth0_jwsk.json
+Streaming.Application/Settings/KeySettings.Secret.cs
+/Streaming.sln.DotSettings.user

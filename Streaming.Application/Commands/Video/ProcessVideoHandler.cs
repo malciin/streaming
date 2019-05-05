@@ -8,8 +8,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Streaming.Application.Commands.Video
@@ -23,11 +21,8 @@ namespace Streaming.Application.Commands.Video
         private readonly IVideoProcessingFilesPathStrategy videoFilesPath;
         private readonly IThumbnailService thumbnailService;
 
-        private VideoState videoState = 0;
-        private DirectoryInfo trasportFilesDirectory;
-
-        IEnumerable<FileInfo> splittedFiles => trasportFilesDirectory.GetFiles()
-            .Where(x => Regex.IsMatch(x.Name, @"\d+\.ts"));
+        private ProcessVideoCommand command;
+        private readonly VideoProcessState videoProcessState;
 
         public ProcessVideoHandler(
             IVideoRepository videoRepo,
@@ -43,98 +38,111 @@ namespace Streaming.Application.Commands.Video
             this.thumbnailService = thumbnailService;
             this.videoFileInfo = videoFileInfo;
             this.videoFilesPath = videoFilesPath;
+            videoProcessState = new VideoProcessState();
         }
 
-        public async Task HandleAsync(ProcessVideoCommand command)
+        public async Task HandleAsync(ProcessVideoCommand processVideoCommand)
         {
+            this.command = processVideoCommand;
+            
             var timer = Stopwatch.StartNew();
-
-            setupProcessingEnvironment(command);
-
-            var mp4VideoPath = videoFilesPath.Mp4ConvertedFilePath(command.VideoId);
-            await processVideoService.ConvertVideoToMp4(command.InputFilePath, mp4VideoPath);
-            var videoLength = await videoFileInfo.GetVideoLengthAsync(mp4VideoPath);
-
-            await processVideoService.SplitMp4FileIntoTSFiles(mp4VideoPath, trasportFilesDirectory.FullName);
-
-            var manifest = await createManifest(command.VideoId);
-
-            await getThumbnails(command.VideoId, mp4VideoPath, videoLength);
-            await uploadVideoParts(command.VideoId);
-            await uploadVideoThumbnails(command.VideoId);
-
+                await ProcessVideo();
             timer.Stop();
-
-            filesCleanup(command);
-
-            videoState |= VideoState.Processed;
 
             await videoRepo.UpdateAsync(new UpdateVideoAfterProcessing
             {
                 FinishedProcessingDate = DateTime.UtcNow,
                 ProcessingInfo = $"Sucessfully processed after {timer.Elapsed.TotalMilliseconds}ms",
-                VideoState = videoState,
+                VideoState = videoProcessState.VideoState,
                 VideoId = command.VideoId,
-                VideoLength = videoLength,
-                VideoManifest = manifest
+                VideoLength = videoProcessState.VideoLength,
+                VideoManifest = videoProcessState.Manifest,
+                MainThumbnailUrl = thumbnailService.GetThumbnailUrl(command.VideoId)
             });
-            await videoRepo.CommitAsync();
         }
 
-        private void filesCleanup(ProcessVideoCommand command)
+        private async Task ProcessVideo()
+        {
+            videoProcessState.Mp4VideoPath = videoFilesPath.Mp4ConvertedFilePath(command.VideoId);
+            await processVideoService.ConvertVideoToMp4(command.InputFilePath, videoProcessState.Mp4VideoPath);
+            videoProcessState.VideoLength = await videoFileInfo.GetVideoLengthAsync(videoProcessState.Mp4VideoPath);
+
+            videoProcessState.TSFilesOutputDirectory = Directory.CreateDirectory(videoFilesPath.TransportStreamDirectoryPath(command.VideoId));
+            videoProcessState.TSFiles = await processVideoService.SplitMp4FileIntoTSFiles(videoProcessState.Mp4VideoPath, videoProcessState.TSFilesOutputDirectory.FullName);
+            await UploadTSFiles(videoProcessState.TSFiles);
+            videoProcessState.Manifest = await CreateManifest(videoProcessState.TSFiles);
+
+            await GenerateThumbnails();
+            await UploadVideoThumbnails();
+            Cleanup();
+            
+            videoProcessState.VideoState |= VideoState.Processed;
+        }
+
+        private void Cleanup()
         {
             File.Delete(command.InputFilePath);
             File.Delete(videoFilesPath.Mp4ConvertedFilePath(command.VideoId));
             File.Delete(videoFilesPath.ThumbnailFilePath(command.VideoId));
-            trasportFilesDirectory.Delete(recursive: true);
+            videoProcessState.TSFilesOutputDirectory.Delete(recursive: true);
         }
 
-        private void setupProcessingEnvironment(ProcessVideoCommand command)
+        private async Task<VideoManifest> CreateManifest(IEnumerable<string> tsFiles)
         {
-            trasportFilesDirectory = Directory.CreateDirectory(videoFilesPath.TransportStreamDirectoryPath(command.VideoId));
-        }
+            var manifest = VideoManifest.Create(command.VideoId);
 
-        private async Task<VideoManifest> createManifest(Guid videoId)
-        {
-            var manifest = VideoManifest.Create(videoId);
-
-            foreach(var file in splittedFiles)
+            foreach(var file in tsFiles)
             {
-                var length = await videoFileInfo.GetVideoLengthAsync(file.FullName);
+                var length = await videoFileInfo.GetVideoLengthAsync(file);
                 manifest.AddPart(length);
             }
-            videoState |= VideoState.ManifestGenerated;
+            videoProcessState.VideoState |= VideoState.ManifestGenerated;
             return manifest;
         }
 
-        private async Task uploadVideoParts(Guid videoId)
+        private async Task UploadTSFiles(IEnumerable<string> tsFiles)
         {
             int partNum = 0;
-            foreach (var file in splittedFiles)
+            foreach (var filePath in tsFiles)
             {
-                using (var fileStream = file.OpenRead())
+                using (var fileStream = File.OpenRead(filePath))
                 {
-                    await videoBlobService.UploadAsync(videoId, partNum++, fileStream);
+                    await videoBlobService.UploadAsync(command.VideoId, partNum++, fileStream);
                 }
             }
         }
 
-        private async Task getThumbnails(Guid videoId, string videoPath, TimeSpan videoLength)
+        private async Task GenerateThumbnails()
         {
             await processVideoService.TakeVideoScreenshot(
-                videoPath, videoFilesPath.ThumbnailFilePath(videoId),
-                new TimeSpan(videoLength.Ticks / 2));
+                command.InputFilePath, videoFilesPath.ThumbnailFilePath(command.VideoId),
+                new TimeSpan(videoProcessState.VideoLength.Ticks / 2));
 
             // await processVideoService.GenerateVideoOverviewScreenshots(videoPath,
             //    thumbnailsDirectory.FullName, new TimeSpan(videoLength.Ticks / 30));
-            videoState |= VideoState.MainThumbnailGenerated;
+            videoProcessState.VideoState |= VideoState.MainThumbnailGenerated;
         }
 
-        private async Task uploadVideoThumbnails(Guid videoId)
+        private async Task UploadVideoThumbnails()
         {
-            using (var fileStream = File.OpenRead(videoFilesPath.ThumbnailFilePath(videoId)))
+            using (var fileStream = File.OpenRead(videoFilesPath.ThumbnailFilePath(command.VideoId)))
             {
-                await thumbnailService.UploadAsync(videoId, fileStream);
+                await thumbnailService.UploadAsync(command.VideoId, fileStream);
+            }
+        }
+
+        private class VideoProcessState
+        {
+            public VideoState VideoState;
+            public VideoManifest Manifest;
+            public TimeSpan VideoLength;
+            public string Mp4VideoPath;
+            public List<string> TSFiles;
+            public DirectoryInfo TSFilesOutputDirectory;
+
+            public VideoProcessState()
+            {
+                VideoState = 0;
             }
         }
     }

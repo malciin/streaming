@@ -24,7 +24,7 @@ namespace Streaming.Infrastructure.Services
             var hashLengthBytes = hasher.HashSize / 8;
             var messageLengthBytes = signedMessage.Length - hashLengthBytes;
 
-            if (messageLengthBytes <= 0)
+            if (messageLengthBytes < 0)
             {
                 throw new ArgumentException("Message malformed");
             }

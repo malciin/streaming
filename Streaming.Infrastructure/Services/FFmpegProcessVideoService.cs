@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -42,18 +43,33 @@ namespace Streaming.Infrastructure.Services
             return command.ExecuteBashAsync(BashExtensions.DefaultOutput.ErrorOutput);
         }
 
-        public Task ConvertVideoToMp4(string videoPath, string outputVideoFile, Action<string> commandLineOutputCallback = null)
+        public async Task ConvertVideoToMp4(string videoPath, string outputVideoFile, Action<string> commandLineOutputCallback = null)
         {
-            throwIfFileNotExists(videoPath);
-            var convertMp4Command = $"ffmpeg -i '{videoPath}' -f mp4 -vcodec libx264 -acodec aac '{outputVideoFile}'";
-            return convertMp4Command.ExecuteBashAsync(BashExtensions.DefaultOutput.ErrorOutput, commandLineOutputCallback);
+            var details = await GetDetailsAsync(videoPath);
+            if (!SupportedVideoCodecs.Contains(details.Video.Codec))
+                throw new NotSupportedVideoFileException();
+            
+            string convertCommand = $"ffmpeg -i '{videoPath}' -f mp4 ";
+            
+            if (details.Video.Codec != VideoCodec.h264)
+                convertCommand += "-vcodec libx264 -acodec aac";
+            else if (details.Audio.Codec != AudioCodec.aac)
+                convertCommand += "-vcodec copy -acodec aac";
+            else
+                convertCommand += "-vcodec copy -acodec copy";
+            
+            await (convertCommand + $" '{outputVideoFile}'").ExecuteBashAsync(BashExtensions.DefaultOutput.ErrorOutput, commandLineOutputCallback);
         }
 
-        public Task SplitMp4FileIntoTSFiles(string mp4VideoFilePath, string outputTsFilesDirectory)
+        public async Task<List<string>> SplitMp4FileIntoTSFiles(string mp4VideoFilePath, string outputTsFilesDirectory)
         {
             throwIfFileNotExists(mp4VideoFilePath);
-            var splitCommand = $"ffmpeg -i '{mp4VideoFilePath}' -c copy -map 0 -segment_time 5 -f segment '{outputTsFilesDirectory}%03d.ts'";
-            return splitCommand.ExecuteBashAsync(BashExtensions.DefaultOutput.ErrorOutput);
+            var uniqueIdentifier = Guid.NewGuid().ToByteArray().ToBase32String();
+            var splitCommand = $"ffmpeg -i '{mp4VideoFilePath}' -c copy -map 0 -segment_time 5 -f segment '{outputTsFilesDirectory}{uniqueIdentifier}_%08d.ts'";
+            await splitCommand.ExecuteBashAsync(BashExtensions.DefaultOutput.ErrorOutput);
+            return new DirectoryInfo(outputTsFilesDirectory).GetFiles(outputTsFilesDirectory)
+                .Where(x => Regex.IsMatch(x.Name, uniqueIdentifier + @"_\d{8}\.ts"))
+                .OrderBy(x => x.Name).Select(x => x.FullName).ToList();
         }
 
         private VideoFileDetailsDTO getVideoDetailsFromOutputString(string output)
@@ -99,11 +115,13 @@ namespace Streaming.Infrastructure.Services
             }
         }
 
+        private static readonly IEnumerable<VideoCodec> SupportedVideoCodecs = new List<VideoCodec>
+        {
+            VideoCodec.h264
+        };
+
         IEnumerable<VideoCodec> IProcessVideoService.SupportedVideoCodecs()
-            => new List<VideoCodec>
-            {
-                VideoCodec.h264
-            };
+            => SupportedVideoCodecs;
 
         private void throwIfFileNotExists(string path)
         {

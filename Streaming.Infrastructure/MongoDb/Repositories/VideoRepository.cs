@@ -8,22 +8,13 @@ using Streaming.Domain.Models;
 
 namespace Streaming.Infrastructure.MongoDb.Repositories
 {
-	public class VideoRepository : _GenericRepository<Video>, IVideoRepository
-	{
+	public class VideoRepository : GenericRepository<Video>, IVideoRepository, IRepositoryMarker
+    {
 		public VideoRepository(IMongoCollection<Video> collection) : base(collection)
 		{
 		}
 
-		public Task UpdateAsync(Video video)
-		{
-			var idFilter = Builders<Video>.Filter.Eq(x => x.VideoId, video.VideoId);
-			var updateDefinition = Builders<Video>.Update.Set(x => x.Title, video.Title);
-
-            this.addToCommit(() => collection.UpdateOneAsync(idFilter, updateDefinition));
-            return Task.FromResult(0);
-        }
-
-        public Task UpdateAsync(UpdateVideoInfo updateVideoInfo)
+        public async Task UpdateAsync(UpdateVideoInfo updateVideoInfo)
         {
             var filters = new List<FilterDefinition<Video>>();
             filters.Add(Builders<Video>.Filter
@@ -39,11 +30,10 @@ namespace Streaming.Infrastructure.MongoDb.Repositories
                 .Set(x => x.Title, updateVideoInfo.NewVideoTitle)
                 .Set(x => x.Description, updateVideoInfo.NewVideoDescription);
 
-            this.addToCommit(() => collection.UpdateOneAsync(Builders<Video>.Filter.And(filters), updateDefinition));
-            return Task.FromResult(0);
+            await Collection.UpdateOneAsync(Builders<Video>.Filter.And(filters), updateDefinition);
         }
 
-        public Task UpdateAsync(UpdateVideoAfterProcessing updateVideoAfterProcessing)
+        public async Task UpdateAsync(UpdateVideoAfterProcessing updateVideoAfterProcessing)
         {
             var searchFilter = Builders<Video>.Filter.Eq(x => x.VideoId, updateVideoAfterProcessing.VideoId);
             var updateDefinition = Builders<Video>.Update
@@ -51,17 +41,16 @@ namespace Streaming.Infrastructure.MongoDb.Repositories
                 .Set(x => x.ProcessingInfo, updateVideoAfterProcessing.ProcessingInfo)
                 .Set(x => x.VideoManifest, updateVideoAfterProcessing.VideoManifest)
                 .Set(x => x.Length, updateVideoAfterProcessing.VideoLength)
-                .Set(x => x.State, updateVideoAfterProcessing.VideoState);
-
-            this.addToCommit(() => collection.UpdateOneAsync(searchFilter, updateDefinition));
-            return Task.FromResult(0);
+                .Set(x => x.State, updateVideoAfterProcessing.VideoState)
+                .Set(x => x.MainThumbnailUrl, updateVideoAfterProcessing.MainThumbnailUrl);
+            
+            await Collection.UpdateOneAsync(searchFilter, updateDefinition);
         }
 
-        public Task DeleteAsync(Guid VideoId)
+        public async Task DeleteAsync(Guid videoId)
         {
-            var searchFilter = Builders<Video>.Filter.Eq(x => x.VideoId, VideoId);
-            this.addToCommit(() => collection.DeleteOneAsync(searchFilter));
-            return Task.FromResult(0);
+            var searchFilter = Builders<Video>.Filter.Eq(x => x.VideoId, videoId);
+            await Collection.DeleteOneAsync(searchFilter);
         }
 	}
 }

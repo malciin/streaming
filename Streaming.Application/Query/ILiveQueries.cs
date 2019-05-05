@@ -1,5 +1,4 @@
-﻿using Streaming.Application.Models;
-using Streaming.Application.Models.DTO.Live;
+﻿using Streaming.Application.Models.DTO.Live;
 using System;
 using System.Collections.Generic;
 

@@ -1,31 +1,38 @@
-﻿using System;
-using System.IO;
-using Microsoft.AspNetCore;
+﻿using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Streaming.Api.FileLogger;
 
 namespace Streaming.Api
 {
     public class Program
     {
-        private static IConfigurationRoot configurationRoot;
 
         public static void Main(string[] args)
-        {
-            configurationRoot = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("Configuration.json", optional: false, reloadOnChange: false)
-                .Build();
-            CreateWebHostBuilder(args).Build().Run();
-        }
+            => CreateWebHostBuilder(args).Build().Run();
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
-                .UseUrls($"http://0.0.0.0:{configurationRoot["Hosting:HttpPort"]}")
-                .ConfigureAppConfiguration(config =>
+                .ConfigureAppConfiguration((ctx, config) =>
                 {
+                    var envName = ctx.HostingEnvironment.EnvironmentName;
                     config.AddJsonFile("Configuration.json", optional: false, reloadOnChange: false);
-                    config.AddJsonFile($"Configuration.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}.json", optional: true, reloadOnChange: false);
+                    config.AddJsonFile($"Configuration.{envName}.json", optional: true, reloadOnChange: false);
+                })
+                .ConfigureLogging((ctx, config) =>
+                {
+                    config.AddProvider(new FileLoggerProvider(ctx.Configuration["Directories:LogsDirectory"]));
+                })
+                .ConfigureServices(services =>
+                {
+                    services.AddSingleton<IStartupEvents, NoneStartupEvents>();
+                })
+                .UseKestrel((ctx, options) =>
+                {
+                    var defaultPort = int.Parse(ctx.Configuration["Hosting:HttpPort"]);
+                    options.ListenLocalhost(defaultPort);
                 })
                 .UseStartup<Startup>();
     }

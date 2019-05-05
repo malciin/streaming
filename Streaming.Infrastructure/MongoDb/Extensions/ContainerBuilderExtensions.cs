@@ -6,21 +6,21 @@ namespace Streaming.Infrastructure.MongoDb.Extensions
 {
     public static class ContainerBuilderExtensions
     {
-        private static void runAllMongoDbMappingMethods()
+        private static void RunAllMongoDbMappingMethods()
         {
             var mongoDbMappingsMethods = typeof(_MappingsMarker).Assembly.GetTypes()
                 .Where(x => x.IsInNamespaceOf<_MappingsMarker>())
-                .Where(x => x.GetMethods().Where(y => y.Name == "Map").Count() > 0)
+                .Where(x => x.GetMethods().Any(y => y.Name == "Map"))
                 .Select(x => x.GetMethod("Map"));
             foreach (var mapMethod in mongoDbMappingsMethods)
-                mapMethod.Invoke(null, new object[] { });
+                mapMethod?.Invoke(null, new object[] { });
         }
 
-        public static ContainerBuilder UseMongoDb(this ContainerBuilder containerBuilder, string connectionString, string databaseName)
+        public static ContainerBuilder UseMongoDb(this ContainerBuilder containerBuilder, string connectionString)
         {
-            runAllMongoDbMappingMethods();
+            RunAllMongoDbMappingMethods();
 
-            containerBuilder.RegisterModule(new IoC.MongoDbModule(connectionString, databaseName));
+            containerBuilder.RegisterModule(new IoC.MongoDbModule(connectionString));
             return containerBuilder;
         }
     }

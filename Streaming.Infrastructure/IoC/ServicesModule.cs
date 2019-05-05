@@ -1,7 +1,5 @@
-﻿using Auth0.ManagementApi;
-using Autofac;
+﻿using Autofac;
 using Streaming.Application.Interfaces.Services;
-using Streaming.Application.Interfaces.Settings;
 using Streaming.Application.Models;
 using Streaming.Infrastructure.Services;
 
@@ -30,10 +28,6 @@ namespace Streaming.Infrastructure.IoC
             builder.RegisterType<AzureBlobClient>()
                    .As<IAzureBlobClient>()
                    .InstancePerLifetimeScope();
-
-            builder.RegisterType<LoggerService>()
-                   .As<ILoggerService>()
-                   .SingleInstance();
 
             builder.RegisterType<SHA256MessageSignerService>()
                    .As<IMessageSignerService>()

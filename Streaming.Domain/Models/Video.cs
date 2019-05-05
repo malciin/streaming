@@ -11,6 +11,8 @@ namespace Streaming.Domain.Models
         public DateTime? FinishedProcessingDate { get; set; }
         public string Description { get; set; }
         public VideoState State { get; set; }
+        
+        public string MainThumbnailUrl { get; set; }
 
         public TimeSpan? Length { get; set; }
         public VideoManifest VideoManifest { get; set; }

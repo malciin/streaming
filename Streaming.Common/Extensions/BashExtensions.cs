@@ -15,11 +15,11 @@ namespace Streaming.Common.Extensions
             ErrorOutput
         }
 
-        public static Process StartBashExecution(this string Command)
+        public static Process StartBashExecution(this string command)
         {
             ProcessStartInfo psi = new ProcessStartInfo();
             psi.FileName = PlatformHelper.CommandlineToolname;
-            psi.Arguments = $"-c \"{Command}\"";
+            psi.Arguments = $"-c \"{command}\"";
             psi.UseShellExecute = false;
             psi.RedirectStandardOutput = true;
             psi.RedirectStandardError = true;
@@ -36,17 +36,17 @@ namespace Streaming.Common.Extensions
         /// <summary>
         /// Execute command and returns command output
         /// </summary>
-        /// <param name="Command">Command string</param>
+        /// <param name="command">command string</param>
         /// <param name="defaultOutput">Default output for read</param>
         /// <param name="commandLineOutputCallback">Callback that is called for every output line readed</param>
         /// <returns></returns>
-        public static async Task<string> ExecuteBashAsync(this string Command, DefaultOutput defaultOutput = DefaultOutput.StandardOutput, Action<string> commandLineOutputCallback = null)
+        public static async Task<string> ExecuteBashAsync(this string command, DefaultOutput defaultOutput = DefaultOutput.StandardOutput, Action<string> commandLineOutputCallback = null)
         {
             string errorOutput = "";
             var strBuilder = new StringBuilder();
             try
             {
-                using (var process = Command.StartBashExecution())
+                using (var process = command.StartBashExecution())
                 {
                     var defaultStream = defaultOutput == DefaultOutput.StandardOutput ? process.StandardOutput : process.StandardError;
                     while(!defaultStream.EndOfStream)
@@ -61,13 +61,13 @@ namespace Streaming.Common.Extensions
                     }
                     process.WaitForExit();
                     if (process.ExitCode != 0)
-                        throw new CommandException(Command, defaultOutput == DefaultOutput.StandardOutput ? errorOutput : strBuilder.ToString());
+                        throw new CommandException(command, defaultOutput == DefaultOutput.StandardOutput ? errorOutput : strBuilder.ToString());
                     return strBuilder.ToString();
                 }
             }
             catch(Exception ex)
             {
-                throw new CommandException(Command, errorOutput, ex);
+                throw new CommandException(command, errorOutput, ex);
             }
         }
     }

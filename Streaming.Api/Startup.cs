@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Streaming.Api.Middlewares;
-using Streaming.Api.Monitor;
 using Streaming.Application.SignalR.Hubs;
 using Streaming.Auth0;
 using Streaming.Infrastructure.IoC.Extensions;
@@ -18,13 +17,14 @@ namespace Streaming.Api
 {
     public class Startup
     {
-        private readonly IHostingEnvironment hostingEnvironment;
+        private readonly IStartupEvents startupEvents;
         private readonly IConfiguration configuration;
 
-        public Startup(IHostingEnvironment hostingEnvironment, IConfiguration configuration)
+        public Startup(IConfiguration configuration, IHostingEnvironment hostingEnvironment, IStartupEvents startupEvents)
         {
+            BannerPrinter.Print(configuration, hostingEnvironment);
             this.configuration = configuration;
-            this.hostingEnvironment = hostingEnvironment;
+            this.startupEvents = startupEvents;
         }
 
         public IServiceProvider ConfigureServices(IServiceCollection services)
@@ -36,8 +36,6 @@ namespace Streaming.Api
                     x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader().AllowCredentials();
                 });
             });
-
-            services.AddScoped<ICustomLogger, CustomLogger>();
 
             services.AddAuthentication(x =>
             {
@@ -56,20 +54,20 @@ namespace Streaming.Api
 
             builder.Populate(services);
             builder.UseDefaultModules();
-            builder.UseMongoDb(configuration["Database:ConnectionString"], "streaming");
+            builder.UseMongoDb(configuration["Database:ConnectionString"]);
+            startupEvents?.ConfigureServicesAutofacCallback?.Invoke(builder);
 
             return new AutofacServiceProvider(builder.Build());
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app)
         {
-            if (env.IsProduction())
-            {
-                app.UseMiddleware<ExceptionHandlingMiddleware>();
-            }
+            startupEvents?.AppConfigurationBeginingCallback?.Invoke(app);
+            app.UseMiddleware<ExceptionHandlingMiddleware>();
             app.UseMiddleware<ValidationExceptionHandlerMiddleware>();
             app.UseCors("AllowAny");
             app.UseAuthentication();
+            startupEvents?.AppConfigurationAfterAuthenticationCallback?.Invoke(app);
             app.UseSignalR(config =>
             {
                 config.MapHub<FFmpegProcessingHub>("/hub/processingInfo");

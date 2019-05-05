@@ -10,7 +10,6 @@ namespace Streaming.Application.Interfaces.Repositories
 		Task AddAsync(Video video);
         Task UpdateAsync(UpdateVideoInfo updateVideoInfo);
         Task UpdateAsync(UpdateVideoAfterProcessing updateVideoAfterProcessing);
-        Task DeleteAsync(Guid VideoId);
-        Task CommitAsync();
+        Task DeleteAsync(Guid videoId);
 	}
 }
