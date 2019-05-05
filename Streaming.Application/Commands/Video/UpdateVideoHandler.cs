@@ -1,9 +1,8 @@
-﻿using System.Security.Claims;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Streaming.Application.Interfaces.Repositories;
 using Streaming.Application.Models;
 using Streaming.Application.Models.Repository.Video;
-using Streaming.Application.Extensions;
 
 namespace Streaming.Application.Commands.Video
 {
@@ -24,9 +23,9 @@ namespace Streaming.Application.Commands.Video
                 NewVideoDescription = command.NewDescription
             };
 
-            if (!command.User.HasStreamingClaim(Claims.CanEditAnyVideo))
+            if (!command.User.Claims.Contains(Claims.CanEditAnyVideo))
             {
-                updateVideoInfo.UpdateByUserIdentifier = command.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                updateVideoInfo.UpdateByUserIdentifier = command.User.Details.UserId;
             }
 
             await videoRepo.UpdateAsync(updateVideoInfo);

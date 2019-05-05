@@ -9,9 +9,11 @@ using Streaming.Application.Commands.Video;
 using Streaming.Application.Interfaces.Repositories;
 using Streaming.Application.Interfaces.Services;
 using Streaming.Application.Interfaces.Settings;
+using Streaming.Application.Models;
 using Streaming.Application.Models.DTO.Video;
 using Streaming.Application.Models.Enum;
 using Streaming.Domain.Enums;
+using Streaming.Domain.Models;
 using Streaming.Infrastructure.IoC;
 using Streaming.Tests.Mocks;
 using Streaming.Tests.TestExtensions;
@@ -91,11 +93,12 @@ namespace Streaming.Tests.Commands.Video
             {
                 Title = "Title",
                 Description = "Desc",
-                User = new UserDetailsDTO
-                {
-                    Email = "email@gmail.com",
-                    Nickname = "nick",
-                    UserId = "id"
+                User = new UserInfo{
+                    Details = new UserDetails {
+                        Email = "email@gmail.com",
+                        Nickname = "nick",
+                        UserId = "id"
+                    }
                 },
                 UploadToken = Convert.ToBase64String(new byte[] { 0x10 })
             }).GetAwaiter().GetResult();
@@ -117,11 +120,14 @@ namespace Streaming.Tests.Commands.Video
             {
                 Title = "Title",
                 Description = "Desc",
-                User = new UserDetailsDTO
+                User = new UserInfo
                 {
-                    Email = "email@gmail.com",
-                    Nickname = "nick",
-                    UserId = "id"
+                    Details = new UserDetails
+                    {
+                        Email = "email@gmail.com",
+                        Nickname = "nick",
+                        UserId = "id"    
+                    }
                 },
                 UploadToken = Convert.ToBase64String(new byte[] { 0x10 })
             }).GetAwaiter().GetResult();

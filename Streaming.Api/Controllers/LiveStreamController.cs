@@ -19,22 +19,22 @@ using System.Threading.Tasks;
 namespace Streaming.Api.Controllers
 {
     [ApiController, Route("/Live")]
-    public class LiveStreamController : _ApiControllerBase
+    public class LiveStreamController : ApiControllerBase
     {
         private readonly IMessageSignerService messageSigner;
         private readonly ILiveQueries queries;
 
-        public LiveStreamController(ICommandDispatcher CommandDispatcher,
+        public LiveStreamController(ICommandDispatcher commandDispatcher,
                                        IMessageSignerService messageSigner,
-                                       ILiveQueries liveQueries) : base(CommandDispatcher)
+                                       ILiveQueries liveQueries) : base(commandDispatcher)
         {
             this.messageSigner = messageSigner;
             this.queries = liveQueries;
         }
 
         [HttpGet("{Id}")]
-        public LiveStreamMetadataDTO Get(Guid Id)
-            => queries.Get(Id);
+        public LiveStreamMetadataDTO Get(Guid id)
+            => queries.Get(id);
 
         [HttpPost]
         public IEnumerable<LiveStreamMetadataDTO> Search([FromBody] SearchLiveStreamsRequest request)
@@ -55,10 +55,10 @@ namespace Streaming.Api.Controllers
         public async Task<IActionResult> OnConnect([FromBody] OnConnectRequest request)
         {
             var streamId = Guid.NewGuid();
-            await CommandDispatcher.HandleAsync(new StartLiveStreamCommand
+            await DispatchAsync(new StartLiveStreamCommand
             {
                 StreamId = streamId,
-                App = request.App.ToString(),
+                App = request.App,
                 StreamKey = request.StreamKey,
                 ManifestUri = new Uri(request.HttpUrl, $"{streamId}.m3u8")
             });
@@ -69,7 +69,7 @@ namespace Streaming.Api.Controllers
         [HttpPost("OnUnpublish")]
         public async Task<IActionResult> OnUnpublish([FromBody] OnUnpublishRequest request)
         {
-            await CommandDispatcher.HandleAsync(new FinishLiveStreamCommand
+            await DispatchAsync(new FinishLiveStreamCommand
             {
                 StreamId = request.StreamId
             });

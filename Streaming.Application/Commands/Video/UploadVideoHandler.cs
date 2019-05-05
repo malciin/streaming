@@ -42,12 +42,7 @@ namespace Streaming.Application.Commands.Video
 				Title = command.Title,
 				Description = command.Description,
 				VideoId = videoId,
-                Owner = new Domain.Models.UserDetails
-                {
-                    UserId = command.User.UserId,
-                    Email = command.User.Email,
-                    Nickname = command.User.Nickname
-                }
+                Owner = command.User.Details
 			};
 
 			await videoRepo.AddAsync(video);
@@ -56,7 +51,7 @@ namespace Streaming.Application.Commands.Video
             {
 				VideoId = video.VideoId,
                 InputFilePath = inputFilePath,
-                UserId = command.User.UserId
+                UserId = command.User.Details.UserId
             });
 		}
 	}
