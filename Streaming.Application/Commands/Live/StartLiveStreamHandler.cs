@@ -25,7 +25,7 @@ namespace Streaming.Application.Commands.Live
         {
             if (!String.Equals(command.App, "live", StringComparison.InvariantCultureIgnoreCase))
             {
-                throw new ArgumentException("App must be setted to live");
+                throw new ArgumentException("RTMP app path must be equal 'live'");
             }
 
             var bytes = command.StreamKey.ToByteArrayFromBase32String();

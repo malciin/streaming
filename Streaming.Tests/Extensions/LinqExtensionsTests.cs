@@ -1,7 +1,7 @@
-﻿using Streaming.Common.Extensions;
-using NUnit.Framework;
+﻿using NUnit.Framework;
+using Streaming.Common.Extensions;
 
-namespace Streaming.Tests.Extensions.Tests
+namespace Streaming.Tests.Extensions
 {
     public class LinqExtensionsTests
     {

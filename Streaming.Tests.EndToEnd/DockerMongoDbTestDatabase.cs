@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
+using NUnit.Framework;
 using Streaming.Common.Extensions;
 
 namespace Streaming.Tests.EndToEnd
@@ -31,6 +29,8 @@ namespace Streaming.Tests.EndToEnd
         {
             if (!_databaseAlreadyRunning)
             {
+                Assert.DoesNotThrowAsync(() => "docker info".ExecuteBashAsync(), "Please ensure you've got installed Docker - docker is required " +
+                                                                                 "to run test mongo database");
                 RemoveContainerByName(MongoDbContainerName);
                 var containerId = $"docker run -d --name {MongoDbContainerName} -P mongo"
                     .ExecuteBashAsync().GetAwaiter().GetResult();

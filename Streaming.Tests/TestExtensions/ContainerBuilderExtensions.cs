@@ -1,8 +1,8 @@
-﻿using Autofac;
+﻿using System;
+using Autofac;
 using Moq;
-using System;
 
-namespace Streaming.Tests.Extensions
+namespace Streaming.Tests.TestExtensions
 {
     public static class ContainerBuilderExtensions
     {
