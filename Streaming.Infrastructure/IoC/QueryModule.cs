@@ -4,7 +4,7 @@ using System.Reflection;
 
 namespace Streaming.Infrastructure.IoC
 {
-    class QueryModule : Autofac.Module
+    public class QueryModule : Autofac.Module
     {
         protected override void Load(ContainerBuilder builder)
         {

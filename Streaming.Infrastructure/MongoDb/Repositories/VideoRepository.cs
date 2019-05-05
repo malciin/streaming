@@ -8,7 +8,7 @@ using Streaming.Domain.Models;
 
 namespace Streaming.Infrastructure.MongoDb.Repositories
 {
-	public class VideoRepository : _GenericRepository<Video>, IVideoRepository, IRepositoryMarker
+	public class VideoRepository : GenericRepository<Video>, IVideoRepository, IRepositoryMarker
     {
 		public VideoRepository(IMongoCollection<Video> collection) : base(collection)
 		{

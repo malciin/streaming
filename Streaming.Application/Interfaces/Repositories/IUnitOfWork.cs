@@ -4,7 +4,7 @@ namespace Streaming.Application.Interfaces.Repositories
 {
     public interface IUnitOfWork
     {
-        ILiveStreamRepository LiveStreams { get; }
+        IPastLiveStreamRepository PastLiveStreams { get; }
         IVideoRepository Videos { get; }
         Task CommitAsync();
     }

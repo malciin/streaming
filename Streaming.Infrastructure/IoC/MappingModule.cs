@@ -3,7 +3,7 @@ using Streaming.Application;
 
 namespace Streaming.Infrastructure.IoC
 {
-    class MappingModule : Autofac.Module
+    public class MappingModule : Autofac.Module
     {
         protected override void Load(ContainerBuilder builder)
         {

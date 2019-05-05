@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Autofac;
 using MongoDB.Driver;
 using Streaming.Application.Interfaces.Repositories;
-using Streaming.Application.Interfaces.Settings;
 using Streaming.Domain.Models;
 
 namespace Streaming.Infrastructure.MongoDb.Repositories
@@ -12,12 +11,12 @@ namespace Streaming.Infrastructure.MongoDb.Repositories
     {
         private readonly IComponentContext componentContext;
 
-        private readonly Lazy<ILiveStreamRepository> liveStreamRepository;
+        private readonly Lazy<IPastLiveStreamRepository> pastLiveStreamRepository;
         private readonly Lazy<IVideoRepository> videoRepository;
 
         private readonly IClientSessionHandle clientSessionHandle;
 
-        public ILiveStreamRepository LiveStreams => liveStreamRepository.Value;
+        public IPastLiveStreamRepository PastLiveStreams => pastLiveStreamRepository.Value;
         public IVideoRepository Videos => videoRepository.Value;
 
         private Func<T> GetLazyRepositoryInstantiation<T, TDomainObj>()
@@ -34,7 +33,7 @@ namespace Streaming.Infrastructure.MongoDb.Repositories
         {
             this.componentContext = componentContext;
             this.clientSessionHandle = clientSessionHandle;
-            liveStreamRepository = new Lazy<ILiveStreamRepository>(GetLazyRepositoryInstantiation<ILiveStreamRepository, LiveStream>());
+            pastLiveStreamRepository = new Lazy<IPastLiveStreamRepository>(GetLazyRepositoryInstantiation<IPastLiveStreamRepository, LiveStream>());
             videoRepository = new Lazy<IVideoRepository>(GetLazyRepositoryInstantiation<IVideoRepository, Video>());
         }
 

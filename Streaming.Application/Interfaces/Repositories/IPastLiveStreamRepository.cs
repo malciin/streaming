@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace Streaming.Application.Interfaces.Repositories
 {
-    public interface ILiveStreamRepository : IFilterableRepository<LiveStream>
+    public interface IPastLiveStreamRepository : IFilterableRepository<LiveStream>
     {
         Task AddAsync(LiveStream liveStream);
     }

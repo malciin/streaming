@@ -7,15 +7,16 @@ using Streaming.Application.Interfaces.Repositories;
 
 namespace Streaming.Infrastructure.MongoDb.Repositories
 {
-    public class _GenericRepository<T> : IFilterableRepository<T> where T : class
+    public class GenericRepository<T> : IFilterableRepository<T> where T : class
     {
         protected readonly IMongoCollection<T> Collection;
-        public _GenericRepository(IMongoCollection<T> collection)
+
+        protected GenericRepository(IMongoCollection<T> collection)
         {
             this.Collection = collection;
         }
 
-        public async Task<T> SingleAsync(Expression<Func<T, bool>> filter)
+        public async Task<T> GetSingleAsync(Expression<Func<T, bool>> filter)
             => await Collection.Find(filter).FirstAsync();
 
         public async Task<IEnumerable<T>> GetAsync(Expression<Func<T, bool>> filter, int skip = 0, int limit = 0)
