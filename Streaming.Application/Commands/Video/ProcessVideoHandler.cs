@@ -1,4 +1,4 @@
-﻿using Streaming.Application.Interfaces.Repositories;
+using Streaming.Application.Interfaces.Repositories;
 using Streaming.Application.Interfaces.Services;
 using Streaming.Application.Interfaces.Strategies;
 using Streaming.Application.Models.Repository.Video;
@@ -15,7 +15,7 @@ namespace Streaming.Application.Commands.Video
     public class ProcessVideoHandler : ICommandHandler<ProcessVideoCommand>
     {
 		private readonly IVideoRepository videoRepo;
-		private readonly IVideoFilesService videoBlobService;
+		private readonly IVideoPartsFileService videoBlobService;
         private readonly IProcessVideoService processVideoService;
         private readonly IVideoFileInfoService videoFileInfo;
         private readonly IVideoProcessingFilesPathStrategy videoFilesPath;
@@ -26,7 +26,7 @@ namespace Streaming.Application.Commands.Video
 
         public ProcessVideoHandler(
             IVideoRepository videoRepo,
-			IVideoFilesService videoBlobService,
+			IVideoPartsFileService videoBlobService,
             IProcessVideoService processVideoService,
             IVideoFileInfoService videoFileInfo,
             IThumbnailService thumbnailService,

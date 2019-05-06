@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace Streaming.Infrastructure.Services
 {
-    public class VideoFilesAzureBlobService : IVideoFilesService
+    public class VideoPartsFileAzureBlobService : IVideoPartsFileService
 	{
 		private readonly IAzureBlobClient blobClient;
         private readonly IFileNameStrategy fileNameStrategy;
         private readonly static string blobContainerName = "videos";
-		public VideoFilesAzureBlobService(IAzureBlobClient blobClient, IFileNameStrategy fileNameStrategy)
+		public VideoPartsFileAzureBlobService(IAzureBlobClient blobClient, IFileNameStrategy fileNameStrategy)
 		{
             this.blobClient = blobClient;
             this.fileNameStrategy = fileNameStrategy;

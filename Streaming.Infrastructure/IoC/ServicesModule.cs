@@ -17,8 +17,8 @@ namespace Streaming.Infrastructure.IoC
                    .As<IVideoFileInfoService>()
                    .SingleInstance();
 
-            builder.RegisterType<VideoFilesLocalService>()
-                   .As<IVideoFilesService>()
+            builder.RegisterType<VideoPartsFileLocalService>()
+                   .As<IVideoPartsFileService>()
                    .InstancePerLifetimeScope();
 
             builder.RegisterType<ThumbnailLocalService>()
