@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Streaming.Application.Models;
-using Streaming.Domain.Models;
 
 namespace Streaming.Application.Commands.Video
 {

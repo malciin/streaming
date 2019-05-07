@@ -1,4 +1,4 @@
-using Streaming.Application.Interfaces.Repositories;
+﻿using Streaming.Application.Interfaces.Repositories;
 using Streaming.Application.Interfaces.Services;
 using Streaming.Application.Interfaces.Strategies;
 using Streaming.Application.Models.Repository.Video;
@@ -64,11 +64,11 @@ namespace Streaming.Application.Commands.Video
         private async Task ProcessVideo()
         {
             videoProcessState.Mp4VideoPath = videoFilesPath.Mp4ConvertedFilePath(command.VideoId);
-            await processVideoService.ConvertVideoToMp4(command.InputFilePath, videoProcessState.Mp4VideoPath);
+            await processVideoService.ConvertVideoToMp4Async(command.InputFilePath, videoProcessState.Mp4VideoPath);
             videoProcessState.VideoLength = await videoFileInfo.GetVideoLengthAsync(videoProcessState.Mp4VideoPath);
 
             videoProcessState.TSFilesOutputDirectory = Directory.CreateDirectory(videoFilesPath.TransportStreamDirectoryPath(command.VideoId));
-            videoProcessState.TSFiles = await processVideoService.SplitMp4FileIntoTSFiles(videoProcessState.Mp4VideoPath, videoProcessState.TSFilesOutputDirectory.FullName);
+            videoProcessState.TSFiles = await processVideoService.SplitMp4FileIntoTsFilesAsync(videoProcessState.Mp4VideoPath, videoProcessState.TSFilesOutputDirectory.FullName);
             await UploadTSFiles(videoProcessState.TSFiles);
             videoProcessState.Manifest = await CreateManifest(videoProcessState.TSFiles);
 
@@ -114,7 +114,7 @@ namespace Streaming.Application.Commands.Video
 
         private async Task GenerateThumbnails()
         {
-            await processVideoService.TakeVideoScreenshot(
+            await processVideoService.TakeVideoScreenshotAsync(
                 command.InputFilePath, videoFilesPath.ThumbnailFilePath(command.VideoId),
                 new TimeSpan(videoProcessState.VideoLength.Ticks / 2));
 

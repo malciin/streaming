@@ -15,15 +15,15 @@ namespace Streaming.Application.Query
     {
         private readonly Mapper mapper;
         private readonly IFilterableRepository<Video> filterableVideos;
-		private readonly IVideoFilesService videoBlobService;
+		private readonly IVideoPartsFileService videoPartsFileService;
 
         public VideoQueries(Mapper mapper,
             IVideoRepository filterableVideos,
-            IVideoFilesService videoBlobService)
+            IVideoPartsFileService videoPartsFileService)
         {
             this.mapper = mapper;
             this.filterableVideos = filterableVideos;
-			this.videoBlobService = videoBlobService;
+			this.videoPartsFileService = videoPartsFileService;
         }
 
         public async Task<VideoMetadataDTO> GetBasicVideoMetadataAsync(Guid videoId)
@@ -31,10 +31,10 @@ namespace Streaming.Application.Query
 
 		public async Task<string> GetVideoManifestAsync(Guid videoId)
 		    => (await filterableVideos.GetSingleAsync(x => x.VideoId == videoId))
-                .VideoManifest.GenerateManifest(ctx => videoBlobService.GetVideoUrl(ctx.VideoId, ctx.PartNumber));
+                .VideoManifest.GenerateManifest(ctx => videoPartsFileService.GetVideoUrl(ctx.VideoId, ctx.PartNumber));
 
 		public async Task<Stream> GetVideoPartAsync(Guid videoId, int part)
-			=> await videoBlobService.GetVideoAsync(videoId, part);
+			=> await videoPartsFileService.GetVideoAsync(videoId, part);
 
 		public async Task<IEnumerable<VideoMetadataDTO>> SearchAsync(VideoSearchDTO search)
 		{

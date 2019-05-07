@@ -1,6 +1,4 @@
-﻿using Streaming.Application.Interfaces.Settings;
-
-namespace Streaming.Application.Settings
+﻿namespace Streaming.Application.Settings
 {
     public partial class KeysSettings
     {

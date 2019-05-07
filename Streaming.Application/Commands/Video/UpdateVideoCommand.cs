@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Security.Claims;
 using Streaming.Application.Models;
-using Streaming.Domain.Models;
 
 namespace Streaming.Application.Commands.Video
 {

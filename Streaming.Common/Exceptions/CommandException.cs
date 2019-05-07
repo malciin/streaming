@@ -4,11 +4,12 @@ namespace Streaming.Common.Exceptions
 {
     public class CommandException : Exception
     {
-        public CommandException(string command, string output) : this(command, output, null)
+        public CommandException(string command, int exitCode, string output) : this(command, exitCode, output, null)
         {
         }
 
-        public CommandException(string command, string output, Exception innerException)  : base($"Command: \"{command}\", Output: \"{output}\"", innerException)
+        public CommandException(string command, int exitCode, string output, Exception innerException)  
+            : base($"Command: \"{command}\", ExitCode: {exitCode}, Output: \"{output}\"", innerException)
         {
         }
     }

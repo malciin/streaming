@@ -1,6 +1,4 @@
 ﻿using Streaming.Application.Models;
-using Streaming.Application.Models.DTO.Video;
-using Streaming.Domain.Models;
 
 namespace Streaming.Application.Commands.Video
 {

@@ -2,6 +2,6 @@
 {
     public interface ICommandBus
 	{
-		void Push(ICommand Command);
+		void Push(ICommand command);
 	}
 }
