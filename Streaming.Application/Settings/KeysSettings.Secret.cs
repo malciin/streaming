@@ -5,7 +5,7 @@
         public void PerformSecretDeveloperBinding()
         {
             // Type your secret bindings here for keys if you don't use configuration.json
-            // This file is added to git with --skip-worktree flag
+            // If you change this file, run git update-index --assume-unchanged Streaming.Application/Settings/KeysSettings.Secret.cs
         }
     }
 }
