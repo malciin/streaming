@@ -1,4 +1,4 @@
-using Streaming.Application.Exceptions;
+﻿using Streaming.Application.Exceptions;
 using Streaming.Application.Interfaces.Services;
 using Streaming.Application.Models.DTO.Video;
 using Streaming.Application.Models.Enum;
@@ -10,6 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
 using Streaming.Common.EmbedProcesses;
 
 namespace Streaming.Infrastructure.Services
@@ -64,7 +65,7 @@ namespace Streaming.Infrastructure.Services
             {
                 if (progressCallback != null)
                     process.AddWatcher(new FFmpegConversionProgressWatcher(progressCallback));
-                await process.HandleAsync();
+                await process.GetResultAsync();
             }
         }
 
@@ -79,47 +80,42 @@ namespace Streaming.Infrastructure.Services
                 .OrderBy(x => x.Name).Select(x => x.FullName).ToList();
         }
 
-        private VideoFileDetailsDTO getVideoDetailsFromOutputString(string output)
-        {
-            var videoDetails = new VideoFileDetailsDTO();
-
-            // We removing new lines because sometimes ffmpeg can add accidentally newline and as a consequence
-            // regex will throw an exception - we only save newlines before "Stream" to correctly recognize multiple streams
-            output = output.Replace(Environment.NewLine, String.Empty).Replace("Stream #", $"{Environment.NewLine}Stream #");
-
-            var durationAndBitrateRegex = Regex.Match(output, @"Duration: (?<duration>(\d+[:\.]?)+).*bitrate: (?<bitrate>\d+) kb\/s");
-            var duration = durationAndBitrateRegex.Groups["duration"].Value;
-            videoDetails.Duration = TimeSpan.ParseExact(duration, @"hh\:mm\:ss\.ff", CultureInfo.InvariantCulture);
-            videoDetails.Video.BitrateKbs = int.Parse(durationAndBitrateRegex.Groups["bitrate"].Value);
-
-            var videoTypeRegex = Regex.Match(output, @"Stream #\d:\d+.*Video\: (?<codec>[^ ,]+).* (?<xResolution>\d+)x(?<yResolution>\d+)");
-            videoDetails.Video.Codec = (VideoCodec)Enum.Parse(typeof(VideoCodec), videoTypeRegex.Groups["codec"].Value);
-            videoDetails.Video.Resolution = (int.Parse(videoTypeRegex.Groups["xResolution"].Value), int.Parse(videoTypeRegex.Groups["yResolution"].Value));
-
-            var audioTypeRegex = Regex.Match(output, @"Stream #\d:\d+.*Audio\: (?<codec>[^ ,]+)");
-            videoDetails.Audio.Codec = (AudioCodec)Enum.Parse(typeof(AudioCodec), audioTypeRegex.Groups["codec"].Value);
-
-            return videoDetails;
-        }
-
         public async Task<VideoFileDetailsDTO> GetDetailsAsync(string videoPath)
         {
             throwIfFileNotExists(videoPath);
-            using (var process = $"ffmpeg -i '{videoPath}'".StartBashExecution())
-            {
-                // We manually create process and read from StandardError, because ffmpeg returns
-                // an error and '-1' error code when we don't specify the output file
-                var output = await process.StandardError.ReadToEndAsync();
+            var commandResult = await EmbeddedProcess.Create("ffprobe", $"-v quiet -print_format json -show_format -show_streams {videoPath}").GetExecutionResultAsync();
+            return ParseJsonOutput(videoPath, commandResult.StandardOutput);
+        }
 
-                try
-                {
-                    return getVideoDetailsFromOutputString(output);
-                }
-                catch (Exception inner)
-                {
-                    throw new NotVideoFileException(videoPath, inner);
-                }
+        private static VideoFileDetailsDTO ParseJsonOutput(string videoPath, string commandResult)
+        {
+            var videoFileInfoJson = JObject.Parse(commandResult);
+            var videoInfo = videoFileInfoJson["streams"]?.FirstOrDefault(x => x["codec_type"].Value<string>() == "video");
+            var audioInfo = videoFileInfoJson["streams"]?.FirstOrDefault(x => x["codec_type"].Value<string>() == "audio");
+            if (videoInfo == null)
+            {
+                throw new NotVideoFileException(videoPath);
             }
+
+            var format = videoFileInfoJson["format"];
+
+            var details = new VideoFileDetailsDTO()
+            {
+                Video =
+                {
+                    Codec = (VideoCodec) Enum.Parse(typeof(VideoCodec), videoInfo["codec_name"].Value<string>()),
+                    Resolution = (videoInfo["width"].Value<int>(), videoInfo["height"].Value<int>()),
+                    BitrateKbs = videoInfo["bit_rate"]?.Value<int>()
+                },
+                Duration = TimeSpan.FromSeconds(format["duration"].Value<double>()),
+                SizeBytes = format["size"].Value<int>()
+            };
+            if (audioInfo != null)
+            {
+                details.Audio.Codec = (AudioCodec) Enum.Parse(typeof(AudioCodec), audioInfo["codec_name"].Value<string>());
+            }
+
+            return details;
         }
 
         private static readonly IEnumerable<VideoCodec> SupportedVideoCodecs = new List<VideoCodec>

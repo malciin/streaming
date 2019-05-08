@@ -12,17 +12,12 @@ namespace Streaming.Common.EmbedProcesses
         private string Args { get; set; }
         private Process Process { get; set; }
 
-        private readonly TaskCompletionSource<string> tsc;
         private readonly StringBuilder standardOutputBuilder;
         private readonly StringBuilder standardErrorBuilder;
         private bool processStarted = false;
         
-        public bool HasExited => Process.HasExited;
-        public int ExitCode => Process.ExitCode;
-
         private EmbeddedProcess()
         {
-            tsc = new TaskCompletionSource<string>();
             standardErrorBuilder = new StringBuilder();
             standardOutputBuilder = new StringBuilder();
         }
@@ -33,13 +28,28 @@ namespace Streaming.Common.EmbedProcesses
             Process.OutputDataReceived += watcher.OutputDataReceived;
         }
         
-        public async Task<string> HandleAsync()
+        /// <summary>
+        /// Get the standard output from executed command if the returned code == 0
+        /// Otherwise throw CommandException
+        /// </summary>
+        /// <returns>Output from executed command</returns>
+        public async Task<string> GetResultAsync()
         {
             using (Process)
             {
+                var tsc = new TaskCompletionSource<string>();
                 if (!processStarted)
                 {
-                    Start();
+                    StartProcess((sender, args) =>
+                    {
+                        if (Process.ExitCode != 0)
+                        {
+                            tsc.TrySetException(
+                                new CommandException($"{ProgramName} {Args}", Process.ExitCode, standardErrorBuilder.ToString()));
+                        }
+
+                        tsc.TrySetResult(standardOutputBuilder.ToString());
+                    });
                 }
                 Process.BeginOutputReadLine();
                 Process.BeginErrorReadLine();
@@ -47,21 +57,39 @@ namespace Streaming.Common.EmbedProcesses
                 return await tsc.Task;
             }
         }
+        
+        /// <summary>
+        /// Provide more details about finished process like ResponseCode and both error and standard output
+        /// </summary>
+        public async Task<ExecutionResult> GetExecutionResultAsync()
+        {
+            using (Process)
+            {
+                var tsc = new TaskCompletionSource<ExecutionResult>();
+                if (!processStarted)
+                {
+                    StartProcess((sender, args) =>
+                    {
+                        tsc.TrySetResult(new ExecutionResult
+                        {
+                            ReturnCode = Process.ExitCode,
+                            ErrorOutput = standardErrorBuilder.ToString(),
+                            StandardOutput = standardOutputBuilder.ToString()
+                        });
+                    });
+                }
+                Process.BeginOutputReadLine();
+                Process.BeginErrorReadLine();
 
-        public void Start()
+                return await tsc.Task;
+            }
+        }
+    
+        private void StartProcess(EventHandler exitedEventStrategy)
         {
             Process.OutputDataReceived += (sender, args) => standardOutputBuilder.AppendLine(args.Data);
             Process.ErrorDataReceived += (sender, args) => standardErrorBuilder.AppendLine(args.Data);
-            Process.Exited += (sender, args) =>
-            {
-                if (Process.ExitCode != 0)
-                {
-                    tsc.TrySetException(
-                        new CommandException($"{ProgramName} {Args}", Process.ExitCode, standardErrorBuilder.ToString()));
-                }
-
-                tsc.TrySetResult(standardOutputBuilder.ToString());
-            };
+            Process.Exited += exitedEventStrategy;
             processStarted = true;
             
             Process.Start();
@@ -93,6 +121,13 @@ namespace Streaming.Common.EmbedProcesses
                 ProgramName = programName,
                 Args = args
             };
+        }
+
+        public class ExecutionResult
+        {
+            public int ReturnCode { get; set; }
+            public string StandardOutput { get; set; }
+            public string ErrorOutput { get; set; }
         }
     }
 }

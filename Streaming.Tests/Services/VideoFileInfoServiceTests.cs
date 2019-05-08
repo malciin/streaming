@@ -47,7 +47,7 @@ namespace Streaming.Tests.Services
 
         private string GetFilePath(string extension) =>
             videoSamplesPath.GetFiles()
-                            .First(x => String.Equals(extension, x.Extension, StringComparison.InvariantCultureIgnoreCase))
+                            .First(x => x.Name == $"sample{extension}")
                             .FullName;
             
         private readonly int maxMsVideoDurationError = 250;

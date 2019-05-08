@@ -22,7 +22,7 @@ namespace Streaming.Tests.EndToEnd.Auth0Controller
 
             var response = Client.GetAsync($"{WebHost.ApiUri}Auth0").GetAwaiter().GetResult();
             Assert.True(response.IsSuccessStatusCode, $"Not success status code! Status code was: {response.StatusCode} " +
-                "- firstly check that you've got an internet connection");
+                "- firstly check that you've got an internet connection and correct auth0 settings");
             var token = response.Content.ReadFromJsonAsObject<TokenDTO>();
 
             var auth0Settings = WebHost.Services.GetService<IAuth0ManagementApiSettings>();
@@ -47,7 +47,7 @@ namespace Streaming.Tests.EndToEnd.Auth0Controller
 
             WebHost.ConfigureTestUser(Claims.CanAccessAuth0Api);
             response = Client.GetAsync($"{WebHost.ApiUri}Auth0").GetAwaiter().GetResult();
-            Assert.IsTrue(response.IsSuccessStatusCode);
+            Assert.IsTrue(response.IsSuccessStatusCode, $"Returned not success status code: {response.StatusCode}! Check that you've got correct Auth0 settings firstly");
         }
     }
 }
