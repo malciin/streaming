@@ -33,7 +33,7 @@ namespace Streaming.Application.Commands.Video
 
             var hasher = MD5.Create();
 
-            using (var partStream = command.PartBytes.OpenReadStream())
+            using (var partStream = command.PartStream)
             {
                 var hash = Convert.ToBase64String(hasher.ComputeHash(partStream));
                 if (!String.Equals(hash, command.PartMD5Hash))

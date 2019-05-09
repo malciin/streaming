@@ -8,7 +8,7 @@ namespace Streaming.Application.Validators
     {
         public UploadVideoPartCommandValidator()
         {
-            RuleFor(x => x.PartBytes)
+            RuleFor(x => x.PartStream)
                 .NotNull();
 
             RuleFor(x => x.PartMD5Hash)

@@ -1,13 +1,12 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System.IO;
 using Streaming.Application.Models;
 
 namespace Streaming.Application.Commands.Video
 {
-    public class UploadVideoPartCommand : IAuthenticatedCommand
+    public class UploadVideoPartCommand : ICommand
     {
         public string UploadToken { get; set; }
         public string PartMD5Hash { get; set; }
-        public IFormFile PartBytes { get; set; }
-        public UserInfo User { get; set; }
+        public Stream PartStream { get; set; }
     }
 }

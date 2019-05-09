@@ -60,7 +60,7 @@ namespace Streaming.Api.Controllers
             {
                 PartMD5Hash = request.PartMD5Hash,
                 UploadToken = request.UploadToken,
-                PartBytes = request.PartBytes
+                PartStream = request.PartBytes.OpenReadStream()
             });
             return NoContent();
         }
