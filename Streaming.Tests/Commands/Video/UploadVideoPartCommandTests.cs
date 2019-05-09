@@ -17,6 +17,8 @@ namespace Streaming.Tests.Commands.Video
 {
     public class UploadVideoPartCommandTests
     {
+        #region TestSetup
+        
         private Guid returnedGuidFromUploadToken;
         private DirectoryInfo rawVideosUploadDir;
         private DirectoryInfo videoSamplesDir;
@@ -46,7 +48,7 @@ namespace Streaming.Tests.Commands.Video
             var messageSignerServiceMock = MessageSignerServiceMock.CreateForRandomGuid();
             containerBuilder.Register(x => messageSignerServiceMock.Object).AsImplementedInterfaces();
             
-            rawVideosUploadDir = new DirectoryInfo("_Data/RawVideos");
+            rawVideosUploadDir = Directory.CreateDirectory("_Data/RawVideos");
             videoSamplesDir = new DirectoryInfo("_Data/VideoSamples");
             
             var videoProcessingFilePathStrategyMock = new Mock<IVideoProcessingFilesPathStrategy>();
@@ -57,6 +59,12 @@ namespace Streaming.Tests.Commands.Video
             var container = containerBuilder.Build();
             CommandDispatcher = container.Resolve<ICommandDispatcher>();
         }
+
+        [TearDown]
+        public void Teardown()
+            => rawVideosUploadDir.Delete(true);
+        
+        #endregion
 
         [Test]
         public void Wrong_MD5_Hash_Should_Throw_HashesNotEqualException()
@@ -92,6 +100,8 @@ namespace Streaming.Tests.Commands.Video
                     Assert.AreEqual(@byte, (byte)outputFile.ReadByte());
             }
         }
+        
+        #region HelperMethods
 
         private UploadVideoPartCommand GetUploadVideoPartCommandFor(byte[] bytes)
         {
@@ -103,5 +113,7 @@ namespace Streaming.Tests.Commands.Video
             };
             return command;
         }
+        
+        #endregion
     }
 }
