@@ -68,8 +68,6 @@ namespace Streaming.Tests.Services
                 $" but gets {result.Video.Resolution.xResolution}x{result.Video.Resolution.yResolution}"); 
             Assert.AreEqual(expected.Video.Codec, result.Video.Codec, $"Wrong codec! Expected {expected.Video.Codec} but gets {result.Video.Codec}");
         }
-        
-        
 
         [Test]
         public void Valid_Video_Info_For_3gp_Format() =>
