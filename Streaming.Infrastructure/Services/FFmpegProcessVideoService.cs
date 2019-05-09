@@ -10,6 +10,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
+using Streaming.Common;
 using Streaming.Common.EmbedProcesses;
 
 namespace Streaming.Infrastructure.Services
@@ -35,32 +36,36 @@ namespace Streaming.Infrastructure.Services
             double interval = 1 / screenshotInterval.TotalSeconds;
             
             var uniqueIdentifier = Guid.NewGuid().ToByteArray().ToBase32String();
-            var tempDirectory = Directory.CreateDirectory(Path.GetTempPath());
-            var command = $"ffmpeg -i '{mp4VideoFilePath}' -filter:v scale=\"140:-1\",fps={interval} '{Path.Combine(tempDirectory.FullName, $"{uniqueIdentifier}_%08d.jpg")}'";
-            await command.ExecuteBashAsync();
-            
-            var files = tempDirectory.GetFiles()
-                .Where(x => Regex.IsMatch(x.Name, uniqueIdentifier + @"_\d{8}\.ts"))
-                .OrderBy(x => x.Name).Select(x => x.FullName).ToList();
-            
-            for (int i = 0; i < files.Count; i++)
+            using (var tempDirectory = TemporaryDirectory.CreateDirectory())
             {
-                files[i] = screenshotFilesPathStrategy(new ScreenshotGenerationContext
+                var command = $"ffmpeg -i '{mp4VideoFilePath}' -filter:v scale=\"140:-1\",fps={interval} '{Path.Combine(tempDirectory.FullName, $"{uniqueIdentifier}_%08d.jpg")}'";
+                await command.ExecuteBashAsync();
+            
+                var files = tempDirectory.GetFiles()
+                    .Where(x => Regex.IsMatch(x.Name, uniqueIdentifier + @"_\d{8}\.ts"))
+                    .OrderBy(x => x.Name).Select(x => x.FullName).ToList();
+            
+                for (int i = 0; i < files.Count; i++)
                 {
-                    ScreenshotNumber = i,
-                    ScreenshotTime = TimeSpan.FromSeconds(screenshotInterval.TotalSeconds * i)
-                });
-            }
+                    var newPath = screenshotFilesPathStrategy(new ScreenshotGenerationContext
+                    {
+                        ScreenshotNumber = i,
+                        ScreenshotTime = TimeSpan.FromSeconds(screenshotInterval.TotalSeconds * i)
+                    });
+                    File.Move(files[i], newPath);
+                    files[i] = newPath;
+                }
 
-            return files;
+                return files;
+            }
         }
 
         public Task TakeVideoScreenshotAsync(string videoPath, string screenshotOutputPath, TimeSpan timeSpan)
         {
             throwIfFileNotExists(videoPath);
             var lengthString = $"{timeSpan.Hours}:{timeSpan.Minutes}:{timeSpan.Seconds}";
-            var command = $"ffmpeg -ss {lengthString} -i '{videoPath}' -vframes 1 -q:v 2 '{screenshotOutputPath}'";
-            return command.ExecuteBashAsync();
+            var process = EmbeddedProcess.Create("ffmpeg", $"-ss {lengthString} -i \"{videoPath}\" -vframes 1 -q:v 2 \"{screenshotOutputPath}\"");
+            return process.GetResultAsync();
         }
 
         public async Task ConvertVideoToMp4Async(string videoPath, string outputVideoFile, Action<double> progressCallback = null)
@@ -69,7 +74,7 @@ namespace Streaming.Infrastructure.Services
             if (!SupportedVideoCodecs.Contains(details.Video.Codec))
                 throw new NotSupportedVideoFileException();
             
-            string ffmpegArgs = $"-i {videoPath} -f mp4 ";
+            string ffmpegArgs = $"-i \"{videoPath}\" -f mp4 ";
             
             if (details.Video.Codec != VideoCodec.h264)
                 ffmpegArgs += "-vcodec libx264 -acodec aac";
@@ -77,7 +82,7 @@ namespace Streaming.Infrastructure.Services
                 ffmpegArgs += "-vcodec copy -acodec aac";
             else
                 ffmpegArgs += "-vcodec copy -acodec copy";
-            ffmpegArgs += $" {outputVideoFile}";
+            ffmpegArgs += $" \"{outputVideoFile}\"";
             
             using (var process = EmbeddedProcess.Create("ffmpeg", ffmpegArgs))
             {
@@ -91,19 +96,23 @@ namespace Streaming.Infrastructure.Services
         {
             throwIfFileNotExists(mp4VideoFilePath);
             var uniqueIdentifier = Guid.NewGuid().ToByteArray().ToBase32String();
-            var tempDirectory = Directory.CreateDirectory(Path.GetTempPath());
-            var splitCommand = $"ffmpeg -i '{mp4VideoFilePath}' -c copy -map 0 -segment_time 5 -f segment '{Path.Combine(tempDirectory.FullName, $"{uniqueIdentifier}_%08d.ts")}'";
-            await splitCommand.ExecuteBashAsync();
-            var files = tempDirectory.GetFiles()
-                .Where(x => Regex.IsMatch(x.Name, uniqueIdentifier + @"_\d{8}\.ts"))
-                .OrderBy(x => x.Name).Select(x => x.FullName).ToList();
-            
-            for (int i = 0; i < files.Count; i++)
+            using (var tempDirectory = TemporaryDirectory.CreateDirectory())
             {
-                files[i] = tsFilesPathStrategy(i);
+                var splitProcess = EmbeddedProcess.Create("ffmpeg", $"-i \"{mp4VideoFilePath}\" -c copy -map 0 -segment_time 4 -f segment \"" +
+                                                                    Path.Combine(tempDirectory.FullName, $"{uniqueIdentifier}_%08d.ts") + "\"");
+                await splitProcess.GetResultAsync();
+                var files = tempDirectory.GetFiles()
+                    .Where(x => Regex.IsMatch(x.Name, uniqueIdentifier + @"_\d{8}\.ts"))
+                    .OrderBy(x => x.Name).Select(x => x.FullName).ToList();
+            
+                for (int i = 0; i < files.Count; i++)
+                {
+                    var newPath = tsFilesPathStrategy(i);
+                    File.Move(files[i], newPath);
+                    files[i] = newPath;
+                }
+                return files;
             }
-
-            return files;
         }
 
         public async Task<VideoFileDetailsDTO> GetDetailsAsync(string videoPath)

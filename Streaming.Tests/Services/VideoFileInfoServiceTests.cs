@@ -50,22 +50,25 @@ namespace Streaming.Tests.Services
                             .First(x => x.Name == $"sample{extension}")
                             .FullName;
             
-        private readonly int maxMsVideoDurationError = 250;
+        private readonly TimeSpan maxDurationError = TimeSpan.FromMilliseconds(250);
 
         private void TestVideoFormatInfo(string sampleExtension, VideoFileDetailsDTO expected)
         {
             var result = videoFileInfoService.GetDetailsAsync(GetFilePath(sampleExtension)).GetAwaiter().GetResult();
             var durationFromSpecifiedMethod = videoFileInfoService.GetVideoLengthAsync(GetFilePath(sampleExtension)).GetAwaiter().GetResult();
-
-            Assert.True(Math.Abs(durationFromSpecifiedMethod.Subtract(expected.Duration).TotalMilliseconds) <= maxMsVideoDurationError, 
+            
+            Assert.True(durationFromSpecifiedMethod.EqualWithError(expected.Duration, maxDurationError), 
                 $"Wrong duration from duration only method! Expected {expected.Duration.TotalMilliseconds}ms but gets {durationFromSpecifiedMethod.TotalMilliseconds}ms " +
-                $"with max allowed duration error of {maxMsVideoDurationError}ms");
-            Assert.True(Math.Abs(result.Duration.Subtract(expected.Duration).TotalMilliseconds) <= maxMsVideoDurationError, 
+                $"with max allowed duration error of {maxDurationError.TotalMilliseconds}ms");
+            
+            Assert.True(result.Duration.EqualWithError(expected.Duration, maxDurationError), 
                 $"Wrong duration! Expected {expected.Duration.TotalMilliseconds}ms but gets {result.Duration.TotalMilliseconds}ms " + 
-                $"with max allowed duration error of {maxMsVideoDurationError}ms");
+                $"with max allowed duration error of {maxDurationError.TotalMilliseconds}ms");
+            
             Assert.AreEqual(expected.Video.Resolution, result.Video.Resolution,
                 $"Wrong resolution! Expected {expected.Video.Resolution.xResolution}x{expected.Video.Resolution.yResolution}" +
                 $" but gets {result.Video.Resolution.xResolution}x{result.Video.Resolution.yResolution}"); 
+            
             Assert.AreEqual(expected.Video.Codec, result.Video.Codec, $"Wrong codec! Expected {expected.Video.Codec} but gets {result.Video.Codec}");
         }
 
