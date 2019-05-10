@@ -7,9 +7,9 @@ namespace Streaming.Common.Extensions
         /// <summary>
         /// Return true if given dateTime contains within certain dates
         /// </summary>
-        public static bool IsWithin(this DateTime value, DateTime first, DateTime second)
+        public static bool IsWithin(this DateTime value, DateTime from, DateTime to)
         {
-            return first.Ticks <= value.Ticks && value.Ticks <= second.Ticks;
+            return from.Ticks <= value.Ticks && value.Ticks <= to.Ticks;
         }
     }
 }

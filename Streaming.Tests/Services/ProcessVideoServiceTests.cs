@@ -60,6 +60,10 @@ namespace Streaming.Tests.Services
             var screenshotPath = Path.Combine(workDir.FullName, "screen.jpg");
             await processVideoService.TakeVideoScreenshotAsync(inputFiles.SampleMp4, screenshotPath, TimeSpan.FromSeconds(2.5));
             Assert.IsTrue(File.Exists(screenshotPath));
+            Assert.DoesNotThrow(() => {
+                var img = System.Drawing.Image.FromFile(screenshotPath);
+                img.Dispose();
+            }, "System.Drawing.Image cannot load generated thumbnail");
         }
 
         [Test]
@@ -96,7 +100,7 @@ namespace Streaming.Tests.Services
             TimeSpan totalTimeSpan = TimeSpan.Zero;
             foreach (var tsFile in orderedTsFiles)
             {
-                var expectedPath = Strategy(i);
+                var expectedPath = Strategy(i++);
                 Assert.AreEqual(tsFile, expectedPath, $"Inproper path! Expected {expectedPath} but was {tsFile}");
                 Assert.IsTrue(File.Exists(tsFile), $"{tsFile} not exists!");
                 totalTimeSpan = totalTimeSpan.Add(await videoFileInfoService.GetVideoLengthAsync(tsFile));
@@ -112,6 +116,11 @@ namespace Streaming.Tests.Services
             var gifPath = Path.Combine(workDir.FullName, "test.gif");
             await processVideoService.TakeVideoGifAsync(inputFiles.SampleMp4, gifPath, TimeSpan.Zero,
                 TimeSpan.FromSeconds(2.5));
+
+            Assert.DoesNotThrow(() => {
+                    var img = System.Drawing.Image.FromFile(gifPath);
+                    img.Dispose();
+                }, "System.Drawing.Image cannot load generated gif");
         }
 
         private class InputFiles
