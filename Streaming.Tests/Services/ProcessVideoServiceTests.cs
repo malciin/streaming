@@ -19,13 +19,11 @@ namespace Streaming.Tests.Services
         private IVideoFileInfoService videoFileInfoService;
 
         private TimeSpan maxDurationError = TimeSpan.FromMilliseconds(500);
-        private DirectoryInfo videoSamplesDir;
         private DirectoryInfo workDir;
+        private DirectoryInfo tsFilesDir;
 
-        private string SampleMp4 => videoSamplesDir.GetFiles().Where(x => x.Name == "sample.mp4").First().FullName;
-        private readonly TimeSpan SampleMp4Duration = TimeSpan.FromMilliseconds(5_700);
-
-
+        private InputFiles inputFiles;
+        
         [OneTimeSetUp]
         public void OneTimeSetup()
         {
@@ -43,8 +41,9 @@ namespace Streaming.Tests.Services
             var container = builder.Build();
             processVideoService = container.Resolve<IProcessVideoService>();
             videoFileInfoService = container.Resolve<IVideoFileInfoService>();
-            videoSamplesDir = new DirectoryInfo("_Data/VideoSamples");
+            inputFiles = new InputFiles(new DirectoryInfo("_Data/VideoSamples"));
             workDir = Directory.CreateDirectory("_Data/Temporary");
+            tsFilesDir = Directory.CreateDirectory(Path.Combine(workDir.FullName, "TSFiles"));
         }
 
         [TearDown]
@@ -59,19 +58,18 @@ namespace Streaming.Tests.Services
         public async Task Thumbnail_Generate()
         {
             var screenshotPath = Path.Combine(workDir.FullName, "screen.jpg");
-            await processVideoService.TakeVideoScreenshotAsync(SampleMp4, screenshotPath, TimeSpan.FromSeconds(2.5));
+            await processVideoService.TakeVideoScreenshotAsync(inputFiles.SampleMp4, screenshotPath, TimeSpan.FromSeconds(2.5));
             Assert.IsTrue(File.Exists(screenshotPath));
         }
 
         [Test]
         public async Task Convert_To_Mp4_With_Progress_Support()
         {
-            var bigBuckBunny2_5sFLV = videoSamplesDir.GetFiles().First(x => x.Name.Contains("BigBuckBunny2.5s")).FullName;
             int calledTimes = 0;
 
             var outputMp4 = Path.Combine(workDir.FullName, "output.mp4");
             var receivedPercents = new List<double>();
-            Assert.DoesNotThrowAsync(() => processVideoService.ConvertVideoToMp4Async(bigBuckBunny2_5sFLV, outputMp4,
+            Assert.DoesNotThrowAsync(() => processVideoService.ConvertVideoToMp4Async(inputFiles.BigBuckBunnyFlv2_5s, outputMp4,
                 progress =>
                 {
                     calledTimes++;
@@ -90,22 +88,51 @@ namespace Streaming.Tests.Services
         [Test]
         public async Task Convert_To_TSFiles()
         {
-            var tsFilesDir = Directory.CreateDirectory(Path.Combine(workDir.FullName, "TSFiles"));
-            string NameStrategy(int part) => Path.Combine(tsFilesDir.FullName, $"{part}.ts");
+            var orderedTsFiles = await processVideoService.SplitMp4FileIntoTsFilesAsync(inputFiles.BigBuckBunnyAudioOnly120s, NameStrategy);
             
-            // TODO: Add another test that checks if returned orderedTsFiles is correctly ordered (9 -> 10 -> 11) not in lexical sort but numeric
-            var orderedTsFiles = await processVideoService.SplitMp4FileIntoTsFilesAsync(SampleMp4, NameStrategy);
             int i = 0;
-            
             TimeSpan totalTimeSpan = TimeSpan.Zero;
             foreach (var tsFile in orderedTsFiles)
             {
+                Assert.IsTrue(File.Exists(tsFile), $"{tsFile} not exists!");
                 totalTimeSpan = totalTimeSpan.Add(await videoFileInfoService.GetVideoLengthAsync(tsFile));
+            }
+            Assert.IsTrue(totalTimeSpan.EqualWithError(inputFiles.BigBuckBunnyAudioOnly120sLength, maxDurationError), 
+                $"Expected {inputFiles.BigBuckBunnyAudioOnly120sLength.TotalMilliseconds}ms += {maxDurationError.TotalMilliseconds}ms but was {totalTimeSpan.TotalMilliseconds}ms");
+        }
+
+        [Test]
+        public async Task Returned_Ts_Files_List_Should_Be_Number_Ordered_Not_Lexical_Ordered()
+        {
+            var orderedTsFiles = await processVideoService.SplitMp4FileIntoTsFilesAsync(inputFiles.BigBuckBunnyAudioOnly120s, NameStrategy);
+            
+            int i = 0;
+            foreach (var tsFile in orderedTsFiles)
+            {
                 var expectedPath = NameStrategy(i++);
                 Assert.AreEqual(tsFile, expectedPath, $"Inproper path! Expected {expectedPath} but was {tsFile}");
             }
-            Assert.IsTrue(totalTimeSpan.EqualWithError(SampleMp4Duration, maxDurationError), 
-                $"Expected {SampleMp4Duration.TotalMilliseconds}ms += {maxDurationError.TotalMilliseconds}ms but was {totalTimeSpan.TotalMilliseconds}ms");
         }
+
+        private class InputFiles
+        {
+            private DirectoryInfo samplesDir;
+
+            public string SampleMp4 => samplesDir.GetFiles().First(x => x.Name == "sample.mp4").FullName;
+            public string BigBuckBunnyFlv2_5s => samplesDir.GetFiles().First(x => x.Name.Contains("BigBuckBunny2.5s")).FullName;
+            public string BigBuckBunnyAudioOnly120s => samplesDir.GetFiles().First(x => x.Name.Contains("BigBuckBunnyAudioOnly120s")).FullName;
+            public TimeSpan BigBuckBunnyAudioOnly120sLength => TimeSpan.FromSeconds(120.5);
+            
+            public InputFiles(DirectoryInfo samplesDir)
+            {
+                this.samplesDir = samplesDir;
+            }
+        }
+        
+        #region HelperMethods
+        
+        private string NameStrategy(int partNum) => Path.Combine(tsFilesDir.FullName, $"{partNum}.ts");
+        
+        #endregion
     }
 }

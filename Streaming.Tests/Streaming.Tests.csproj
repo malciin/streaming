@@ -32,6 +32,9 @@
     <None Update="_Data\VideoSamples\BigBuckBunny2.5s.flv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="_Data\VideoSamples\BigBuckBunnyAudioOnly120s.mp4">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="_Data\VideoSamples\sample.3gp">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
