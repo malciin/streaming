@@ -88,30 +88,30 @@ namespace Streaming.Tests.Services
         [Test]
         public async Task Convert_To_TSFiles()
         {
-            var orderedTsFiles = await processVideoService.SplitMp4FileIntoTsFilesAsync(inputFiles.BigBuckBunnyAudioOnly120s, NameStrategy);
+            string Strategy(int partNumber) => Path.Combine(tsFilesDir.FullName, $"{partNumber}.ts");
+            var orderedTsFiles = await processVideoService.SplitMp4FileIntoTsFilesAsync(inputFiles.BigBuckBunnyAudioOnly120s, 
+                Strategy);
             
             int i = 0;
             TimeSpan totalTimeSpan = TimeSpan.Zero;
             foreach (var tsFile in orderedTsFiles)
             {
+                var expectedPath = Strategy(i);
+                Assert.AreEqual(tsFile, expectedPath, $"Inproper path! Expected {expectedPath} but was {tsFile}");
                 Assert.IsTrue(File.Exists(tsFile), $"{tsFile} not exists!");
                 totalTimeSpan = totalTimeSpan.Add(await videoFileInfoService.GetVideoLengthAsync(tsFile));
+                
             }
             Assert.IsTrue(totalTimeSpan.EqualWithError(inputFiles.BigBuckBunnyAudioOnly120sLength, maxDurationError), 
                 $"Expected {inputFiles.BigBuckBunnyAudioOnly120sLength.TotalMilliseconds}ms += {maxDurationError.TotalMilliseconds}ms but was {totalTimeSpan.TotalMilliseconds}ms");
         }
 
         [Test]
-        public async Task Returned_Ts_Files_List_Should_Be_Number_Ordered_Not_Lexical_Ordered()
+        public async Task Create_Gif_Test()
         {
-            var orderedTsFiles = await processVideoService.SplitMp4FileIntoTsFilesAsync(inputFiles.BigBuckBunnyAudioOnly120s, NameStrategy);
-            
-            int i = 0;
-            foreach (var tsFile in orderedTsFiles)
-            {
-                var expectedPath = NameStrategy(i++);
-                Assert.AreEqual(tsFile, expectedPath, $"Inproper path! Expected {expectedPath} but was {tsFile}");
-            }
+            var gifPath = Path.Combine(workDir.FullName, "test.gif");
+            await processVideoService.TakeVideoGifAsync(inputFiles.SampleMp4, gifPath, TimeSpan.Zero,
+                TimeSpan.FromSeconds(2.5));
         }
 
         private class InputFiles
@@ -128,11 +128,5 @@ namespace Streaming.Tests.Services
                 this.samplesDir = samplesDir;
             }
         }
-        
-        #region HelperMethods
-        
-        private string NameStrategy(int partNum) => Path.Combine(tsFilesDir.FullName, $"{partNum}.ts");
-        
-        #endregion
     }
 }

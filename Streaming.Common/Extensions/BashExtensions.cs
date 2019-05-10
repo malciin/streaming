@@ -10,9 +10,12 @@ namespace Streaming.Common.Extensions
         /// Execute command and returns command output.
         /// Throws CommandException if command return different ExitCode than 0
         /// </summary>
-        public static Task<string> ExecuteBashAsync(this string command)
+        public static async Task<string> ExecuteBashAsync(this string command)
         {
-            return EmbeddedProcess.Create(PlatformHelper.CommandlineToolname, $"-c \"{command}\"").GetResultAsync();
+            using (var process = EmbeddedProcess.Create(PlatformHelper.CommandlineToolname, $"-c \"{command}\""))
+            {
+                return await process.GetResultAsync();
+            }
         }
     }
 }

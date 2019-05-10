@@ -22,6 +22,8 @@ namespace Streaming.Tests.Commands.Video
 {
     public class UploadVideoCommandTests
     {
+        #region TestSetup
+        
         private List<Streaming.Domain.Models.Video> videos;
         private List<VideoCodec> supportedVideoCodecs;
         private VideoFileDetailsDTO videoDetails;
@@ -85,6 +87,8 @@ namespace Streaming.Tests.Commands.Video
             
             CommandDispatcher = containerBuilder.Build().Resolve<ICommandDispatcher>();
         }
+        
+        #endregion
         
         [Test]
         public void UploadVideoCommand_Adding_Video_Works()

@@ -29,6 +29,29 @@ namespace Streaming.Infrastructure.Services
             return TimeSpan.FromSeconds(double.Parse(result));
         }
 
+        public async Task TakeVideoGifAsync(string videoPath, string gifOutputPath, TimeSpan startTime, TimeSpan gifLength)
+        {
+            var pallete = $"{Path.GetTempFileName()}.png";
+            var generatePalleteProcess = EmbeddedProcess.Create("ffmpeg", 
+                $"-y -ss {startTime.TotalSeconds} -t {gifLength.TotalSeconds} -i \"{videoPath}\" " +
+                $"-vf fps=10,scale=120:-1:flags=lanczos,palettegen {pallete}");
+            var generateGifProcess = EmbeddedProcess.Create("ffmpeg",
+                $"-ss {startTime.TotalSeconds} -t {gifLength.TotalSeconds} -i \"{videoPath}\" -i \"{pallete}\" " +
+                $"-filter_complex \"fps=10,scale=120:-1:flags=lanczos[x];[x][1:v]paletteuse\" {gifOutputPath}");
+
+            try
+            {
+                await generatePalleteProcess.GetResultAsync();
+                await generateGifProcess.GetResultAsync();
+            }
+            finally
+            {
+                generatePalleteProcess.Dispose();
+                generateGifProcess.Dispose();
+                File.Delete(pallete);
+            }
+        }
+
         public async Task<List<string>> GenerateVideoOverviewScreenshotsAsync(string mp4VideoFilePath, TimeSpan screenshotInterval,
             Func<ScreenshotGenerationContext, string> screenshotFilesPathStrategy)
         {
@@ -60,12 +83,14 @@ namespace Streaming.Infrastructure.Services
             }
         }
 
-        public Task TakeVideoScreenshotAsync(string videoPath, string screenshotOutputPath, TimeSpan timeSpan)
+        public async Task TakeVideoScreenshotAsync(string videoPath, string screenshotOutputPath, TimeSpan timeSpan)
         {
             throwIfFileNotExists(videoPath);
             var lengthString = $"{timeSpan.Hours}:{timeSpan.Minutes}:{timeSpan.Seconds}";
-            var process = EmbeddedProcess.Create("ffmpeg", $"-ss {lengthString} -i \"{videoPath}\" -vframes 1 -q:v 2 \"{screenshotOutputPath}\"");
-            return process.GetResultAsync();
+            using (var process = EmbeddedProcess.Create("ffmpeg", $"-ss {lengthString} -i \"{videoPath}\" -vframes 1 -q:v 2 \"{screenshotOutputPath}\""))
+            {
+                await process.GetResultAsync();
+            }
         }
 
         public async Task ConvertVideoToMp4Async(string videoPath, string outputVideoFile, Action<double> progressCallback = null)
@@ -98,9 +123,13 @@ namespace Streaming.Infrastructure.Services
             var uniqueIdentifier = Guid.NewGuid().ToByteArray().ToBase32String();
             using (var tempDirectory = TemporaryDirectory.CreateDirectory())
             {
-                var splitProcess = EmbeddedProcess.Create("ffmpeg", $"-i \"{mp4VideoFilePath}\" -c copy -map 0 -segment_time 4 -f segment \"" +
-                                                                    Path.Combine(tempDirectory.FullName, $"{uniqueIdentifier}_%08d.ts") + "\"");
-                await splitProcess.GetResultAsync();
+                using (var splitProcess = EmbeddedProcess.Create("ffmpeg",
+                    $"-i \"{mp4VideoFilePath}\" -c copy -map 0 -segment_time 4 -f segment \"" +
+                    Path.Combine(tempDirectory.FullName, $"{uniqueIdentifier}_%08d.ts") + "\""))
+                {
+                    await splitProcess.GetResultAsync();
+                }
+
                 var files = tempDirectory.GetFiles()
                     .Where(x => Regex.IsMatch(x.Name, uniqueIdentifier + @"_\d{8}\.ts"))
                     .OrderBy(x => x.Name).Select(x => x.FullName).ToList();
