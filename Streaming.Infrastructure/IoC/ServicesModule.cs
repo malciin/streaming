@@ -36,10 +36,6 @@ namespace Streaming.Infrastructure.IoC
             builder.RegisterType<LiveStreamManager>()
                    .As<ILiveStreamManager>()
                    .SingleInstance();
-
-            builder.RegisterType<Auth0ClientWrapper>()
-                   .As<IAuth0Client>()
-                   .SingleInstance();
         }
     }
 }

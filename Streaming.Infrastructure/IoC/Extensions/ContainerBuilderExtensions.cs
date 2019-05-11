@@ -6,6 +6,7 @@ namespace Streaming.Infrastructure.IoC.Extensions
     {
         public static ContainerBuilder UseDefaultModules(this ContainerBuilder builder)
         {
+            builder.RegisterModule<Auth0Module>();
             builder.RegisterModule<CommandModule>();
             builder.RegisterModule<ServicesModule>();
             builder.RegisterModule<SettingsModule>();

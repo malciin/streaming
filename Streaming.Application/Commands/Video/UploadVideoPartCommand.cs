@@ -1,5 +1,4 @@
 ﻿using System.IO;
-using Streaming.Application.Models;
 
 namespace Streaming.Application.Commands.Video
 {

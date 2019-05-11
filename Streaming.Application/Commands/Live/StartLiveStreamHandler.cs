@@ -1,10 +1,10 @@
 ﻿using Streaming.Application.Interfaces.Services;
 using Streaming.Application.Models.DTO.Live;
 using Streaming.Common.Extensions;
-using Streaming.Domain.Models;
 using System;
 using System.Text;
 using System.Threading.Tasks;
+using Streaming.Application.Interfaces.Repositories;
 
 namespace Streaming.Application.Commands.Live
 {
@@ -12,13 +12,13 @@ namespace Streaming.Application.Commands.Live
     {
         private readonly IMessageSignerService messageSignerService;
         private readonly ILiveStreamManager liveManager;
-        private readonly IAuth0Client auth0Client;
+        private readonly IUserRepository userRepository;
 
-        public StartLiveStreamHandler(ILiveStreamManager liveManager, IMessageSignerService messageSignerService, IAuth0Client auth0Client)
+        public StartLiveStreamHandler(ILiveStreamManager liveManager, IMessageSignerService messageSignerService, IUserRepository userRepository)
         {
             this.messageSignerService = messageSignerService;
+            this.userRepository = userRepository;
             this.liveManager = liveManager;
-            this.auth0Client = auth0Client;
         }
 
         public async Task HandleAsync(StartLiveStreamCommand command)
@@ -32,18 +32,12 @@ namespace Streaming.Application.Commands.Live
             var clientIdentifierBytes = messageSignerService.GetMessage(bytes);
             var clientIdentifier = Encoding.UTF8.GetString(clientIdentifierBytes);
 
-            var clientInfo = await auth0Client.GetInfoAsync(clientIdentifier);
-
+            var clientInfo = await userRepository.GetSingleAsync(clientIdentifier);
             await liveManager.StartNewLiveStreamAsync(new NewLiveStreamDTO
             {
                 LiveStreamId = command.StreamId,
                 ManifestUri = command.ManifestUri,
-                User = new UserDetails
-                {
-                    Email = clientInfo.Email,
-                    Nickname = clientInfo.NickName,
-                    UserId = clientInfo.UserId
-                }
+                User = clientInfo
             });
         }
     }

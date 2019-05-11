@@ -15,7 +15,9 @@
     "LogsDirectory": "logs"
   },
   "Database": {
-    "Name": "streaming"
+    "UseDockerDatabase": true,
+    "Name": "streaming",
+    "ConnectionString": "mongodb://localhost:27017"
   },
   "Jwt": {
     "Issuer": "https://id0.eu.auth0.com/",

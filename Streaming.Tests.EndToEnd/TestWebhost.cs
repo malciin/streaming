@@ -17,6 +17,7 @@ using System.Reflection;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using MongoDB.Bson.Serialization;
+using MongoDB.Driver;
 
 namespace Streaming.Tests.EndToEnd
 {
@@ -72,9 +73,19 @@ namespace Streaming.Tests.EndToEnd
 
         public ITestWebhost Start()
         {
-            var databaseConnectionString = String.Empty;
-            if (useDatabase)
+            var databaseConnectionString = Configuration["Database:ConnectionString"];
+            if (useDatabase && bool.Parse(Configuration["Database:UseDockerDatabase"]))
                 databaseConnectionString = database.Start();
+            if (useDatabase)
+            {
+                // Cleanup database on every test
+                var client = new MongoClient(databaseConnectionString);
+                foreach (var name in client.ListDatabaseNames().ToEnumerable())
+                {
+                    if (!String.Equals(name, "admin", StringComparison.InvariantCultureIgnoreCase))
+                        client.DropDatabase(name);
+                }
+            }
 
             var anyClassMap = BsonClassMap.GetRegisteredClassMaps().FirstOrDefault();
             if (anyClassMap != null)

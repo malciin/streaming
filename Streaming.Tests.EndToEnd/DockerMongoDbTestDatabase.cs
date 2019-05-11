@@ -41,15 +41,6 @@ namespace Streaming.Tests.EndToEnd
                 _databaseAlreadyRunning = true;
                 _alreadyRunningDatabaseConnectionString = $"mongodb://localhost:{databasePort}";
             }
-            else
-            {
-                var client = new MongoClient(_alreadyRunningDatabaseConnectionString);
-                foreach (var name in client.ListDatabaseNames().ToEnumerable())
-                {
-                    if (!String.Equals(name, "admin", StringComparison.InvariantCultureIgnoreCase))
-                        client.DropDatabase(name);
-                }
-            }
             return _alreadyRunningDatabaseConnectionString;
         }
     }

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Auth0.ManagementApi.Models;
 using Autofac;
 using Moq;
 using NUnit.Framework;
@@ -22,7 +21,7 @@ namespace Streaming.Tests.Commands.Live
         
         private Mock<IPastLiveStreamRepository> liveStreamRepositoryMock;
         private Mock<ILiveStreamManager> liveStreamManagerMock;
-        private Mock<IAuth0Client> auth0ClientMock;
+        private Mock<IUserRepository> userRepositoryMock;
 
         private ICommandDispatcher CommandDispatcher { get; set; }
 
@@ -45,14 +44,12 @@ namespace Streaming.Tests.Commands.Live
             var messageSignerServiceMock = MessageSignerServiceMock.CreateForRandomGuid();
             containerBuilder.Register(x => messageSignerServiceMock.Object).AsImplementedInterfaces();
 
-            auth0ClientMock = new Mock<IAuth0Client>();
-            auth0ClientMock.Setup(x => x.GetInfoAsync(It.IsAny<string>())).ReturnsAsync((string id) => new User
-            {
-                NickName = "malcin",
-                UserId = id,
-                Email = "email@gmail.com"
+            userRepositoryMock =UserRepositoryMock.CreateForData(new UserDetails {
+                UserId = "malcin",
+                Email = "email@gmail.com",
+                Nickname = "malcin"
             });
-            containerBuilder.Register(x => auth0ClientMock.Object).As<IAuth0Client>().SingleInstance();
+            containerBuilder.Register(x => userRepositoryMock.Object).As<IUserRepository>().SingleInstance();
 
             var context = containerBuilder.Build();
             CommandDispatcher = context.Resolve<ICommandDispatcher>();
