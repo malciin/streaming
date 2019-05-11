@@ -23,8 +23,8 @@ namespace Streaming.Tests.Commands.Video
         private DirectoryInfo rawVideosUploadDir;
         private DirectoryInfo videoSamplesDir;
 
-        private string SampleMp4Video => videoSamplesDir.GetFiles().Where(x => x.Extension == ".mp4")
-            .Select(x => x.FullName).First();
+        private string SampleMp4Video => videoSamplesDir.GetFiles()
+            .First(x => x.Name == "sample.mp4").FullName;
         private string VideoPartPath => Path.Combine(rawVideosUploadDir.FullName, returnedGuidFromUploadToken.ToString());
         private ICommandDispatcher CommandDispatcher { get; set; }
         

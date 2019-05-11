@@ -19,6 +19,7 @@ namespace Streaming.Application.Commands.Video
             this.messageSigner = messageSigner;
         }
 
+        // TODO: Create ITokenService to generate upload token and retreive data from them (code duplications)
         private Guid getVideoIdFromToken(string uploadToken)
         {
             var signedMessage = Convert.FromBase64String(uploadToken);

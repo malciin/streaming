@@ -168,6 +168,9 @@ namespace Streaming.Tests.EndToEnd
                     .ToList();
                 if (claims.Any())
                 {
+                    claims.Add(new Claim(ClaimTypes.NameIdentifier, "userId"));
+                    claims.Add(new Claim(ClaimTypes.Email, "user@user.com"));
+                    claims.Add(new Claim("nickname", "malciin"));
                     var claimsIdentity = new ClaimsIdentity(claims, "testAuthentication");
                     context.User = new ClaimsPrincipal(claimsIdentity);
                 }

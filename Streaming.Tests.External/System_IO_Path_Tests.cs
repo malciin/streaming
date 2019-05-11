@@ -9,7 +9,8 @@ namespace Streaming.Tests.External
         [TestCase("test.", "")]
         [TestCase("some/directory/to/photo.jpg", ".jpg")]
 		[TestCase(@"some\windows\directory\photo.jpg", ".jpg")]
-        public void GetExtensions_Should_Return_Path_With_Dot(string input, string expectedOutput)
+        [TestCase("some/dir/to/photo....jpg", ".jpg")]
+        public void GetExtensions_Should_Return_Extension_With_Dot(string input, string expectedOutput)
         {
             var result = Path.GetExtension(input);
             Assert.AreEqual(expectedOutput, result, $"For '{input}' expected '{expectedOutput}' but was {result}");
