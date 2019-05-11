@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Streaming.Api.Extensions;
 using Streaming.Application.Commands;
+using Streaming.Application.Models;
 using Streaming.Domain.Models;
 
 namespace Streaming.Api.Controllers
@@ -16,10 +17,11 @@ namespace Streaming.Api.Controllers
             this.commandDispatcher = commandDispatcher;
         }
 
-        public Task DispatchAsync(ICommand command)
+        protected Task DispatchAsync<T>(T command) where T : ICommand
         {
             if (command is IAuthenticatedCommand authenticatedCommand)
             {
+                authenticatedCommand.User = new UserInfo();
                 authenticatedCommand.User.Details = new UserDetails
                 {
                     UserId = User.FindFirst(ClaimTypes.NameIdentifier).Value,

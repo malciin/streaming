@@ -27,7 +27,7 @@ namespace Streaming.Application.Commands
 				var dispatcher = scope.Resolve<ICommandDispatcher>();
                 try
                 {
-                    await dispatcher.HandleAsync(command);
+                    await dispatcher.HandleAsync((dynamic)command);
                 }
                 catch(Exception ex)
                 {
