@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using MongoDB.Driver;
 using NUnit.Framework;
 using Streaming.Common.Extensions;
 

@@ -9,31 +9,23 @@ namespace Streaming.Application.Commands.Video
 	public class UploadVideoHandler : ICommandHandler<UploadVideoCommand>
 	{
 		private readonly ICommandBus commandBus;
-        private readonly IMessageSignerService messageSigner;
-        private readonly IVideoRepository videoRepo;
+		private readonly ITokenService tokenService;
+		private readonly IVideoRepository videoRepo;
         private readonly IVideoProcessingFilesPathStrategy videoProcessingFilesPathStrategy;
 
         public UploadVideoHandler(IVideoRepository videoRepo,
             ICommandBus commandBus,
-            IMessageSignerService messageSigner,
-            IVideoProcessingFilesPathStrategy videoProcessingFilesPathStrategy)
+            IVideoProcessingFilesPathStrategy videoProcessingFilesPathStrategy, ITokenService tokenService)
 		{
 			this.videoRepo = videoRepo;
             this.commandBus = commandBus;
-            this.messageSigner = messageSigner;
             this.videoProcessingFilesPathStrategy = videoProcessingFilesPathStrategy;
-        }
-
-        private Guid GetVideoIdFromUploadToken(string uploadToken)
-        {
-            var signedMessage = Convert.FromBase64String(uploadToken);
-            var message = messageSigner.GetMessage(signedMessage);
-            return new Guid(message);
-        }
+            this.tokenService = tokenService;
+		}
 
         public async Task HandleAsync(UploadVideoCommand command)
-		{
-            var videoId = GetVideoIdFromUploadToken(command.UploadToken);
+        {
+	        Guid videoId = tokenService.GetDataFromUploadVideoToken(command.UploadToken).VideoId;
             var inputFilePath = videoProcessingFilesPathStrategy.RawUploadedVideoFilePath(videoId);
 
 			var video = new Domain.Models.Video

@@ -9,6 +9,7 @@ using NUnit.Framework;
 using Streaming.Application.Commands;
 using Streaming.Application.Commands.Video;
 using Streaming.Application.Interfaces.Strategies;
+using Streaming.Application.Models.DTO.Video;
 using Streaming.Common.Exceptions;
 using Streaming.Infrastructure.IoC;
 using Streaming.Tests.Mocks;
@@ -45,8 +46,8 @@ namespace Streaming.Tests.Commands.Video
             containerBuilder.RegisterModule<CommandModule>();
             containerBuilder.RegisterModule<StrategiesModule>();
 
-            var messageSignerServiceMock = MessageSignerServiceMock.CreateForRandomGuid();
-            containerBuilder.Register(x => messageSignerServiceMock.Object).AsImplementedInterfaces();
+            var tokenServiceMock = TokenServiceMock.CreateForData(new UploadVideoTokenDataDTO {VideoId = Guid.NewGuid()});
+            containerBuilder.Register(x => tokenServiceMock.Object).AsImplementedInterfaces();
             
             rawVideosUploadDir = Directory.CreateDirectory("_Data/RawVideos");
             videoSamplesDir = new DirectoryInfo("_Data/VideoSamples");

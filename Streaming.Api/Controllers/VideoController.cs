@@ -20,11 +20,12 @@ namespace Streaming.Api.Controllers
     public class VideoController : ApiControllerBase
     {
         private readonly IVideoQueries queries;
-        private readonly IMessageSignerService messageSigner;
-        public VideoController(ICommandDispatcher commandDispatcher, IVideoQueries queries, IMessageSignerService messageSigner) : base(commandDispatcher)
+        private readonly ITokenService tokenService;
+        
+        public VideoController(ICommandDispatcher commandDispatcher, IVideoQueries queries, ITokenService tokenService) : base(commandDispatcher)
         {
             this.queries = queries;
-            this.messageSigner = messageSigner;
+            this.tokenService = tokenService;
         }
 
         [HttpPost]
@@ -44,11 +45,12 @@ namespace Streaming.Api.Controllers
         [ClaimAuthorize(Claims.CanUploadVideo)]
         public TokenDTO GetUploadToken()
         {
-            // Too tired when I wrote this, to move this to dedicated serivice or something...
-            var signedMessage = messageSigner.SignMessage(Guid.NewGuid().ToByteArray());
-            return new TokenDTO
+            var token = tokenService.GetUploadVideoToken(new UploadVideoTokenDataDTO
             {
-                Token = Convert.ToBase64String(signedMessage)
+                VideoId = Guid.NewGuid()
+            });
+            return new TokenDTO {
+                Token = token
             };
         }
 

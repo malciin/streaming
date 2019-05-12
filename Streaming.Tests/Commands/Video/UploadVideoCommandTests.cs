@@ -32,7 +32,7 @@ namespace Streaming.Tests.Commands.Video
         private Mock<IVideoRepository> videoRepositoryMock;
         private Mock<IUserRepository> userRepositoryMock;
         private Mock<ICommandBus> commandBusMock;
-        private Mock<IMessageSignerService> messageSignerServiceMock;
+        private Mock<ITokenService> tokenServiceMock;
 
         private ICommandDispatcher CommandDispatcher { get; set; }
 
@@ -67,11 +67,10 @@ namespace Streaming.Tests.Commands.Video
             videos = new List<Streaming.Domain.Models.Video>();
             videoRepositoryMock = VideoRepositoryMock.CreateForData(videos);
             containerBuilder.Register(x => videoRepositoryMock.Object).AsImplementedInterfaces();
-            
-            messageSignerServiceMock = new Mock<IMessageSignerService>();
-            messageSignerServiceMock.Setup(x => x.GetMessage(It.IsAny<byte[]>())).Returns(Guid.NewGuid().ToByteArray());
-            containerBuilder.Register(x => messageSignerServiceMock.Object).AsImplementedInterfaces();
 
+            tokenServiceMock = TokenServiceMock.CreateForData(new UploadVideoTokenDataDTO {VideoId = Guid.NewGuid()});
+            containerBuilder.Register(x => tokenServiceMock.Object).AsImplementedInterfaces();
+            
             userRepositoryMock = UserRepositoryMock.CreateForData(new UserDetails {
                 UserId = "malcin",
                 Email = "email@gmail.com",

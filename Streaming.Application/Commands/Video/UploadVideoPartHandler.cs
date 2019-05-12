@@ -11,26 +11,17 @@ namespace Streaming.Application.Commands.Video
 {
     public class UploadVideoPartHandler : ICommandHandler<UploadVideoPartCommand>
     {
+        private readonly ITokenService tokenService;
         private readonly IVideoProcessingFilesPathStrategy pathStrategy;
-        private readonly IMessageSignerService messageSigner;
-        public UploadVideoPartHandler(IVideoProcessingFilesPathStrategy pathStrategy, IMessageSignerService messageSigner)
+        public UploadVideoPartHandler(IVideoProcessingFilesPathStrategy pathStrategy, ITokenService tokenService)
         {
             this.pathStrategy = pathStrategy;
-            this.messageSigner = messageSigner;
-        }
-
-        // TODO: Create ITokenService to generate upload token and retreive data from them (code duplications)
-        private Guid getVideoIdFromToken(string uploadToken)
-        {
-            var signedMessage = Convert.FromBase64String(uploadToken);
-            var message = messageSigner.GetMessage(signedMessage);
-
-            return new Guid(message);
+            this.tokenService = tokenService;
         }
 
         public async Task HandleAsync(UploadVideoPartCommand command)
         {
-            Guid videoId = getVideoIdFromToken(command.UploadToken);
+            Guid videoId = tokenService.GetDataFromUploadVideoToken(command.UploadToken).VideoId;
 
             var hasher = MD5.Create();
 

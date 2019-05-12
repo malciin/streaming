@@ -8,7 +8,6 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Auth0.ManagementApi.Models;
 using NUnit.Framework;
 using Streaming.Application.DTO;
 using Streaming.Application.Models;
