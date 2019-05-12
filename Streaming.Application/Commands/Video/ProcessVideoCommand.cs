@@ -1,10 +1,8 @@
-﻿using System;
-
-namespace Streaming.Application.Commands.Video
+﻿namespace Streaming.Application.Commands.Video
 {
     public class ProcessVideoCommand : ICommand
     {
-        public Guid VideoId { get; set; }
+        public Domain.Models.Video Video { get; set; }
         public string InputFilePath { get; set; }
     }
 }

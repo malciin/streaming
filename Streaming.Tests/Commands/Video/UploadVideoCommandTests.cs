@@ -94,11 +94,9 @@ namespace Streaming.Tests.Commands.Video
                 Title = "Title",
                 Description = "Desc",
                 User = new UserInfo{
-                    Details = new UserDetails {
-                        Email = "email@gmail.com",
-                        Nickname = "nick",
-                        UserId = "id"
-                    }
+                    Email = "email@gmail.com",
+                    Nickname = "nick",
+                    UserId = "id"
                 },
                 UploadToken = Convert.ToBase64String(new byte[] { 0x10 })
             }).GetAwaiter().GetResult();
@@ -122,12 +120,9 @@ namespace Streaming.Tests.Commands.Video
                 Description = "Desc",
                 User = new UserInfo
                 {
-                    Details = new UserDetails
-                    {
-                        Email = "email@gmail.com",
-                        Nickname = "nick",
-                        UserId = "id"    
-                    }
+                    Email = "email@gmail.com",
+                    Nickname = "nick",
+                    UserId = "id"    
                 },
                 UploadToken = Convert.ToBase64String(new byte[] { 0x10 })
             }).GetAwaiter().GetResult();

@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using Streaming.Api.Extensions;
 using Streaming.Application.Commands;
 using Streaming.Application.Models;
-using Streaming.Domain.Models;
 
 namespace Streaming.Api.Controllers
 {
@@ -22,13 +21,9 @@ namespace Streaming.Api.Controllers
             if (command is IAuthenticatedCommand authenticatedCommand)
             {
                 authenticatedCommand.User = new UserInfo();
-                authenticatedCommand.User.Details = new UserDetails
-                {
-                    UserId = User.FindFirst(ClaimTypes.NameIdentifier).Value,
-                    Email = User.FindFirst(ClaimTypes.Email).Value,
-                    Nickname = User.FindFirst(x => x.Type == "nickname")?.Value
-                };
-
+                authenticatedCommand.User.UserId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                authenticatedCommand.User.Email = User.FindFirst(ClaimTypes.Email).Value;
+                authenticatedCommand.User.Nickname = User.FindFirst(x => x.Type == "nickname")?.Value;
                 authenticatedCommand.User.Claims = User.GetStreamingClaims();
             }
 

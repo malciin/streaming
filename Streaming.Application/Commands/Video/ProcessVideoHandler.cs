@@ -1,8 +1,6 @@
 ﻿using Streaming.Application.Interfaces.Repositories;
 using Streaming.Application.Interfaces.Services;
 using Streaming.Application.Interfaces.Strategies;
-using Streaming.Application.Models.Repository.Video;
-using Streaming.Domain.Enums;
 using Streaming.Domain.Models;
 using System;
 using System.Collections.Generic;
@@ -49,55 +47,43 @@ namespace Streaming.Application.Commands.Video
                 await ProcessVideo();
             timer.Stop();
 
-            await videoRepo.UpdateAsync(new UpdateVideoAfterProcessing
-            {
-                FinishedProcessingDate = DateTime.UtcNow,
-                ProcessingInfo = $"Sucessfully processed after {timer.Elapsed.TotalMilliseconds}ms",
-                VideoState = videoProcessState.VideoState,
-                VideoId = command.VideoId,
-                VideoLength = videoProcessState.VideoLength,
-                VideoManifest = videoProcessState.Manifest,
-                MainThumbnailUrl = thumbnailService.GetThumbnailUrl(command.VideoId)
-            });
+            await videoRepo.UpdateAsync(processVideoCommand.Video);
         }
 
         private async Task ProcessVideo()
         {
-            videoProcessState.Mp4VideoPath = videoFilesPath.Mp4ConvertedFilePath(command.VideoId);
+            videoProcessState.Mp4VideoPath = videoFilesPath.Mp4ConvertedFilePath(command.Video.VideoId);
             await processVideoService.ConvertVideoToMp4Async(command.InputFilePath, videoProcessState.Mp4VideoPath);
             videoProcessState.VideoLength = await videoFileInfo.GetVideoLengthAsync(videoProcessState.Mp4VideoPath);
 
-            videoProcessState.TSFilesOutputDirectory = Directory.CreateDirectory(videoFilesPath.TransportStreamDirectoryPath(command.VideoId));
+            videoProcessState.TSFilesOutputDirectory = Directory.CreateDirectory(videoFilesPath.TransportStreamDirectoryPath(command.Video.VideoId));
             videoProcessState.TSFiles = await processVideoService.SplitMp4FileIntoTsFilesAsync(videoProcessState.Mp4VideoPath,
-                partNumber => Path.Combine(videoProcessState.TSFilesOutputDirectory.FullName, $"{command.VideoId}.{partNumber}.ts"));
+                partNumber => Path.Combine(videoProcessState.TSFilesOutputDirectory.FullName, $"{command.Video.VideoId}.{partNumber}.ts"));
             await UploadTSFiles(videoProcessState.TSFiles);
-            videoProcessState.Manifest = await CreateManifest(videoProcessState.TSFiles);
-
+            command.Video.SetVideoManifest(await CreateManifest(videoProcessState.TSFiles));
+            
             await GenerateThumbnails();
             await UploadVideoThumbnails();
             Cleanup();
-            
-            videoProcessState.VideoState |= VideoState.Processed;
         }
 
         private void Cleanup()
         {
             File.Delete(command.InputFilePath);
-            File.Delete(videoFilesPath.Mp4ConvertedFilePath(command.VideoId));
-            File.Delete(videoFilesPath.ThumbnailFilePath(command.VideoId));
+            File.Delete(videoFilesPath.Mp4ConvertedFilePath(command.Video.VideoId));
+            File.Delete(videoFilesPath.ThumbnailFilePath(command.Video.VideoId));
             videoProcessState.TSFilesOutputDirectory.Delete(recursive: true);
         }
 
         private async Task<VideoManifest> CreateManifest(IEnumerable<string> tsFiles)
         {
-            var manifest = VideoManifest.Create(command.VideoId);
+            var manifest = VideoManifest.Create(command.Video.VideoId);
 
             foreach(var file in tsFiles)
             {
                 var length = await videoFileInfo.GetVideoLengthAsync(file);
                 manifest.AddPart(length);
             }
-            videoProcessState.VideoState |= VideoState.ManifestGenerated;
             return manifest;
         }
 
@@ -108,43 +94,38 @@ namespace Streaming.Application.Commands.Video
             {
                 using (var fileStream = File.OpenRead(filePath))
                 {
-                    await videoBlobService.UploadAsync(command.VideoId, partNum++, fileStream);
+                    await videoBlobService.UploadAsync(command.Video.VideoId, partNum++, fileStream);
                 }
             }
         }
 
         private async Task GenerateThumbnails()
         {
+            var mainThumbnailPath = videoFilesPath.ThumbnailFilePath(command.Video.VideoId);
             await processVideoService.TakeVideoScreenshotAsync(
-                videoProcessState.Mp4VideoPath, videoFilesPath.ThumbnailFilePath(command.VideoId),
+                videoProcessState.Mp4VideoPath, videoFilesPath.ThumbnailFilePath(command.Video.VideoId),
                 TimeSpan.FromTicks(videoProcessState.VideoLength.Ticks / 2));
-
+            
             // await processVideoService.GenerateVideoOverviewScreenshots(videoPath,
             //    thumbnailsDirectory.FullName, new TimeSpan(videoLength.Ticks / 30));
-            videoProcessState.VideoState |= VideoState.MainThumbnailGenerated;
         }
 
         private async Task UploadVideoThumbnails()
         {
-            using (var fileStream = File.OpenRead(videoFilesPath.ThumbnailFilePath(command.VideoId)))
+            var mainThumbnailFilePath = videoFilesPath.ThumbnailFilePath(command.Video.VideoId);
+            using (var fileStream = File.OpenRead(mainThumbnailFilePath))
             {
-                await thumbnailService.UploadAsync(command.VideoId, fileStream);
+                await thumbnailService.UploadAsync(command.Video.VideoId, fileStream);
             }
+            command.Video.SetThumbnail(thumbnailService.GetThumbnailUrl(command.Video.VideoId));
         }
 
         private class VideoProcessState
         {
-            public VideoState VideoState;
-            public VideoManifest Manifest;
             public TimeSpan VideoLength;
             public string Mp4VideoPath;
             public List<string> TSFiles;
             public DirectoryInfo TSFilesOutputDirectory;
-
-            public VideoProcessState()
-            {
-                VideoState = 0;
-            }
         }
     }
 }

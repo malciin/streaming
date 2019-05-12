@@ -12,8 +12,8 @@ using Streaming.Application.Interfaces.Services;
 using Streaming.Application.Interfaces.Strategies;
 using Streaming.Application.Models.DTO.Video;
 using Streaming.Application.Models.Enum;
-using Streaming.Application.Models.Repository.Video;
 using Streaming.Common.Extensions;
+using Streaming.Domain.Models;
 using Streaming.Infrastructure.IoC;
 using Streaming.Tests.Mocks;
 
@@ -163,7 +163,7 @@ namespace Streaming.Tests.Commands.Video
             await PushProcessCommand(processVideoId);
             
             videoRepositoryMock.Verify(x =>
-                x.UpdateAsync(It.IsAny<UpdateVideoAfterProcessing>()));
+                x.UpdateAsync(It.IsAny<Streaming.Domain.Models.Video>()));
         }
 
         #region HelperMethods
@@ -172,7 +172,7 @@ namespace Streaming.Tests.Commands.Video
         {
             await CommandDispatcher.HandleAsync(new ProcessVideoCommand
             {
-                VideoId = videoId,
+                Video = new Streaming.Domain.Models.Video(videoId, "test", "test", new UserDetails()),
                 InputFilePath = SampleMp4Video
             });
         }

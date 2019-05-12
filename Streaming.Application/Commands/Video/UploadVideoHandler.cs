@@ -28,20 +28,12 @@ namespace Streaming.Application.Commands.Video
 	        Guid videoId = tokenService.GetDataFromUploadVideoToken(command.UploadToken).VideoId;
             var inputFilePath = videoProcessingFilesPathStrategy.RawUploadedVideoFilePath(videoId);
 
-			var video = new Domain.Models.Video
-            {
-				CreatedDate = DateTime.Now,
-				Title = command.Title,
-				Description = command.Description,
-				VideoId = videoId,
-                Owner = command.User.Details
-			};
-
+			var video = new Domain.Models.Video(videoId, command.Title, command.Description, command.User);
 			await videoRepo.AddAsync(video);
 
             commandBus.Push(new ProcessVideoCommand
             {
-				VideoId = video.VideoId,
+				Video = video,
                 InputFilePath = inputFilePath,
             });
 		}

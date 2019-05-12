@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace Streaming.Domain.Models
@@ -17,6 +18,7 @@ namespace Streaming.Domain.Models
 
         private Guid mediaId;
         private readonly List<TimeSpan> partsLength;
+        public TimeSpan Length => TimeSpan.FromTicks(partsLength.Sum(x => x.Ticks));
 
         private VideoManifest()
         {

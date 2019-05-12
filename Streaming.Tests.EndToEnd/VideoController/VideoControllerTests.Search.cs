@@ -4,7 +4,6 @@ using System.Linq;
 using System.Net.Http;
 using NUnit.Framework;
 using Streaming.Application.Models.DTO.Video;
-using Streaming.Domain.Enums;
 using Streaming.Domain.Models;
 using Streaming.Common.Extensions;
 
@@ -19,25 +18,17 @@ namespace Streaming.Tests.EndToEnd.VideoController
             for (int i = 1; i < 10; i++)
             {
                 var videoGuid = new Guid($"00000000-0000-0000-0000-00000000000{i}");
-                videos.Add(new Video
+                var video = new Video(videoGuid, $"Test title, Case {i}", $"Test description, Case {i}", new UserDetails
                 {
-                    VideoId = videoGuid,
-                    CreatedDate = DateTime.UtcNow,
-                    Title = $"Test title, Case {i}",
-                    Description = $"Test description, Case {i}",
-                    State = VideoState.Processed | VideoState.MainThumbnailGenerated | VideoState.ManifestGenerated,
-                    Length = TimeSpan.FromSeconds(i),
-                    FinishedProcessingDate = DateTime.UtcNow.AddSeconds(1),
-                    Owner = new UserDetails
-                    {
-                        UserId = $"{i}",
-                        Email = $"user{i}@gmail.com",
-                        Nickname = $"user{i}"
-                    },
-                    VideoManifest = VideoManifest
-                            .Create(videoGuid)
-                            .AddPart(TimeSpan.FromSeconds(i + 1))
+                    UserId = $"{i}",
+                    Email = $"user{i}@gmail.com",
+                    Nickname = $"user{i}"
                 });
+                video.SetVideoManifest(VideoManifest
+                    .Create(videoGuid)
+                    .AddPart(TimeSpan.FromSeconds(i + 1)));
+                video.SetThumbnail("thumbnail.jpg");
+                videos.Add(video);
             }
 
             WebHost.SeedDatabase(videos)

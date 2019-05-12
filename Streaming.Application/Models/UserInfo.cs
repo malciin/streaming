@@ -1,10 +1,13 @@
+using System.Linq;
 using Streaming.Domain.Models;
 
 namespace Streaming.Application.Models
 {
-    public class UserInfo
+    public class UserInfo : UserDetails
     {
-        public UserDetails Details { get; set; }
         public string[] Claims { get; set; }
+
+        public bool HaveClaim(string claim)
+            => Claims.Contains(claim);
     }
 }

@@ -1,8 +1,8 @@
 ﻿using System.Linq;
+using System.Security.Authentication;
 using System.Threading.Tasks;
 using Streaming.Application.Interfaces.Repositories;
 using Streaming.Application.Models;
-using Streaming.Application.Models.Repository.Video;
 
 namespace Streaming.Application.Commands.Video
 {
@@ -16,19 +16,16 @@ namespace Streaming.Application.Commands.Video
 
         public async Task HandleAsync(UpdateVideoCommand command)
         {
-            var updateVideoInfo = new UpdateVideoInfo
+            var video = await videoRepo.GetSingleAsync(x => x.VideoId == command.VideoId);
+            if (video.Owner.UserId == command.User.UserId || command.User.HaveClaim(Claims.CanEditAnyVideo))
             {
-                UpdateByVideoId = command.VideoId,
-                NewVideoTitle = command.NewTitle,
-                NewVideoDescription = command.NewDescription
-            };
-
-            if (!command.User.Claims.Contains(Claims.CanEditAnyVideo))
-            {
-                updateVideoInfo.UpdateByUserIdentifier = command.User.Details.UserId;
+                video.SetTitle(command.NewTitle);
+                video.SetDescription(command.NewDescription);
+                await videoRepo.UpdateAsync(video);
+                return;
             }
 
-            await videoRepo.UpdateAsync(updateVideoInfo);
+            throw new InvalidCredentialException("User cannot edit that video");
         }
     }
 }

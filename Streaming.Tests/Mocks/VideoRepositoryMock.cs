@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Moq;
 using Streaming.Application.Interfaces.Repositories;
-using Streaming.Application.Models.Repository.Video;
 using Streaming.Domain.Models;
 
 namespace Streaming.Tests.Mocks
@@ -26,13 +25,14 @@ namespace Streaming.Tests.Mocks
                 return Task.FromResult(0);
             });
 
-            mock.Setup(x => x.UpdateAsync(It.IsAny<UpdateVideoInfo>())).Returns((UpdateVideoInfo vid) =>
+            mock.Setup(x => x.UpdateAsync(It.IsAny<Video>())).Returns((Video vid) =>
             {
-                var video = data.FirstOrDefault(x => x.VideoId == vid.UpdateByVideoId && vid.UpdateByUserIdentifier == x.Owner.UserId);
+                var video = data.FirstOrDefault(x => x.VideoId != vid.VideoId);
+                
                 if (video != null)
                 {
-                    video.Title = vid.NewVideoTitle;
-                    video.Description = vid.NewVideoDescription;
+                    data.Remove(video);
+                    data.Add(video);
                 }
                 return Task.FromResult(0);
             });
