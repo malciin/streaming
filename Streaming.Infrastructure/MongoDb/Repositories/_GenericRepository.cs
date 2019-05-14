@@ -23,7 +23,6 @@ namespace Streaming.Infrastructure.MongoDb.Repositories
         public async Task<IPackage<T>> GetAsync(Expression<Func<T, bool>> filter, int skip = 0, int limit = 0)
         {
             var fluentFindDefinition = Collection.Find(filter);
-            var totalResult = await fluentFindDefinition.CountDocumentsAsync();
 
             if (skip != 0)
             {
@@ -34,7 +33,12 @@ namespace Streaming.Infrastructure.MongoDb.Repositories
                 fluentFindDefinition = fluentFindDefinition.Limit(limit);
             }
 
-            return Package<T>.CreatePackage(await fluentFindDefinition.ToListAsync(), (int)totalResult);
+            return Package<T>.CreatePackage(await fluentFindDefinition.ToListAsync(), await CountAsync(filter));
+        }
+
+        public async Task<int> CountAsync(Expression<Func<T, bool>> filter)
+        {
+            return (int)(await Collection.CountDocumentsAsync(filter));
         }
 
         public virtual async Task AddAsync(T entity)
