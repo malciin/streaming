@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Moq;
 using Streaming.Application.Interfaces.Repositories;
+using Streaming.Application.Models;
 using Streaming.Domain.Models;
 
 namespace Streaming.Tests.Mocks
@@ -29,8 +30,12 @@ namespace Streaming.Tests.Mocks
                     data.Where(filter.Compile()).FirstOrDefault());
             
             mock.Setup(x => x.GetAsync(It.IsAny<Expression<Func<LiveStream, bool>>>(), It.IsAny<int>(), It.IsAny<int>()))
-                .ReturnsAsync((Expression<Func<LiveStream, bool>> expression, int skip, int limit) => 
-                    data.Where(expression.Compile()).Skip(skip).Take(limit));
+                .ReturnsAsync((Expression<Func<LiveStream, bool>> expression, int skip, int limit) =>
+                    {
+                        var filteredData = data.Where(expression.Compile()).ToList();
+                        var totalResult = filteredData.Count();
+                        return Package<LiveStream>.CreatePackage(filteredData.Skip(skip).Take(limit), totalResult);
+                    });
 
             return mock;
         }

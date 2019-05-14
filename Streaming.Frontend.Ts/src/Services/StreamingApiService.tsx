@@ -8,6 +8,7 @@ import VideoMetadata from '../Models/VideoMetadata';
 import LiveStreamMetadata from '../Models/LiveStreamMetadata';
 import Mapper from './Mapper';
 import VideoFilter from '../Models/Services/Streaming.Api/VideoFilter';
+import Packaged from '../Models/Packaged';
 
 export default class StreamingApiService extends ApiService {
     constructor(authContext: Auth0Service) {
@@ -26,10 +27,17 @@ export default class StreamingApiService extends ApiService {
         return Mapper.mapVideoMetadata(json);
     }
     
-    async getVideos(filterObject: VideoFilter): Promise<VideoMetadata[]> {
+    async getVideos(filterObject: VideoFilter): Promise<Packaged<VideoMetadata>> {
         let json = await this.makeApiRequest(Config.apiPath + '/Video/Search',
             HttpMethod.POST, filterObject);
-        return json.map(x => Mapper.mapVideoMetadata(x));
+        let result: Packaged<VideoMetadata> = {
+            Items: json.items.map(x => Mapper.mapVideoMetadata(x)),
+            Details: {
+                Count: json.details.count,
+                TotalCount: json.details.totalCount
+            }
+        };
+        return result;
     }
     
     async getLiveStream(id: string): Promise<void> {

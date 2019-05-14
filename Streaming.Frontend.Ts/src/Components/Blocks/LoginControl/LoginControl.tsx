@@ -12,8 +12,6 @@ interface LoginControlState {
 class LoginControl extends React.Component<LoginControlState> {
     constructor(props)
     {
-        console.log("PROPS");
-        console.log(props);
         super(props);
         this.loginCallback = this.loginCallback.bind(this);
     }
@@ -27,10 +25,6 @@ class LoginControl extends React.Component<LoginControlState> {
         if(this.props.pendingLogin) {
             return <div className="nav-item"></div>
         }
-        console.log("Props:");
-        console.log(this.props);
-        console.log("USER:"); 
-        console.log(this.props.user);
         if (this.props.user == null)
             return <div className="nav-link hoverable" onClick={this.loginCallback}>Login</div>;
         else

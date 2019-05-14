@@ -31,8 +31,6 @@ export default class UserListItem extends React.Component<UserListItemProps, Use
             apiState: ApiState.None,
             userClaims: this.props.userModel.appMetadata.claims
         };
-
-        console.log(this.props);
     }
 
     addClaimState(data) {

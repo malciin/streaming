@@ -61,14 +61,14 @@ namespace Streaming.Tests.EndToEnd.VideoController
                     Keywords = new string[] {},
                     Offset = 0,
                     HowMuch = 1
-                })).Content.ReadFromJsonAsObject<List<VideoMetadataDTO>>();
+                })).Content.ReadFromJsonAsObject<Package<VideoMetadataDTO>>();
 
-                if (!returnedVideos.Any())
+                if (!returnedVideos.Items.Any())
                 {
                     Thread.Sleep(1_000);
                     continue;
                 }
-                var video = returnedVideos.First();
+                var video = returnedVideos.Items.First();
                 Assert.AreEqual("Test titleeeeeee", video.Title, "Uploaded video title is different!");
                 Assert.AreEqual("Test descriptionnnnnn", video.Description, "Uploaded video description is different!");
                 var manifestRequest = await Client.GetAsync($"{WebHost.ApiUri}Video/Manifest/{video.VideoId}");

@@ -16,8 +16,6 @@ export default class AdminPage extends React.Component<{}, { users: Auth0User[] 
     }
     async componentDidMount() {
         var data = await this.context.auth0Api.getUsers();
-        console.log("RECEIVED");
-        console.log(data);
         this.setState({
             users: data
         })

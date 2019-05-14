@@ -8,6 +8,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Streaming.Application.Interfaces.Models;
+using Streaming.Application.Models;
 
 namespace Streaming.Application.Query
 {
@@ -36,12 +38,12 @@ namespace Streaming.Application.Query
 		public async Task<Stream> GetVideoPartAsync(Guid videoId, int part)
 			=> await videoPartsFileService.GetVideoAsync(videoId, part);
 
-		public async Task<IEnumerable<VideoMetadataDTO>> SearchAsync(VideoSearchDTO search)
+		public async Task<IPackage<VideoMetadataDTO>> SearchAsync(VideoSearchDTO search)
 		{
-			return (await filterableVideos.GetAsync(x => 
+			return (await filterableVideos.GetAsync(x =>
 					x.Title.Contains(String.Join(" ", search.Keywords)) &&
-                    x.State.HasFlag(VideoState.Processed), skip: search.Offset, limit: search.HowMuch))
-				.Select(x => mapper.MapVideoMetadataDTO(x));
+					x.State.HasFlag(VideoState.Processed), skip: search.Offset, limit: search.HowMuch))
+				.Map(mapper.MapVideoMetadataDTO);
 		}
     }
 }

@@ -32,7 +32,7 @@ namespace Streaming.Application.Models
                 var liveStreams = scope.Resolve<IPastLiveStreamRepository>();
 
                 var lastLiveStream = (await liveStreams.GetAsync(x => x.Owner.UserId == newLiveStream.User.UserId))
-                    .OrderByDescending(x => x.Ended).FirstOrDefault();
+                    .Items.OrderByDescending(x => x.Ended).FirstOrDefault();
 
                 streams.TryAdd(newLiveStream.LiveStreamId, new LiveStream
                 {
@@ -104,7 +104,7 @@ namespace Streaming.Application.Models
             {
                 var pastLiveStreams = scope.Resolve<IPastLiveStreamRepository>();
                 return (await pastLiveStreams.GetAsync(filter, skip, limit))
-                    .Select(x => mapper.MapPastLiveStreamMetadataDTO(x));
+                    .Items.Select(x => mapper.MapPastLiveStreamMetadataDTO(x));
             }
         }
     }

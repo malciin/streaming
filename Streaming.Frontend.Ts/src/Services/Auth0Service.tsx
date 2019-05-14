@@ -20,7 +20,6 @@ export default class Auth0Service {
     constructor(Store)
     {
         this.Store = Store;
-        console.log(Config);
         this.auth0 = new auth0.WebAuth(Config.auth0);
 
         this.setSession = this.setSession.bind(this);
@@ -84,7 +83,6 @@ export default class Auth0Service {
         {
             this.pendingSilentLogin = true;
             Store.dispatch({ type: Type.StartPendingLogin });
-            console.log(Store.getState());
             var authResult = await AsyncFunctions.auth0.checkSession(this.auth0);
             
             if (authResult && authResult.accessToken && authResult.idToken)
@@ -98,7 +96,6 @@ export default class Auth0Service {
             }
         }
         Store.dispatch({ type: Type.EndPendingLogin });
-        console.log(Store.getState());
     }
 
     setSession(authResult) {
@@ -110,7 +107,6 @@ export default class Auth0Service {
         this.managementApiIdToken = authResult.managementApiIdToken;
         this.idToken = authResult.idToken;
         this.expiresAt = expiresAt;
-        console.log(this);
         var user: LoggedUser = {
             nickname: this.idTokenPayload.nickname,
             claims: this.idTokenPayload[Config.auth0.claimsNamespace]

@@ -30,7 +30,6 @@ export default abstract class ApiService {
         let bearerToken: string = null;
         if (authLevel != AuthLevel.None)
             await this.authContext.waitForAuth();
-        console.log(this.authContext);
         switch (authLevel) {
             case AuthLevel.User:
                 bearerToken = this.authContext.idToken;
@@ -38,7 +37,6 @@ export default abstract class ApiService {
             case AuthLevel.Auth0ManagementApi:
                 bearerToken = this.authContext.managementApiIdToken;
         }
-        console.log(bearerToken);
         var headers = {
             'Accept': 'application/json',
             'Content-Type': 'application/json'

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using NUnit.Framework;
+using Streaming.Application.Interfaces.Models;
+using Streaming.Application.Models;
 using Streaming.Application.Models.DTO.Video;
 using Streaming.Domain.Models;
 using Streaming.Common.Extensions;
@@ -12,7 +14,7 @@ namespace Streaming.Tests.EndToEnd.VideoController
     public partial class VideoControllerTests : EndToEndTestClass
     {
         [Test]
-        public void Search_PaginationWorks()
+        public void Search_Package_Works()
         {
             var videos = new List<Video>();
             for (int i = 1; i < 10; i++)
@@ -41,9 +43,11 @@ namespace Streaming.Tests.EndToEnd.VideoController
                 Keywords = new string[] {}
             }).GetAwaiter().GetResult();
             Assert.True(response.IsSuccessStatusCode, $"Not success status code! Status code was: {response.StatusCode}");
-
-            var receivedVideos = response.Content.ReadFromJsonAsObject<IEnumerable<VideoMetadataDTO>>();
-            Assert.AreEqual(videos.Count, receivedVideos.Count());
+            
+            var totalVideos = videos.Count;
+            IPackage<VideoMetadataDTO> receivedVideos = response.Content.ReadFromJsonAsObject<Package<VideoMetadataDTO>>();
+            Assert.AreEqual(videos.Count, receivedVideos.Details.Count);
+            Assert.AreEqual(totalVideos, receivedVideos.Details.TotalCount, $"Package Details.TotalCount should return total matching items");
 
             response = Client.PostAsJsonAsync($"{WebHost.ApiUri}Video/Search", new VideoSearchDTO
             {
@@ -52,11 +56,12 @@ namespace Streaming.Tests.EndToEnd.VideoController
                 Keywords = new string[] { }
             }).GetAwaiter().GetResult();
             Assert.True(response.IsSuccessStatusCode, $"Not success status code! Status code was: {response.StatusCode}");
-            receivedVideos = response.Content.ReadFromJsonAsObject<IEnumerable<VideoMetadataDTO>>();
-            Assert.AreEqual("Test title, Case 4", receivedVideos.First().Title);
-            Assert.AreEqual(5, receivedVideos.Count());
+            receivedVideos = response.Content.ReadFromJsonAsObject<Package<VideoMetadataDTO>>();
+            Assert.AreEqual(totalVideos, receivedVideos.Details.TotalCount, $"Package Details.TotalCount should return total matching items");
+            Assert.AreEqual("Test title, Case 4", receivedVideos.Items.First().Title);
+            Assert.AreEqual(5, receivedVideos.Details.Count);
 
-            Assert.IsTrue(receivedVideos.IsSortedDescending(x => x.CreatedDate), $"Expected that videos are sorted descending by CreatedDate");
+            Assert.IsTrue(receivedVideos.Items.IsSortedDescending(x => x.CreatedDate), $"Expected that videos are sorted descending by CreatedDate");
         }
     }
 }

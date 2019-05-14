@@ -15,7 +15,6 @@ export default class Auth0ApiService extends ApiService {
 
     async getUsers(): Promise<Auth0User[]> {
         let json = await this.makeApiRequest(`${this.apiUrl}users`, HttpMethod.GET, null, AuthLevel.Auth0ManagementApi);
-        console.log(json);
         return json.map(x => Mapper.mapAuth0User(x));
     }
 

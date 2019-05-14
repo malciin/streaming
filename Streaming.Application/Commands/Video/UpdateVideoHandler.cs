@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using System.Security.Authentication;
+﻿using System.Security.Authentication;
 using System.Threading.Tasks;
 using Streaming.Application.Interfaces.Repositories;
 using Streaming.Application.Models;

@@ -20,7 +20,7 @@ export default class VideoListPage extends React.Component<{}, { videos: VideoMe
             offset: 0
         });
         this.setState ({
-            videos: videos
+            videos: videos.Items
         });
     }
 

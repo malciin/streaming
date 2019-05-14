@@ -8,6 +8,7 @@ using Streaming.Api.Requests.Video;
 using Streaming.Application.Commands;
 using Streaming.Application.Commands.Video;
 using Streaming.Application.DTO;
+using Streaming.Application.Interfaces.Models;
 using Streaming.Application.Interfaces.Services;
 using Streaming.Application.Models;
 using Streaming.Application.Models.DTO.Video;
@@ -74,7 +75,7 @@ namespace Streaming.Api.Controllers
         }
 
         [HttpPost("Search")]
-        public async Task<IEnumerable<VideoMetadataDTO>> SearchAsync ([FromBody] VideoSearchDTO search)
+        public async Task<IPackage<VideoMetadataDTO>> SearchAsync ([FromBody] VideoSearchDTO search)
         {
 			return await queries.SearchAsync(search);
         }

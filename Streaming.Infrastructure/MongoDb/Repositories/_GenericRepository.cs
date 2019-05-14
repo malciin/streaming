@@ -1,9 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using MongoDB.Driver;
+using Streaming.Application.Interfaces.Models;
 using Streaming.Application.Interfaces.Repositories;
+using Streaming.Application.Models;
 
 namespace Streaming.Infrastructure.MongoDb.Repositories
 {
@@ -19,9 +20,10 @@ namespace Streaming.Infrastructure.MongoDb.Repositories
         public async Task<T> GetSingleAsync(Expression<Func<T, bool>> filter)
             => await Collection.Find(filter).FirstAsync();
 
-        public async Task<IEnumerable<T>> GetAsync(Expression<Func<T, bool>> filter, int skip = 0, int limit = 0)
+        public async Task<IPackage<T>> GetAsync(Expression<Func<T, bool>> filter, int skip = 0, int limit = 0)
         {
             var fluentFindDefinition = Collection.Find(filter);
+            var totalResult = await fluentFindDefinition.CountDocumentsAsync();
 
             if (skip != 0)
             {
@@ -32,7 +34,7 @@ namespace Streaming.Infrastructure.MongoDb.Repositories
                 fluentFindDefinition = fluentFindDefinition.Limit(limit);
             }
 
-            return await fluentFindDefinition.ToListAsync();
+            return Package<T>.CreatePackage(await fluentFindDefinition.ToListAsync(), (int)totalResult);
         }
 
         public virtual async Task AddAsync(T entity)

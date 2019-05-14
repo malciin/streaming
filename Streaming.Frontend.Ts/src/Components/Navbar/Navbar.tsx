@@ -19,10 +19,6 @@ class Navbar extends React.Component<{userClaims: string[]}> {
     }
 
     render() {
-        console.log(this.props.userClaims);
-        console.log(Claims);
-        console.log(Claims.canUploadVideo);
-        console.log(this.props.userClaims.includes(Claims.canUploadVideo));
         return (
             <nav className="navbar navbar-expand-lg navbar-light bg-light">
                 <div className="navbar-brand">

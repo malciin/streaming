@@ -7,7 +7,6 @@ import Helpers from '../../../Shared/Helpers';
 export default class LiveStreamListItem extends React.Component<{ liveStreamModel: LiveStreamMetadata }> {
     constructor(props) {
         super(props);
-        console.log(props.model);
     }
     
     render() {
