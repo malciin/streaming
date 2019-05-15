@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using FluentValidation.AspNetCore;
@@ -7,6 +8,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Streaming.Api.Middlewares;
 using Streaming.Application.SignalR.Hubs;
 using Streaming.Auth0;
@@ -63,6 +65,11 @@ namespace Streaming.Api
         public void Configure(IApplicationBuilder app)
         {
             startupEvents?.AppConfigurationBeginingCallback?.Invoke(app);
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                RequestPath = "/localStorage",
+                FileProvider = new PhysicalFileProvider(Path.Combine($"{Directory.GetCurrentDirectory()}", "localStorage"))
+            });
             app.UseMiddleware<ExceptionHandlingMiddleware>();
             app.UseMiddleware<ValidationExceptionHandlerMiddleware>();
             app.UseCors("AllowAny");

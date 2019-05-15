@@ -16,3 +16,6 @@
 .icon-doc-text:before { content: '\e80e'; } /* '' */
 .icon-thumbs-up:before { content: '\e80f'; } /* '' */
 .icon-thumbs-down:before { content: '\e810'; } /* '' */
+.icon-menu-outline:before { content: '\e811'; } /* '' */
+.icon-login:before { content: '\e812'; } /* '' */
+.icon-logout:before { content: '\e813'; } /* '' */

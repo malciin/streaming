@@ -5,40 +5,44 @@ import LoginControl from '../Blocks/LoginControl/LoginControl';
 import { connect } from 'react-redux';
 import { ReduxState } from '../../Redux';
 import Claims from '../../Models/Claims';
+import LoggedUser from '../../Models/LoggedUser';
 
 
 class Navbar extends React.Component<{userClaims: string[]}> {
+    private menu: HTMLDivElement;
 
     constructor(props) {
         super(props);
         this.getStreamKey = this.getStreamKey.bind(this);
+        this.toggleMenu = this.toggleMenu.bind(this);
     }
 
     async getStreamKey() {
         var key = await this.context.streamingApi.getStreamToken();
     }
 
+    toggleMenu() {
+        this.menu.classList.toggle('hidden');
+    }
+
     render() {
         return (
-            <nav className="navbar navbar-expand-lg navbar-light bg-light">
+            <nav className="navbar">
                 <div className="navbar-brand">
                     <img src= {"/pageLogo.png"} alt="logo" />  
                 </div>
-                <div className="navbar">
-                    <ul className="navbar-nav">
-                        <li className="nav-item"><NavLink className="nav-link" to="/">Homepage</NavLink></li>
+                <div className="navbar-links" ref={el => {this.menu = el}}>
+                    <ul>
+                        <li><NavLink to="/">Homepage</NavLink></li>
                         { this.props.userClaims.includes(Claims.canUploadVideo) && 
-                        <li className="nav-item"><NavLink className="nav-link" to="/Upload">Upload video</NavLink></li> }
+                        <li><NavLink to="/Upload">Upload video</NavLink></li> }
                         { this.props.userClaims.includes(Claims.canAccessAuth0Api) && 
-                        <li className="nav-item"><NavLink className="nav-link" to="/Admin">Admin panel</NavLink></li> }
-                        { this.props.userClaims.includes(Claims.canAccessAuth0Api) &&
-                        <li className="nav-item" onClick={this.getStreamKey}>GetKey</li> }
+                        <li><NavLink to="/Admin">Admin panel</NavLink></li> }
                     </ul>
                 </div>
-                <div className="collapse navbar-collapse justify-content-end" id="navbarCollapse">
-                    <ul className="navbar-nav">
-                        <li className="nav-item"><LoginControl /></li>
-                    </ul>
+                <LoginControl className="navbar-user cursor-pointer" loggedUserMessage={(user: LoggedUser) => <img src={user.avatarUrl} />} />
+                <div className="navbar-toggle" onClick={this.toggleMenu}>
+                    <i className="icon-menu-outline" />
                 </div>
             </nav>
         );

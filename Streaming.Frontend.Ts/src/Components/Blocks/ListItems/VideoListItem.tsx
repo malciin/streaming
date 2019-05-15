@@ -4,6 +4,9 @@ import Claims from '../../../Models/Claims';
 import './VideoListItem.scss';
 import { AppContext } from '../../../AppContext';
 import VideoMetadata from '../../../Models/VideoMetadata';
+import { Config } from '../../../Shared/Config';
+import * as moment from 'moment';
+import Helpers from '../../../Shared/Helpers';
 
 interface VideoListItemProps {
     videoModel: VideoMetadata,
@@ -19,17 +22,25 @@ export default class VideoListItem extends React.Component<VideoListItemProps, {
     }
 
     render() {
+        let len = moment.duration(this.props.videoModel.length);
         return <div className="video-list-item">
             <Link to={"/Vid/" + this.props.videoModel.videoId }>
             <div className="thumbnail">
                 <div className="thumbnail-box">
-                    <img className="thumbnail-image icon-video" alt="Video thumbnail" src={this.props.videoModel.thumbnailUrl} />
+                    { /* TODO: Remove temporary absolute url for video thumbnail */ }
+                    <img className="thumbnail-image icon-video" alt="Video thumbnail" src={Config.apiPath + "\\" + this.props.videoModel.thumbnailUrl} />
+                    <div className="video-length">{`${len.minutes()}m ${len.seconds()}s`}</div>
                 </div>
             </div>
             </Link>
             <div className="video-metadata">
                 <div className="video-title">
                     {this.props.videoModel.title} 
+                </div>
+                <div className="description text-secondary-color">
+                    Uploaded by <Link to={"/User/" + this.props.videoModel.ownerNickname}>
+                    {this.props.videoModel.ownerNickname}</Link>
+                    {" " + Helpers.getHumanizedDateAgoDifference(this.props.videoModel.createdDate) + " ago"}
                 </div>
                 <div className="description text-secondary-color">
                     {this.props.videoModel.description}

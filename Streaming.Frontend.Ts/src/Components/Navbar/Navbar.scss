@@ -1,7 +1,95 @@
-.navbar { 
-    padding: 0px;
+@import '../../Shared/GlobalStyle.scss';
+
+nav {
+    margin: 0;
+    padding: 0;
+    background-color: white;
+    position: relative;
+
+    .navbar-brand {
+        display: inline-block;
+        padding: 0;
+        margin: 0;
+        img {
+            vertical-align: middle;
+            margin: 0;
+            padding: 0;
+            height: 40px;
+        }
+    }
+
+    .navbar-user {
+        display: inline-block;
+        vertical-align: top;
+        position: absolute;
+        font-size: 28px;
+        right: 45px;
+        top: 5px;
+        img {
+            display:block;
+            margin: 0;
+            padding: 0;
+            height: 32px;
+            border-radius: 20px;
+        }
+
+        @media only screen and (min-width: $mobile-max-width) {
+            vertical-align: bottom;
+            right: 5px;
+        }
+    }
+
+    .navbar-links {
+        @media only screen and (min-width: $mobile-max-width) {
+            display: inline-block;
+            vertical-align: bottom;
+        }
+        ul {
+            display: block;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            overflow: hidden;
+            background-color: $background-color;
+            @media only screen and (min-width: $mobile-max-width) {
+                background-color: initial;
+            }
+            li {
+                display: block;
+                text-align: center;
+                margin: 0;
+                padding: 5px;
+                @media only screen and (min-width: $mobile-max-width) {
+                    display: inline-block;
+                    background-color: initial;
+                    &:hover {
+                        background-color: lighten($accent-color, 40%);
+                    }
+                }
+            }
+            a {
+                display: block;
+            }
+            li, a {
+                text-decoration: none;
+                color: white;
+                @media only screen and (min-width: $mobile-max-width) {
+                    color: black;
+                }
+            }
+        }
+    }
+
+    .navbar-toggle {
+        position: absolute;
+        float: right;
+        right: 0px;
+        top: 5px;
+        font-size: 28px;
+        cursor: pointer;
+        @media only screen and (min-width: $mobile-max-width) {
+            display: none;
+        }
+    }
 }
 
-.navbar-brand img  {
-    height: 40px;
-}

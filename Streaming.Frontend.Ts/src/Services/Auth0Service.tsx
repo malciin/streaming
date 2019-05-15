@@ -107,8 +107,10 @@ export default class Auth0Service {
         this.managementApiIdToken = authResult.managementApiIdToken;
         this.idToken = authResult.idToken;
         this.expiresAt = expiresAt;
+        console.log(this.idTokenPayload);
         var user: LoggedUser = {
             nickname: this.idTokenPayload.nickname,
+            avatarUrl: this.idTokenPayload.picture,
             claims: this.idTokenPayload[Config.auth0.claimsNamespace]
         };
         this.pendingSilentLogin = false;

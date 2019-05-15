@@ -107,6 +107,24 @@
       "css": "thumbs-down",
       "code": 59408,
       "src": "entypo"
+    },
+    {
+      "uid": "a151e07df1262b33b210de5d956e4cc8",
+      "css": "menu-outline",
+      "code": 59409,
+      "src": "typicons"
+    },
+    {
+      "uid": "3a00327e61b997b58518bd43ed83c3df",
+      "css": "login",
+      "code": 59410,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "0d20938846444af8deb1920dc85a29fb",
+      "css": "logout",
+      "code": 59411,
+      "src": "fontawesome"
     }
   ]
 }
