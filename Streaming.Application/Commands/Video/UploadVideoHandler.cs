@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Streaming.Application.Interfaces.Repositories;
 using Streaming.Application.Interfaces.Services;
 using Streaming.Application.Interfaces.Strategies;
+using Streaming.Domain.Models;
 
 namespace Streaming.Application.Commands.Video
 {
@@ -28,7 +29,11 @@ namespace Streaming.Application.Commands.Video
 	        Guid videoId = tokenService.GetDataFromUploadVideoToken(command.UploadToken).VideoId;
             var inputFilePath = videoProcessingFilesPathStrategy.RawUploadedVideoFilePath(videoId);
 
-			var video = new Domain.Models.Video(videoId, command.Title, command.Description, command.User);
+			var video = new Domain.Models.Video(videoId, command.Title, command.Description, new UserDetails{
+				Email = command.User.Email,
+				Nickname = command.User.Nickname,
+				UserId = command.User.UserId
+			});
 			await videoRepo.AddAsync(video);
 
             commandBus.Push(new ProcessVideoCommand
