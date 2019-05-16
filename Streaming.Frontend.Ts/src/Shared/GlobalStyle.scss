@@ -14,7 +14,11 @@ html, body {
 }
 
 .text-secondary-color {
-    color: darken($text-color, 25%);
+    color: darken($text-color, 15%);
+}
+
+.text-third-color {
+    color: darken($text-color, 35%);
 }
 
 .cursor-pointer {
@@ -27,4 +31,22 @@ html, body {
 
 .hidden {
     display: none;
+}
+
+.container {
+    width: 100%;
+    @media only screen and (min-width: $mobile-max-width) and (max-width: 850px) {
+        width: $mobile-max-width;
+        margin: 0 auto;
+    }
+
+    @media only screen and (min-width: 850px) and (max-width: 1250px) {
+        width: 800px;
+        margin: 0 auto;
+    }
+
+    @media only screen and (min-width: 1250px){
+        width: 1200px;
+        margin: 0 auto;
+    }
 }

@@ -1,5 +1,6 @@
 import * as React from 'react'
 import VideoMetadata from '../../../Models/VideoMetadata';
+import { Link } from "react-router-dom";
 import { Config } from '../../../Shared/Config';
 import VideoPlayer from '../../Blocks/VideoPlayer/VideoPlayer';
 import { AppContext } from '../../../AppContext';
@@ -30,21 +31,26 @@ export default class VideoPage extends React.Component<VideoPageProps, VideoPage
     }
 
     render() {
-        return <div className="videoPage">
-            { this.state.video && <div className="container">
+        return <div className="video-page container">
+            <div className="video-player-container">
                 <VideoPlayer 
-                    manifestUrl={ `${Config.apiPath}/Video/Manifest/${this.state.video.videoId}` } 
+                    manifestUrl={ `${Config.apiPath}/Video/Manifest/${this.props.videoId}` } 
                     autoplay={false} />
-
-                <div className="videoInfo">
-                    <div className="videoTitle">
-                        <h2>{this.state.video.title}</h2>
-                    </div>
-                    <div className="videoCreation">
-                        <h3>{`${Helpers.getHumanizedDateAgoDifference(this.state.video.createdDate)} ago`}</h3>
-                    </div>
-                </div>
+            </div>
+            {this.state.video &&
+            <div className="video-info">
                 
+                <div className="title">
+                    {this.state.video.title} 
+                </div>
+                <div className="details text-third-color">
+                    Uploaded by <Link to={"/User/" + this.state.video.ownerNickname}>
+                    {this.state.video.ownerNickname}</Link>
+                    {" " + Helpers.getHumanizedDateAgoDifference(this.state.video.createdDate) + " ago"}
+                </div>
+                <div className="description text-secondary-color">
+                    {this.state.video.description}
+                </div>
             </div>}
         </div>
     }

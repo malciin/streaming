@@ -26,18 +26,16 @@ export default class VideoListItem extends React.Component<VideoListItemProps, {
         return <div className="video-list-item">
             <Link to={"/Vid/" + this.props.videoModel.videoId }>
             <div className="thumbnail">
-                <div className="thumbnail-box">
-                    { /* TODO: Remove temporary absolute url for video thumbnail */ }
-                    <img className="thumbnail-image icon-video" alt="Video thumbnail" src={Config.apiPath + "\\" + this.props.videoModel.thumbnailUrl} />
-                    <div className="video-length">{`${len.minutes()}m ${len.seconds()}s`}</div>
-                </div>
+                { /* TODO: Remove temporary absolute url for video thumbnail */ }
+                <img alt="Video thumbnail" src={Config.apiPath + "\\" + this.props.videoModel.thumbnailUrl} />
+                <div className="video-length">{`${len.minutes()}m ${len.seconds()}s`}</div>
             </div>
             </Link>
-            <div className="video-metadata">
-                <div className="video-title">
+            <div className="video-info">
+                <div className="title">
                     {this.props.videoModel.title} 
                 </div>
-                <div className="description text-secondary-color">
+                <div className="details text-third-color">
                     Uploaded by <Link to={"/User/" + this.props.videoModel.ownerNickname}>
                     {this.props.videoModel.ownerNickname}</Link>
                     {" " + Helpers.getHumanizedDateAgoDifference(this.props.videoModel.createdDate) + " ago"}

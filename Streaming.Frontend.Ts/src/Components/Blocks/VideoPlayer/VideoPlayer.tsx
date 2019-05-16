@@ -46,10 +46,8 @@ export default class VideoPlayer extends React.Component<VideoPlayerProps> {
 
     render() {
         return (
-            <div>
                 <video className="video-js" ref={el => {this.htmlVideoElement = el;}} controls>
                 </video>
-            </div>
         )
     }
 }

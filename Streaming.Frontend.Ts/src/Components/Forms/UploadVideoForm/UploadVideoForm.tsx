@@ -4,6 +4,7 @@ import TextField from '../../Blocks/TextField/TextField';
 import ButtonField from '../../Blocks/ButtonField/ButtonField';
 import VideoFormData from '../../../Models/Forms/VideoFormData';
 import FileUploadCard from '../../Blocks/Dropzone/FileUploadCard';
+import './UploadVideoForm.scss';
 
 export interface UploadVideoFormProps {
     submit: (video: VideoFormData) => void;
@@ -57,8 +58,8 @@ class UploadVideoForm extends React.Component<UploadVideoFormProps, UploadVideoF
     render() {
         return (
             <div className="container">
-                <TextField onChange={this.handleFieldChange} label="Please enter a video title" name="videoTitle" />
-                <TextField onChange={this.handleFieldChange} label="Please enter a video description" name="videoDescription"/>
+                <TextField className={"new-video-title"} onChange={this.handleFieldChange} label="Please enter a video title" name="videoTitle" />
+                <TextField multiline={true} onChange={this.handleFieldChange} label="Please enter a video description" name="videoDescription"/>
                 { !this.state.videoFile && <VideoFileDropzone 
                     onDropFile={this.onDropFile} 
                     acceptedExtensions={['.mp4']}

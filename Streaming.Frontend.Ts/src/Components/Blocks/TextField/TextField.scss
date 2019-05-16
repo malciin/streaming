@@ -1,13 +1,20 @@
 @import '../../../Shared/GlobalStyle.scss';
 
-.form-group {
+.text-input {
     label {
+        padding: 5px;
+        display: block;
+        font-style: italic;
         color: darken($text-color, 25%);
     }
-    .form-control {
+    .input {
+        box-sizing: border-box;
+        margin: 0 auto;
+        width: 100%;
+        display: block;
+        padding: 10px;
         color: $text-color;
         background-color: darken($background-color, 5%);
-        outline: 0 none;
         border-color: darken($background-color, 5%);
         &:focus {
             background-color: lighten($background-color, 10%);
@@ -15,6 +22,10 @@
             box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px $accent-color;
             outline: 0 none;
         }
+    }
+
+    textarea {
+        resize: none;
     }
     
 }

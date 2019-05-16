@@ -4,6 +4,8 @@ import './TextField.scss'
 interface TextFieldProps {
     label: string;
     name: string;
+    multiline?: boolean,
+    className?: string,
     onChange: (fieldName: string, value: string) => void;
 }
 
@@ -13,12 +15,26 @@ export default class TextField extends React.Component<TextFieldProps> {
     }
 
     render() {
+        var handleChange = (event: any) => 
+        this.props.onChange(this.props.name, event.currentTarget.value)
+
+        var input;
+        if (!this.props.multiline) {
+            input = <input className={`input ${this.props.className}`} onChange={handleChange} 
+                name={this.props.name} type="text"/>;
+        }
+            
+        else {
+            input = <textarea className={`input ${this.props.className}`} onChange={element => {
+                element.currentTarget.style.height = "";
+                element.currentTarget.style.height = element.currentTarget.scrollHeight + 10 + "px";
+                handleChange(element);
+            }} name={this.props.name}/>;
+        }
         return (
-            <div className="form-group">
+            <div className="text-input">
                 { this.props.label && <label>{this.props.label}</label>}
-                <input onChange={(event: React.ChangeEvent<HTMLInputElement>) => 
-                        this.props.onChange(this.props.name, event.currentTarget.value)} 
-                    name={this.props.name} className="form-control" type="text"/>
+                { input }
             </div>
         );
     }

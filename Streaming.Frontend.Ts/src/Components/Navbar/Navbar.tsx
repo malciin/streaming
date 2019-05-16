@@ -31,7 +31,7 @@ class Navbar extends React.Component<{userClaims: string[]}> {
                 <div className="navbar-brand">
                     <img src= {"/pageLogo.png"} alt="logo" />  
                 </div>
-                <div className="navbar-links" ref={el => {this.menu = el}}>
+                <div className="navbar-links hidden" ref={el => {this.menu = el}}>
                     <ul>
                         <li><NavLink to="/">Homepage</NavLink></li>
                         { this.props.userClaims.includes(Claims.canUploadVideo) && 

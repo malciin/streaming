@@ -2,6 +2,7 @@ import * as React from 'react';
 import VideoListItem from '../../Blocks/ListItems/VideoListItem';
 import { AppContext } from '../../../AppContext';
 import VideoMetadata from '../../../Models/VideoMetadata';
+import '../../../Shared/GlobalStyle.scss';
 
 export default class VideoListPage extends React.Component<{}, { videos: VideoMetadata[] }>{
     constructor(props) {
@@ -33,16 +34,14 @@ export default class VideoListPage extends React.Component<{}, { videos: VideoMe
 
     render() {
         return (
-            <div className="indexPage">
-                <div className="container">
-                    {
-                        this.state.videos.map((video, i) => {
-                            return <VideoListItem key={video.videoId} 
-                                videoModel={video}
-                                onDeleteVideo={this.deleteVideoRequest} />
-                        })
-                    }
-                </div>
+            <div className="container">
+                {
+                    this.state.videos.map((video, i) => {
+                        return <VideoListItem key={video.videoId} 
+                            videoModel={video}
+                            onDeleteVideo={this.deleteVideoRequest} />
+                    })
+                }
             </div>
         );
     }

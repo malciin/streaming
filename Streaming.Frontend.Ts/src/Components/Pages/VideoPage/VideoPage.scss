@@ -1,8 +1,17 @@
 @import '../../../Shared/GlobalStyle.scss';
 
-.videoInfo {
-    color: white;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
+.video-page {
+    .video-player-container {
+        position: relative;
+        overflow: hidden;
+        height: 400px;
+    
+        @media only screen and (min-width: 850px) and (max-width: 1250px) {
+            height: 478px;
+        }
+    
+        @media only screen and (min-width: 1250px){
+            height: 703px;
+        }
+    }
 }
