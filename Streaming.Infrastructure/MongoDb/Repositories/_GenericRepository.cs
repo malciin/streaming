@@ -20,9 +20,9 @@ namespace Streaming.Infrastructure.MongoDb.Repositories
         public async Task<T> GetSingleAsync(Expression<Func<T, bool>> filter)
             => await Collection.Find(filter).FirstAsync();
 
-        public async Task<IPackage<T>> GetAsync(Expression<Func<T, bool>> filter, int skip = 0, int limit = 0)
+        public async Task<IPackage<T>> GetAsync(Expression<Func<T, bool>> filter, Expression<Func<T, object>> orderBy, int skip = 0, int limit = 0)
         {
-            var fluentFindDefinition = Collection.Find(filter);
+            IFindFluent<T,T> fluentFindDefinition = Collection.Find(filter).SortByDescending(orderBy);
 
             if (skip != 0)
             {

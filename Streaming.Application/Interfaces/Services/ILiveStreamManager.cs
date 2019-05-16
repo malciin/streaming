@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Streaming.Application.Interfaces.Models;
 using Streaming.Domain.Models;
 
 namespace Streaming.Application.Interfaces.Services
@@ -23,13 +24,12 @@ namespace Streaming.Application.Interfaces.Services
         /// <summary>
         /// Get single past live stream
         /// </summary>
-        Task<PastLiveStreamMetadataDTO> GetPastSingleAsync(Expression<Func<LiveStream, bool>> filter);
+        Task<PastLiveStreamMetadataDTO> GetPastSingleAsync(Guid id);
         
         /// <summary>
         /// Gets multiple past live streams
         /// </summary>
-        Task<IEnumerable<PastLiveStreamMetadataDTO>> GetPastAsync(Expression<Func<LiveStream, bool>> filter, int skip,
-            int limit);
+        Task<IPackage<PastLiveStreamMetadataDTO>> GetPastAsync(Expression<Func<LiveStream, bool>> filter, Expression<Func<LiveStream, object>> orderBy, int skip, int limit);
         
         Task StartNewLiveStreamAsync(NewLiveStreamDTO newLiveStream);
         Task FinishLiveStreamAsync(Guid liveStreamId);

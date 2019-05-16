@@ -1,5 +1,4 @@
 using System.Linq;
-using Streaming.Domain.Models;
 
 namespace Streaming.Application.Models
 {

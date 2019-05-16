@@ -2,8 +2,8 @@
 {
     public class VideoSearchDTO
     {
+        public string[] Keywords { get; set; }
         public int Offset { get; set; }
         public int HowMuch { get; set; }
-        public string[] Keywords { get; set; }
     }
 }

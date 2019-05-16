@@ -8,7 +8,7 @@ namespace Streaming.Application.Interfaces.Repositories
 	public interface IFilterableRepository<T> where T : class
 	{
 		Task<T> GetSingleAsync(Expression<Func<T, bool>> filter);
-        Task<IPackage<T>> GetAsync(Expression<Func<T, bool>> filter, int skip = 0, int limit = 0);
+		Task<IPackage<T>> GetAsync(Expression<Func<T, bool>> filter, Expression<Func<T, object>> orderBy, int skip = 0, int limit = 0);
         Task<int> CountAsync(Expression<Func<T, bool>> filter);
 	}
 }

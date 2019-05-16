@@ -29,10 +29,10 @@ namespace Streaming.Tests.Mocks
                 .ReturnsAsync((Expression<Func<LiveStream, bool>> filter) =>
                     data.Where(filter.Compile()).FirstOrDefault());
             
-            mock.Setup(x => x.GetAsync(It.IsAny<Expression<Func<LiveStream, bool>>>(), It.IsAny<int>(), It.IsAny<int>()))
-                .ReturnsAsync((Expression<Func<LiveStream, bool>> expression, int skip, int limit) =>
+            mock.Setup(x => x.GetAsync(It.IsAny<Expression<Func<LiveStream, bool>>>(), It.IsAny<Expression<Func<LiveStream, object>>>(), It.IsAny<int>(), It.IsAny<int>()))
+                .ReturnsAsync((Expression<Func<LiveStream, bool>> expression, Expression<Func<LiveStream, object>> orderBy,  int skip, int limit) =>
                     {
-                        var filteredData = data.Where(expression.Compile()).ToList();
+                        var filteredData = data.Where(expression.Compile()).OrderByDescending(orderBy.Compile()).ToList();
                         var totalResult = filteredData.Count();
                         return Package<LiveStream>.CreatePackage(filteredData.Skip(skip).Take(limit), totalResult);
                     });

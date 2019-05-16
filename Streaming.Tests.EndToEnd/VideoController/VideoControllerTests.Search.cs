@@ -60,7 +60,8 @@ namespace Streaming.Tests.EndToEnd.VideoController
             Assert.AreEqual(totalVideos, receivedVideos.Details.TotalCount, $"Package Details.TotalCount should return total matching items");
             Assert.AreEqual("Test title, Case 4", receivedVideos.Items.First().Title);
             Assert.AreEqual(5, receivedVideos.Details.Count);
-
+            
+            // TODO: Move this to Query unit tests
             Assert.IsTrue(receivedVideos.Items.IsSortedDescending(x => x.CreatedDate), $"Expected that videos are sorted descending by CreatedDate");
         }
     }
