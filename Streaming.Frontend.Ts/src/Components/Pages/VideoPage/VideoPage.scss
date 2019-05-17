@@ -14,4 +14,23 @@
             height: 703px;
         }
     }
+
+    .video-info {
+        padding: 15px;
+        .title {
+            font-size: 24px;
+            @media only screen and (min-width: $mobile-max-width) {
+                display: inline-block;
+            }
+        }
+        .details {
+            padding: 5px;
+            font-size: 12px;
+            font-style: italic;
+            @media only screen and (min-width: $mobile-max-width) {
+                float: right;
+                margin-top: 6px;
+            }
+        }
+    }
 }

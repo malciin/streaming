@@ -65,6 +65,7 @@ namespace Streaming.Api
         public void Configure(IApplicationBuilder app)
         {
             startupEvents?.AppConfigurationBeginingCallback?.Invoke(app);
+            Directory.CreateDirectory("localStorage");
             app.UseStaticFiles(new StaticFileOptions
             {
                 RequestPath = "/localStorage",
