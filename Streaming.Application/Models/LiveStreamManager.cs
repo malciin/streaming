@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Streaming.Application.Interfaces.Models;
 
 namespace Streaming.Application.Models
 {
@@ -31,8 +32,8 @@ namespace Streaming.Application.Models
             {
                 var liveStreams = scope.Resolve<IPastLiveStreamRepository>();
 
-                var lastLiveStream = (await liveStreams.GetAsync(x => x.Owner.UserId == newLiveStream.User.UserId))
-                    .Items.OrderByDescending(x => x.Ended).FirstOrDefault();
+                var lastLiveStream = (await liveStreams.GetAsync(x => x.Owner.UserId == newLiveStream.User.UserId, x => x.Ended, 0, 1))
+                    .Items.FirstOrDefault();
 
                 streams.TryAdd(newLiveStream.LiveStreamId, new LiveStream
                 {
@@ -89,22 +90,21 @@ namespace Streaming.Application.Models
             });
         }
 
-        public async Task<PastLiveStreamMetadataDTO> GetPastSingleAsync(Expression<Func<LiveStream, bool>> filter)
+        public async Task<PastLiveStreamMetadataDTO> GetPastSingleAsync(Guid id)
         {
             using (var scope = lifetimeScope.BeginLifetimeScope())
             {
                 var pastLiveStreams = scope.Resolve<IPastLiveStreamRepository>();
-                return mapper.MapPastLiveStreamMetadataDTO(await pastLiveStreams.GetSingleAsync(filter));
+                return mapper.MapPastLiveStreamMetadataDTO(await pastLiveStreams.GetSingleAsync(x => x.LiveStreamId == id));
             }
         }
 
-        public async Task<IEnumerable<PastLiveStreamMetadataDTO>> GetPastAsync(Expression<Func<LiveStream, bool>> filter, int skip, int limit)
+        public async Task<IPackage<PastLiveStreamMetadataDTO>> GetPastAsync(Expression<Func<LiveStream, bool>> filter, Expression<Func<LiveStream, object>> orderBy, int skip, int limit)
         {
             using (var scope = lifetimeScope.BeginLifetimeScope())
             {
                 var pastLiveStreams = scope.Resolve<IPastLiveStreamRepository>();
-                return (await pastLiveStreams.GetAsync(filter, skip, limit))
-                    .Items.Select(x => mapper.MapPastLiveStreamMetadataDTO(x));
+                return (await pastLiveStreams.GetAsync(filter, orderBy, skip, limit)).Map(mapper.MapPastLiveStreamMetadataDTO);
             }
         }
     }

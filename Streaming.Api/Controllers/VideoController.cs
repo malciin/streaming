@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -77,7 +76,7 @@ namespace Streaming.Api.Controllers
         [HttpPost("Search")]
         public async Task<IPackage<VideoMetadataDTO>> SearchAsync ([FromBody] VideoSearchDTO search)
         {
-			return await queries.SearchAsync(search);
+            return await queries.SearchAsync(search, x => x.CreatedDate);
         }
 
         [HttpGet("{Id}/{Part}")]

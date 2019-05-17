@@ -59,7 +59,7 @@ namespace Streaming.Tests.Services
             liveStreamRepositoryMock.Verify(x => x.AddAsync(It.IsAny<LiveStream>()), Times.Once());
 
             Assert.NotNull(liveStreamRepositoryMock.Object
-                .GetAsync(x => x.LiveStreamId == newStreamGuid)
+                .GetSingleAsync(x => x.LiveStreamId == newStreamGuid)
                 .GetAwaiter().GetResult());
         }
 

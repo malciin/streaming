@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Moq;
 using Streaming.Application.Interfaces.Repositories;
+using Streaming.Application.Models;
 using Streaming.Domain.Models;
 
 namespace Streaming.Tests.Mocks
@@ -36,6 +38,16 @@ namespace Streaming.Tests.Mocks
                 }
                 return Task.FromResult(0);
             });
+
+            mock.Setup(x => x.GetSingleAsync(It.IsAny<Expression<Func<Video, bool>>>()))
+                .ReturnsAsync((Expression<Func<Video, bool>> expression) => data.Where(expression.Compile()).First());
+            
+            mock.Setup(x => x.GetAsync(It.IsAny<Expression<Func<Video, bool>>>(), It.IsAny<Expression<Func<Video, object>>>(), It.IsAny<int>(), It.IsAny<int>()))
+                .ReturnsAsync((Expression<Func<Video, bool>> filter, Expression<Func<Video, object>> orderBy, int skip, int limit) =>
+                    {
+                        var total = data.Where(filter.Compile()).OrderByDescending(orderBy.Compile());
+                        return Package<Video>.CreatePackage(total.Skip(skip).Take(limit), total.Count());
+                    });
 
             return mock;
         }
