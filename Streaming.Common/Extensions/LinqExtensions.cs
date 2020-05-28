@@ -8,6 +8,7 @@ namespace Streaming.Common.Extensions
     {
         public static bool IsSortedAscending<T, TY>(this IEnumerable<T> collection, Func<T, TY> sortedBy) where TY : IComparable
         {
+            collection.
             if (collection.Count() <= 1)
             {
                 return true;

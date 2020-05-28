@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as ReactDOM from "react-dom";
-import { Router, Route } from "react-router-dom";
+import { Router, Route, Switch } from "react-router-dom";
 import VideoListPage from './Components/Pages/VideoListPage/VideoListPage';
 import CallbackPage from './Components/Pages/CallbackPage/CallbackPage';
 import History from './Shared/History';
@@ -26,7 +26,7 @@ class App extends React.Component {
 
     render() {
         return (
-        <Router history={History}>
+        <Switch history={History}>
             <div className="app">
                 <Navbar />
                 <Route exact path="/" component={VideoListPage} />
@@ -45,7 +45,7 @@ class App extends React.Component {
                     return <CallbackPage />
                 }} />
             </div>
-        </Router>
+        </Switch>
         );
     }
 }

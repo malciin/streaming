@@ -29,7 +29,7 @@ namespace Streaming.Api
             this.startupEvents = startupEvents;
         }
 
-        public IServiceProvider ConfigureServices(IServiceCollection services)
+        public ConfigureServicesIServiceProvider(IServiceCollection services)
         {
             services.AddCors(options =>
             {
